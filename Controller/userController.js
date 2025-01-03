@@ -1,0 +1,90 @@
+const { Validator } = require("node-input-validator");
+const User = require("../models/Users");
+const UserLoggedFormation = require("../models/userLoggedFormation");
+const helper = require("../helpers/helper");
+let jwt = require("jsonwebtoken");
+
+const {
+  JWTExpiresIn,
+  JWTSecret,
+  TYPE_SYSTEM_ADMIN,
+  TYPE_SUPER_ADMIN,
+  TYPE_SUB_ADMIN,
+  TYPE_MASTER,
+  TYPE_CLIENT,
+} = require("../config/constants");
+let Role = require("../models/Roles");
+const requestIp = require("request-ip");
+
+module.exports = {
+  
+  login: async (req, res) => {
+    try {
+      let v = new Validator(req.body, {
+        username: "required",
+        password: "required"
+      });
+
+      let errorsResponse = await helper.checkValidation(v);
+      if (errorsResponse) {
+        return helper.error(res, errorsResponse);
+      }
+
+      let logData = await User.findOne({
+        userName: v.inputs.username,
+        isDeleted: false,
+      }).populate("role", "roleType");
+
+      if (!logData) {
+        throw "Username or Password did not match, Please try again.";
+      }
+
+      if (!logData?.isActive) {
+        throw "Sorry, Your Account is InActive Please Contact Administrator";
+      }
+
+      let checkPassword = await helper.comparePass(
+        v.inputs.password,
+        logData.password
+      );
+
+      if (!checkPassword) {
+        throw "Password did not match, Please try again.";
+      }
+
+      let token = jwt.sign(
+        {
+          data: {
+            id: logData._id,
+            fullName: logData.fullName,
+            email: logData.email,
+            userName: logData.userName,
+            role: logData.role,
+          },
+        },
+        JWTSecret,
+        { expiresIn: JWTExpiresIn }
+      );
+
+      logData = logData.toJSON();
+      logData.jwtToken = await helper.generateSignature();
+      logData.authToken = token;
+      logData.role = logData?.role?.roleType;
+      await UserLoggedFormation.create({
+        userId: logData?._id,
+        deviceId: v.inputs.channel, // need to change later
+        token: token,
+        ip: requestIp.getClientIp(req),
+        channel: v.inputs.channel,
+      });
+      return helper.success(res, "User login successfully ", logData);
+    } catch (error) {
+      console.log(error);
+      return helper.error(res, error);
+    }
+  },
+
+
+
+
+};

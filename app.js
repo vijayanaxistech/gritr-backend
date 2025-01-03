@@ -1,0 +1,63 @@
+// Import third-party libraries
+const express = require("express");
+const createError = require("http-errors");
+const path = require("path");
+const fs = require("fs");
+const cors = require("cors");
+const fileupload = require("express-fileupload");
+const compression = require("compression");
+const morgan = require("morgan");
+const swaggerUi = require("swagger-ui-express");
+
+// Import custom files
+const errorMiddleware = require("./middleware/error");
+const connectDB = require("./config/config.js");
+const swaggerDocument = require("./swagger.json");
+const env = require("dotenv");
+const routes = require("./routes.js");
+const expirationTask = require("./tasks/expirationTask");
+
+// Load environment variables
+env.config();
+
+// Set up app and port
+const app = express();
+const PORT = process.env.PORT || 8186;
+const environment = process.env.NODE_ENV || "development";
+
+// Middleware setup
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(compression());
+app.use(fileupload());
+app.use(morgan("dev"));
+
+// Serve API documentation
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocument)
+);
+
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, "public")));
+
+// Define API routes
+routes(app);
+
+// Custom error middleware
+app.use(errorMiddleware);
+
+// Connect to the database and start the server
+connectDB()
+  .then(() => {
+    console.log("Database connected successfully");
+    app.listen(PORT, () => {
+      console.log(`Server started successfully on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Unable to connect to the database:", err);
+    throw createError(500, "Unable to connect to the database");
+  });

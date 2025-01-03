@@ -1,0 +1,88 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "GRITR api docs",
+    "version": "3.0.0",
+    "title": "Tasks API",
+    "contact": {
+      "email": "abc@gmail.com"
+    }
+  },
+  "schemes": ["http"],
+  "host": "localhost:8081",
+  "basePath": "/api",
+  "paths": {
+    "/user/login": {
+      "get": {
+        "summary": "For login",
+        "description": "",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "login object",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "$ref": "#/login/loginBody"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/login/loginResponse"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status value",
+            "schema": {
+              "$ref": "#/login/InvalidResponse"
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "login": {
+    "loginResponse": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "loginBody": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "InvalidResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

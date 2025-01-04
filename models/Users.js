@@ -24,15 +24,11 @@ const userSchema = new mongoose.Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-    masterIds: [],
     role: {
       type: Schema.Types.ObjectId,
       ref: "Role",
     },
-    credit: {
-      type: Number,
-      required: false,
-    },
+  
     available_balance:{
       type: Number,
       required: false,
@@ -45,11 +41,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    active_channel_no: {
-      type: Number,
-      default: true,
-    },
-
     isActive: {
       type: Boolean,
       default: true,

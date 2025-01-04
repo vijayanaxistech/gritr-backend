@@ -5,7 +5,7 @@ const { isAuth } = require("../middleware/auth");
 
 
 router.post("/login", userController.login);
-// router.get("/logout", isAuth, userController.logout);
+router.post("/logout", isAuth, userController.logout);
 // router.post("/change-password", isAuth, userController.changePassword);
 // router.get("/getProfile", userController.getProfile);
 // router.put("/editProfile", userController.editProfile);

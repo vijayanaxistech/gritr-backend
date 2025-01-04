@@ -84,7 +84,42 @@ module.exports = {
     }
   },
 
+  logout: async (req, res) => {
+    try {
+      // Validate that token is provided in the headers
+      const authToken = req.headers.authorization;
 
+      if (!authToken) {
+        throw "Authorization token is required.";
+      }
+
+      const token = authToken.split(" ")[1]; // Bearer token extraction
+      if (!token) {
+        throw "Invalid token format.";
+      }
+
+      // Decode the token to extract user information
+      const decodedToken = jwt.verify(token, JWTSecret);
+      if (!decodedToken?.data?.id) {
+        throw "Invalid token.";
+      }
+
+      // Find and delete the session associated with this token
+      const session = await UserLoggedFormation.findOneAndDelete({
+        userId: decodedToken.data.id,
+        token: token,
+      });
+
+      if (!session) {
+        throw "Session not found or already logged out.";
+      }
+
+      return helper.success(res, "User logged out successfully.");
+    } catch (error) {
+      console.log(error);
+      return helper.error(res, error);
+    }
+  },
 
 
 };

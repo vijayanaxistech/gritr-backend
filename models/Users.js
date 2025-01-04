@@ -28,11 +28,6 @@ const userSchema = new mongoose.Schema(
       type: Schema.Types.ObjectId,
       ref: "Role",
     },
-  
-    available_balance:{
-      type: Number,
-      required: false,
-    },
     roleType: {
       type: Number,
       required: false,
@@ -53,11 +48,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: true,
     },
-    subscriptionType: {
-      type: String,
-      enum: ["Free", "Demo", "Unpaid", "Paid"],
-    },
-    remark: {
+     remark: {
       type: String,
       required: false,
     },

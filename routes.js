@@ -3,8 +3,6 @@
 let userRoutes = require("./routes/users");
 
 let roleRoutes = require("./routes/role");
-let superUserRoutes = require("./routes/super/user");
-let sysUserRoutes = require("./routes/sys/user");
 let moduleRoutes = require("./routes/moduleAccess");
 let welcomeMessage = require("./routes/welcomeMsg");
 

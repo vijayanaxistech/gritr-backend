@@ -1,6 +1,8 @@
 let RoleManagement = require("../models/Roles");
 const helper = require("../helpers/helper");
-const { Validator } = require("node-input-validator");
+const {
+  Validator
+} = require("node-input-validator");
 
 module.exports = {
   create: async (req, res) => {
@@ -53,9 +55,11 @@ module.exports = {
         return helper.error(res, "This role name is already in use");
       }
       req.body.updatedAt = new Date();
-      RoleManagement.findOneAndUpdate({ _id: req.params.id }, req.body, {
-        new: true,
-      })
+      RoleManagement.findOneAndUpdate({
+          _id: req.params.id
+        }, req.body, {
+          new: true,
+        })
         .then((response) => {
           return helper.success(res, "Role Updated Successfully.", response);
         })
@@ -68,19 +72,53 @@ module.exports = {
   },
 
   /**
-   * get role by id
+   * get role List
    * @param req
    * @param res
    * @param next
    */
 
-  get: (req, res) => {
-    RoleManagement.findOne({ _id: req.params.id })
-      .then((response) => {
-        return helper.success(res, "Listing Successfully.", response);
-      })
-      .catch((error) => {
-        return helper.error(res, error.message); // Return the error message
-      });
+  getroleList: async (req, res) => {
+    try {
+      const roles = await RoleManagement.find({});
+      return helper.success(res, "Listing Successfully.", roles);
+    } catch (error) {
+      return helper.error(res, error.message);
+    }
   },
+
+
+  updateStatus: async (req, res) => {
+    try {
+      // Validate the request body to ensure `isActive` is provided
+      let v = new Validator(req.body, {
+        isActive: "required|boolean", // Validate `isActive` as a required boolean field
+      });
+  
+      let errors = v.errors;
+      if (errors && errors.length > 0) {
+        return helper.error(res, errors);
+      }
+  
+      // Update only the `isActive` status
+      req.body.updatedAt = new Date(); // Add the updated timestamp
+  
+      const updatedRole = await RoleManagement.findOneAndUpdate(
+        { _id: req.params.id }, // Find the role by ID
+        { isActive: v.inputs.isActive, updatedAt: req.body.updatedAt }, // Update the `isActive` field
+        { new: true } // Return the updated document
+      );
+  
+      if (!updatedRole) {
+        return helper.error(res, "Role not found"); // Handle case where the role doesn't exist
+      }
+  
+      return helper.success(res, "Role status updated successfully.", updatedRole);
+    } catch (error) {
+      return helper.error(res, error.message); // Return the error message
+    }
+  },
+  
+
+  
 };

@@ -9,7 +9,7 @@ const { isAuth } = require("../middleware/auth");
 router.post('/create',isAuth, roleManagement.create);
 router.put('/:id',isAuth, roleManagement.update);
 router.get('/getroleList',isAuth, roleManagement.getroleList);
-router.post('/updateStatus/:id', roleManagement.updateStatus);
+router.post('/updateStatus/:id',isAuth, roleManagement.updateStatus);
 
 
 module.exports = router;

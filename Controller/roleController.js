@@ -90,6 +90,7 @@ module.exports = {
 
   updateStatus: async (req, res) => {
     try {
+      console.log(req);
       // Validate the request body to ensure `isActive` is provided
       let v = new Validator(req.body, {
         isActive: "required|boolean", // Validate `isActive` as a required boolean field

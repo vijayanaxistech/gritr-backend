@@ -1,4 +1,5 @@
 let RoleManagement = require("../models/Roles");
+let Sidebar = require("../models/sidebar");
 const helper = require("../helpers/helper");
 const {
   Validator
@@ -84,6 +85,53 @@ module.exports = {
       return helper.success(res, "Listing Successfully.", roles);
     } catch (error) {
       return helper.error(res, error.message);
+    }
+  },
+
+
+  sidebarList: async (req, res) => {
+    try {
+      const roles = await Sidebar.find({});
+      return helper.success(res, "Listing Successfully.", roles);
+    } catch (error) {
+      return helper.error(res, error.message);
+    }
+  },
+
+  createSidebar: async (req, res) => {
+    try {
+      // Validate input
+      let v = new Validator(req.body, {
+        sidebar_name: "required|string",
+        description: "string|optional",
+        isActive: "boolean|optional",
+        links: "array|optional",
+      });
+
+      let errors = v.errors;
+      if (errors && errors.length > 0) {
+        return helper.error(res, errors);
+      }
+
+      // Check if Sidebar with the same name already exists
+      let checkSidebarName = await Sidebar.findOne({
+        sidebar_name: v.inputs.sidebar_name,
+      });
+
+      if (checkSidebarName) {
+        return helper.error(res, "This sidebar name is already in use.");
+      }
+
+      // Create new Sidebar
+      Sidebar.create(req.body)
+        .then((response) => {
+          return helper.success(res, "Sidebar Created Successfully.", response);
+        })
+        .catch((e) => {
+          throw e;
+        });
+    } catch (error) {
+      return helper.error(res, error.message); // Return the error message
     }
   },
 

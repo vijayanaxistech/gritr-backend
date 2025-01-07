@@ -1,6 +1,9 @@
 let RoleManagement = require("../models/Roles");
 let Sidebar = require("../models/sidebar");
 const helper = require("../helpers/helper");
+const User = require("../models/Users");
+
+
 const {
   Validator
 } = require("node-input-validator");
@@ -167,6 +170,55 @@ module.exports = {
       return helper.error(res, error.message); // Return the error message
     }
   },
+
+ updateRolePermission: async (req, res) => {
+  try {
+    console.log('body---', req.body);
+
+    const { roles, typeId } = req.body; // Destructure roles and typeId from the request body
+
+    // Log and check if the typeId is valid
+    console.log('typeId:', typeId);
+    const mongoose = require('mongoose');
+    const ObjectId = mongoose.Types.ObjectId;
+
+    if (!ObjectId.isValid(typeId)) {
+      return helper.error(res, "Invalid typeId.");
+    }
+
+    // Extract _id values from the roles array
+    const ids = roles.map(role => role._id);
+
+    console.log(ids);
+
+    if (!ids || ids.length === 0) {
+      return helper.error(res, "No role IDs provided.");
+    }
+
+    // Ensure the user exists before updating
+    const existingUser = await User.findOne({ _id: ObjectId(typeId) });
+
+    if (!existingUser) {
+      return helper.error(res, "User not found or typeId mismatch.");
+    }
+
+    // Find the user and update the sidebarIds field by matching the typeId
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: ObjectId(typeId) }, // Match the user by typeId (converted to ObjectId)
+      { $set: { sidebarIds: ids } }, // Update the sidebarIds field with the extracted _id values
+      { new: true } // Return the updated user document
+    );
+
+    console.log('updatedUser----', updatedUser);
+
+    return helper.success(res, "User sidebar IDs updated successfully.", updatedUser); // Return the updated user
+  } catch (error) {
+    return helper.error(res, error.message); // Return the error message
+  }
+}
+
+  
+  
   
 
   

@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    sidebarIds: [],
     image: {
       type: String,
       required: false,

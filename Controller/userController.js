@@ -1,5 +1,6 @@
 const { Validator } = require("node-input-validator");
 const AdminUser = require("../models/AdminUser");
+let RoleManagement = require("../models/Roles");
 const UserLoggedFormation = require("../models/userLoggedFormation");
 const helper = require("../helpers/helper");
 let jwt = require("jsonwebtoken");
@@ -45,8 +46,22 @@ module.exports = {
   
       // Encrypt the password
       req.body.password = await helper.passwordEncrypt(req.body.password);
-  
       // Process the user creation
+
+         
+      
+      if (req.body.roleId) {
+          let existingRole = await RoleManagement.findOne({
+                _id: req.body.roleId,
+          });      
+           
+          if (existingRole) {
+            req.body.roleType = existingRole.roleType;
+          }
+        }
+
+        console.log('existingRole11',req.body);
+      
       AdminUser.create(req.body)
         .then((response) => {
           return helper.success(res, "User Created Successfully.", response);

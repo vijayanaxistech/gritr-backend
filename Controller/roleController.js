@@ -11,12 +11,15 @@ const {
 module.exports = {
   create: async (req, res) => {
     try {
+
+     
       let v = new Validator(req.body, {
         roleName: "required",
-        displayName: "required",
         roleType: "required",
         description: "string",
       });
+
+      console.log('test2');
 
       let errors = v.errors;
       if (errors && errors.length > 0) {
@@ -30,6 +33,8 @@ module.exports = {
       if (checkRoleName) {
         return helper.error(res, "This role name is already in use");
       }
+
+  
 
       RoleManagement.create(req.body)
         .then((response) => {

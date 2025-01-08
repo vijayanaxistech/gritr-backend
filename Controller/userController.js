@@ -1,5 +1,5 @@
 const { Validator } = require("node-input-validator");
-const UserSchema = require("../models/Users");
+const AdminUser = require("../models/AdminUser");
 const UserLoggedFormation = require("../models/userLoggedFormation");
 const helper = require("../helpers/helper");
 let jwt = require("jsonwebtoken");
@@ -35,7 +35,7 @@ module.exports = {
       }
   
       // Check if the userName is already taken
-      let checkUserName = await UserSchema.findOne({
+      let checkUserName = await AdminUser.findOne({
         userName: v.inputs.userName,
       });
   
@@ -47,7 +47,7 @@ module.exports = {
       req.body.password = await helper.passwordEncrypt(req.body.password);
   
       // Process the user creation
-      UserSchema.create(req.body)
+      AdminUser.create(req.body)
         .then((response) => {
           return helper.success(res, "User Created Successfully.", response);
         })
@@ -62,7 +62,7 @@ module.exports = {
   
 
   
-  login1: async (req, res) => {
+  login: async (req, res) => {
     try {
       let v = new Validator(req.body, {
         username: "required",
@@ -74,10 +74,16 @@ module.exports = {
         return helper.error(res, errorsResponse);
       }
 
-      let logData = await UserSchema.findOne({
+      // let logData = await AdminUser.findOne({
+      //   userName: v.inputs.username,
+      //   isDeleted: false,
+      // }).populate("roleId", "roleType");
+
+      let logData = await AdminUser.findOne({
         userName: v.inputs.username,
         isDeleted: false,
-      }).populate("roleId", "roleType");
+      }).select('fullName email userName roleId isActive roleType password');
+      
 
       if (!logData) {
         throw "Username or Password did not match, Please try again.";
@@ -128,7 +134,7 @@ module.exports = {
     }
   },
 
-  login: async (req, res) => {
+  login2: async (req, res) => {
     try {
       const v = new Validator(req.body, {
         username: "required",
@@ -140,7 +146,7 @@ module.exports = {
         return helper.error(res, errorsResponse);
       }
   
-      let logData = await UserSchema.findOne({
+      let logData = await AdminUser.findOne({
         userName: v.inputs.username,
         isDeleted: false,
       }).select('fullName email userName roleId isActive roleType password'); // Use .select() to limit fields

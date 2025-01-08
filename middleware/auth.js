@@ -7,7 +7,7 @@ let planValidity = require("../helpers/planValidity");
 exports.isAuth = async (req, res, next) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "");
-    if (!token) {
+      if (!token) {
       return helper.error(res, "Please Login to access this resource");
     }
 

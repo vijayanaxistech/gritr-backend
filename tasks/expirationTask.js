@@ -1,5 +1,5 @@
 const cron = require('node-cron');
-const User = require("../models/Users");
+const AdminUser = require("../models/AdminUser");
 
 const markExpiredAccountsAsInactive = async () => {
     const now = new Date();
@@ -28,7 +28,7 @@ const markAccountsAsInactive = async (accountType, expirationDate) => {
     console.log('accountType', accountType);
     console.log('expirationDate', expirationDate);
 
-    const matchingUsers = await User.find({
+    const matchingUsers = await AdminUser.find({
         createdAt: { $lte: expirationDate },
         accountType: accountType,
         isActive: true

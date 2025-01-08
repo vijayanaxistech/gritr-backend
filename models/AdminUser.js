@@ -52,5 +52,5 @@ adminUserSchema.methods.toJSON = function () {
   return obj;
 };
 
-// Export the model with a new name
+// Export the model with "Admin_User" name
 module.exports = mongoose.model("Admin_User", adminUserSchema);

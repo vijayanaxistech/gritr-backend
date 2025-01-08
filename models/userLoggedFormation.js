@@ -8,7 +8,7 @@ let userLoggedFormation = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Admin_User",
     },
     channel: {
       type: String,

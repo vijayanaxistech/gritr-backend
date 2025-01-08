@@ -4,7 +4,7 @@ const uuid = require("uuid").v4;
 const uniqueId = uuid();
 const KJUR = require("jsrsasign");
 const { getEncKey } = require("../utils/authHelper");
-const Users = require("../models/Users");
+const AdminUser = require("../models/AdminUser");
 let aes256 = require("aes256");
 const constants = require("../config/constants");
 

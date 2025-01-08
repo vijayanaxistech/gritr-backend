@@ -6,7 +6,7 @@ let ZoomMeeting = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Admin_User",
       autopopulate: true,
     },
     topic: {

@@ -6,7 +6,7 @@ const { isAuth } = require("../middleware/auth");
 
 
 // Core APIs
-router.post('/create', roleManagement.create);
+router.post('/create',isAuth, roleManagement.create);
 router.put('/:id',isAuth, roleManagement.update);
 router.get('/getroleList',isAuth, roleManagement.getroleList);
 router.post('/updateStatus/:id',isAuth, roleManagement.updateStatus);

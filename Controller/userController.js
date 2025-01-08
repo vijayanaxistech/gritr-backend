@@ -1,5 +1,5 @@
 const { Validator } = require("node-input-validator");
-const User = require("../models/Users");
+const UserSchema = require("../models/Users");
 const UserLoggedFormation = require("../models/userLoggedFormation");
 const helper = require("../helpers/helper");
 let jwt = require("jsonwebtoken");
@@ -35,7 +35,7 @@ module.exports = {
       }
   
       // Check if the userName is already taken
-      let checkUserName = await User.findOne({
+      let checkUserName = await UserSchema.findOne({
         userName: v.inputs.userName,
       });
   
@@ -47,7 +47,7 @@ module.exports = {
       req.body.password = await helper.passwordEncrypt(req.body.password);
   
       // Process the user creation
-      User.create(req.body)
+      UserSchema.create(req.body)
         .then((response) => {
           return helper.success(res, "User Created Successfully.", response);
         })

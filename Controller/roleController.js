@@ -12,7 +12,9 @@ module.exports = {
   create: async (req, res) => {
     try {
       let v = new Validator(req.body, {
-        role_name: "required",
+        roleName: "required",
+        roleType: "required",
+        description: "string",
       });
 
       let errors = v.errors;
@@ -21,7 +23,7 @@ module.exports = {
       }
 
       let checkRoleName = await RoleManagement.findOne({
-        role_name: v.inputs.role_name,
+        roleName: v.inputs.roleName,
       });
 
       if (checkRoleName) {

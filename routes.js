@@ -10,7 +10,7 @@ let welcomeMessage = require("./routes/welcomeMsg");
 module.exports = (app) => {
   // admin section routes
   app.use("/api/admin/user", userRoutes);
-  app.use("/api/role", roleRoutes);
+  app.use("/api/admin/role", roleRoutes);
   // app.use("/api/zoom", zoomRoutes);
   
   // app.use("/api/super/user", superUserRoutes);

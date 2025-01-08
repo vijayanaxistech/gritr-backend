@@ -62,7 +62,7 @@ module.exports = {
   
 
   
-  login: async (req, res) => {
+  login1: async (req, res) => {
     try {
       let v = new Validator(req.body, {
         username: "required",
@@ -74,10 +74,10 @@ module.exports = {
         return helper.error(res, errorsResponse);
       }
 
-      let logData = await User.findOne({
+      let logData = await UserSchema.findOne({
         userName: v.inputs.username,
         isDeleted: false,
-      }).populate("role", "roleType");
+      }).populate("roleId", "roleType");
 
       if (!logData) {
         throw "Username or Password did not match, Please try again.";
@@ -103,7 +103,7 @@ module.exports = {
             fullName: logData.fullName,
             email: logData.email,
             userName: logData.userName,
-            role: logData.role,
+            roleId: logData.role,
           },
         },
         JWTSecret,
@@ -127,6 +127,72 @@ module.exports = {
       return helper.error(res, error);
     }
   },
+
+  login: async (req, res) => {
+    try {
+      const v = new Validator(req.body, {
+        username: "required",
+        password: "required",
+      });
+  
+      const errorsResponse = await helper.checkValidation(v);
+      if (errorsResponse) {
+        return helper.error(res, errorsResponse);
+      }
+  
+      let logData = await UserSchema.findOne({
+        userName: v.inputs.username,
+        isDeleted: false,
+      }).select('fullName email userName roleId isActive roleType password'); // Use .select() to limit fields
+  
+      if (!logData) {
+        throw { message: "Invalid username or password" }; // Standardize error messages
+      }
+  
+      if (!logData.isActive) {
+        throw { message: "Your account is inactive. Please contact administrator." };
+      }
+  
+      const checkPassword = await helper.comparePass(v.inputs.password, logData.password);
+  
+      if (!checkPassword) {
+        throw { message: "Password did not match. Please try again." };
+      }
+  
+      const token = jwt.sign(
+        {
+          data: {
+            id: logData._id,
+            fullName: logData.fullName,
+            email: logData.email,
+            userName: logData.userName,
+            roleId: logData.roleId, // Store the roleId in the token for authorization purposes
+          },
+        },
+        JWTSecret,
+        { expiresIn: JWTExpiresIn }
+      );
+  
+      logData = logData.toJSON();
+      logData.jwtToken = await helper.generateSignature();
+      logData.authToken = token;
+      logData.role = logData.roleType; // Simplified role assignment
+  
+      await UserLoggedFormation.create({
+        userId: logData._id,
+        deviceId: v.inputs.channel, // Ensure this field is unique per device/session
+        token: token,
+        ip: requestIp.getClientIp(req),
+        channel: v.inputs.channel,
+      });
+  
+      return helper.success(res, "User login successful", logData);
+    } catch (error) {
+      console.error(error);
+      return helper.error(res, error.message || "An error occurred during login");
+    }
+  },
+  
 
   logout: async (req, res) => {
     try {

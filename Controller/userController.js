@@ -58,6 +58,15 @@ module.exports = {
       return helper.error(res, error.message); // Return the error message
     }
   },
+
+  getUserList: async (req, res) => {
+    try {
+      const roles = await AdminUser.find({});
+      return helper.success(res, "Listing Successfully.", roles);
+    } catch (error) {
+      return helper.error(res, error.message);
+    }
+  },
   
   
 

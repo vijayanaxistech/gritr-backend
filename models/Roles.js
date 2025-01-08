@@ -7,6 +7,10 @@ const roleSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    displayName: {
+      type: String,
+      required: true,
+    },    
     roleType: {
       type: Number,
     },

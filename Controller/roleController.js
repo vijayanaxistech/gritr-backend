@@ -13,6 +13,7 @@ module.exports = {
     try {
       let v = new Validator(req.body, {
         roleName: "required",
+        displayName: "required",
         roleType: "required",
         description: "string",
       });

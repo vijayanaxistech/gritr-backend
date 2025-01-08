@@ -8,6 +8,9 @@ router.post("/createuser", userController.createuser);
 
 router.post("/login", userController.login);
 router.post("/logout", isAuth, userController.logout);
+router.get("/getUserList", isAuth, userController.getUserList);
+
+
 // router.post("/change-password", isAuth, userController.changePassword);
 // router.get("/getProfile", userController.getProfile);
 // router.put("/editProfile", userController.editProfile);

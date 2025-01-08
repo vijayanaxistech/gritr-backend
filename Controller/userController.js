@@ -17,6 +17,50 @@ let Role = require("../models/Roles");
 const requestIp = require("request-ip");
 
 module.exports = {
+
+  createuser: async (req, res) => {
+    try {
+      // Validate required fields
+      let v = new Validator(req.body, {
+        fullName: "required|string",
+        email: "required|string",
+        userName: "required|string",
+        password: "required|string",
+        roleId: "required|string",
+      });
+  
+      let errors = v.errors;
+      if (errors && errors.length > 0) {
+        return helper.error(res, errors);
+      }
+  
+      // Check if the userName is already taken
+      let checkUserName = await User.findOne({
+        userName: v.inputs.userName,
+      });
+  
+      if (checkUserName) {
+        return helper.error(res, "This userName is already in use");
+      }
+  
+      // Encrypt the password
+      req.body.password = await helper.passwordEncrypt(req.body.password);
+  
+      // Process the user creation
+      User.create(req.body)
+        .then((response) => {
+          return helper.success(res, "User Created Successfully.", response);
+        })
+        .catch((e) => {
+          throw e;
+        });
+    } catch (error) {
+      return helper.error(res, error.message); // Return the error message
+    }
+  },
+  
+  
+
   
   login: async (req, res) => {
     try {

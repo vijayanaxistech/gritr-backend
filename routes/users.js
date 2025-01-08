@@ -4,6 +4,8 @@ const userController = require("../Controller/userController");
 const { isAuth } = require("../middleware/auth");
 
 
+router.post("/createuser", userController.createuser);
+
 router.post("/login", userController.login);
 router.post("/logout", isAuth, userController.logout);
 // router.post("/change-password", isAuth, userController.changePassword);

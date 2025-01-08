@@ -8,7 +8,8 @@ let welcomeMessage = require("./routes/welcomeMsg");
 
 
 module.exports = (app) => {
-  app.use("/api/user", userRoutes);
+  // admin section routes
+  app.use("/api/admin/user", userRoutes);
   app.use("/api/role", roleRoutes);
   // app.use("/api/zoom", zoomRoutes);
   

@@ -16,10 +16,8 @@ const adminUserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    password: {
-      type: String,
-      required: true,
-    },
+    password: { type: String, required: true, select: false },  // `select: false` will prevent the password from being returned by default
+
     sidebarIds: [],
     roleId: {
       type: Schema.Types.ObjectId,

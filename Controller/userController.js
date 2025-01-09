@@ -73,6 +73,60 @@ module.exports = {
     }
   },
 
+  
+  getUserById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      if (!id) {
+        return helper.error(res, "User ID is required.");
+      }  
+   
+      //const user = await AdminUser.findById(id).select('+password').lean(); 
+      const user = await AdminUser.findById(id);
+     
+      if (!user) {
+        return helper.error(res, "User not found.");
+      }
+  
+      return helper.success(res, "User fetched successfully.", user);
+    } catch (error) {
+      return helper.error(res, error.message);
+    }
+  },
+  
+
+  updateUserById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+     
+
+      if (!id) {
+        return helper.error(res, "User ID is required.");
+      }
+  
+      if (!updates || Object.keys(updates).length === 0) {
+        return helper.error(res, "Update data is required.");
+      }
+      // Remove the password field from updates if it exists
+      delete updates.password;
+     const user = await AdminUser.findByIdAndUpdate(id, updates, {
+        new: true, // Return the updated document
+        runValidators: true, // Run schema validations on the updates
+      });
+  
+      if (!user) {
+        return helper.error(res, "User not found.");
+      }
+  
+      return helper.success(res, "User updated successfully.", user);
+    } catch (error) {
+      return helper.error(res, error.message);
+    }
+  },
+  
+  
+
   getUserList: async (req, res) => {
     try {
       const roles = await AdminUser.find({});
@@ -81,8 +135,6 @@ module.exports = {
       return helper.error(res, error.message);
     }
   },
-  
-  
 
   
   login: async (req, res) => {

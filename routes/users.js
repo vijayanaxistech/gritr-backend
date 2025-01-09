@@ -7,6 +7,7 @@ const { isAuth } = require("../middleware/auth");
 router.post("/createuser",isAuth, userController.createuser);
 router.get("/getUserById/:id",isAuth, userController.getUserById);
 router.post("/updateUserById/:id",isAuth, userController.updateUserById);
+router.post('/updateUserStatus/:id',isAuth, userController.updateUserStatus);
 
 
 

@@ -99,6 +99,39 @@ module.exports = {
     }
   },
 
+  
+  updateStatus: async (req, res) => {
+    try {
+      console.log(req.body);
+      // Validate the request body to ensure `isActive` is provided
+      let v = new Validator(req.body, {
+        isActive: "required|boolean", // Validate `isActive` as a required boolean field
+      });
+  
+      let errors = v.errors;
+      if (errors && errors.length > 0) {
+        return helper.error(res, errors);
+      }
+  
+      // Update only the `isActive` status
+      req.body.updatedAt = new Date(); // Add the updated timestamp
+  
+      const updatedRole = await RoleManagement.findOneAndUpdate(
+        { _id: req.params.id }, // Find the role by ID
+        { isActive: v.inputs.isActive, updatedAt: req.body.updatedAt }, // Update the `isActive` field
+        { new: true } // Return the updated document
+      );
+  
+      if (!updatedRole) {
+        return helper.error(res, "Role not found"); // Handle case where the role doesn't exist
+      }
+  
+      return helper.success(res, "Role status updated successfully.", updatedRole);
+    } catch (error) {
+      return helper.error(res, error.message); // Return the error message
+    }
+  },
+
 
   // sidebarList: async (req, res) => {
   //   try {
@@ -147,37 +180,6 @@ module.exports = {
   // },
 
 
-  // updateStatus: async (req, res) => {
-  //   try {
-  //     console.log(req);
-  //     // Validate the request body to ensure `isActive` is provided
-  //     let v = new Validator(req.body, {
-  //       isActive: "required|boolean", // Validate `isActive` as a required boolean field
-  //     });
-  
-  //     let errors = v.errors;
-  //     if (errors && errors.length > 0) {
-  //       return helper.error(res, errors);
-  //     }
-  
-  //     // Update only the `isActive` status
-  //     req.body.updatedAt = new Date(); // Add the updated timestamp
-  
-  //     const updatedRole = await RoleManagement.findOneAndUpdate(
-  //       { _id: req.params.id }, // Find the role by ID
-  //       { isActive: v.inputs.isActive, updatedAt: req.body.updatedAt }, // Update the `isActive` field
-  //       { new: true } // Return the updated document
-  //     );
-  
-  //     if (!updatedRole) {
-  //       return helper.error(res, "Role not found"); // Handle case where the role doesn't exist
-  //     }
-  
-  //     return helper.success(res, "Role status updated successfully.", updatedRole);
-  //   } catch (error) {
-  //     return helper.error(res, error.message); // Return the error message
-  //   }
-  // },
 
 //  updateRolePermission: async (req, res) => {
 //   try {

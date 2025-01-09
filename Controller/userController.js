@@ -76,7 +76,7 @@ module.exports = {
   getuserroleList: async (req, res) => {
     try {
       // Step 1: Get the users with their roleIds
-      const users = await AdminUser.find({});
+      const users = await AdminUser.find({ isActive: true });
   
       // Step 2: Retrieve the roleId for each user and map it to get the role information
       const rolesWithDisplayName = await Promise.all(
@@ -88,7 +88,8 @@ module.exports = {
             email: user.email,
             isActive: user.isActive,
             roleType: role ? role.displayName : "Role not found", // Handling case if role is not found
-            createdAt:user.createdAt
+            createdAt:user.createdAt,
+            roleId:role._id,
           };
         })
       );

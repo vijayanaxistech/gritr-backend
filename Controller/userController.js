@@ -60,8 +60,7 @@ module.exports = {
           }
         }
 
-        console.log('existingRole11',req.body);
-      
+       
       AdminUser.create(req.body)
         .then((response) => {
           return helper.success(res, "User Created Successfully.", response);

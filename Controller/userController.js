@@ -73,6 +73,44 @@ module.exports = {
     }
   },
 
+  getuserroleList: async (req, res) => {
+    try {
+      // Step 1: Get the users with their roleIds
+      const users = await AdminUser.find({});
+  
+      // Step 2: Retrieve the roleId for each user and map it to get the role information
+      const rolesWithDisplayName = await Promise.all(
+        users.map(async (user) => {
+          const role = await RoleManagement.findById(user.roleId); // assuming roleId is stored as ObjectId
+          return {
+            userId: user._id,
+            userName: user.userName,
+            email: user.email,
+            isActive: user.isActive,
+            roleType: role ? role.displayName : "Role not found", // Handling case if role is not found
+            createdAt:user.createdAt
+          };
+        })
+      );
+  
+      // Step 3: Send the result
+      return helper.success(res, "Listing Successfully.", rolesWithDisplayName);
+    } catch (error) {
+      return helper.error(res, error.message);
+    }
+  },
+  
+
+
+  getUserList: async (req, res) => {
+    try {
+      const roles = await AdminUser.find({});
+      return helper.success(res, "Listing Successfully.", roles);
+    } catch (error) {
+      return helper.error(res, error.message);
+    }
+  },
+
   
   getUserById: async (req, res) => {
     try {
@@ -142,7 +180,16 @@ module.exports = {
         return helper.error(res, "Update data is required.");
       }
       // Remove the password field from updates if it exists
-      delete updates.password;
+    delete updates.password;
+    if (req.body.roleId) {
+      let existingRole = await RoleManagement.findOne({
+            _id: req.body.roleId,
+      });      
+       
+      if (existingRole) {
+        req.body.roleType = existingRole.roleType;
+      }
+    }
      const user = await AdminUser.findByIdAndUpdate(id, updates, {
         new: true, // Return the updated document
         runValidators: true, // Run schema validations on the updates
@@ -158,14 +205,7 @@ module.exports = {
     }
   },
   
-  getUserList: async (req, res) => {
-    try {
-      const roles = await AdminUser.find({});
-      return helper.success(res, "Listing Successfully.", roles);
-    } catch (error) {
-      return helper.error(res, error.message);
-    }
-  },
+  
 
   
   login: async (req, res) => {

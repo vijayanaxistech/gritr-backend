@@ -12,7 +12,7 @@ module.exports = {
   create: async (req, res) => {
     try {
 
-     
+
       let v = new Validator(req.body, {
         roleName: "required",
         roleType: "required",
@@ -34,7 +34,7 @@ module.exports = {
         return helper.error(res, "This role name is already in use");
       }
 
-  
+
 
       RoleManagement.create(req.body)
         .then((response) => {
@@ -99,7 +99,7 @@ module.exports = {
     }
   },
 
-  
+
   updateStatus: async (req, res) => {
     try {
       console.log(req.body);
@@ -107,25 +107,31 @@ module.exports = {
       let v = new Validator(req.body, {
         isActive: "required|boolean", // Validate `isActive` as a required boolean field
       });
-  
+
       let errors = v.errors;
       if (errors && errors.length > 0) {
         return helper.error(res, errors);
       }
-  
+
       // Update only the `isActive` status
       req.body.updatedAt = new Date(); // Add the updated timestamp
-  
-      const updatedRole = await RoleManagement.findOneAndUpdate(
-        { _id: req.params.id }, // Find the role by ID
-        { isActive: v.inputs.isActive, updatedAt: req.body.updatedAt }, // Update the `isActive` field
-        { new: true } // Return the updated document
+
+      const updatedRole = await RoleManagement.findOneAndUpdate({
+          _id: req.params.id
+        }, // Find the role by ID
+        {
+          isActive: v.inputs.isActive,
+          updatedAt: req.body.updatedAt
+        }, // Update the `isActive` field
+        {
+          new: true
+        } // Return the updated document
       );
-  
+
       if (!updatedRole) {
         return helper.error(res, "Role not found"); // Handle case where the role doesn't exist
       }
-  
+
       return helper.success(res, "Role status updated successfully.", updatedRole);
     } catch (error) {
       return helper.error(res, error.message); // Return the error message
@@ -133,14 +139,14 @@ module.exports = {
   },
 
 
-  // sidebarList: async (req, res) => {
-  //   try {
-  //     const roles = await Sidebar.find({});
-  //     return helper.success(res, "Listing Successfully.", roles);
-  //   } catch (error) {
-  //     return helper.error(res, error.message);
-  //   }
-  // },
+  sidebarList: async (req, res) => {
+    try {
+      const roles = await Sidebar.find({});
+      return helper.success(res, "Listing Successfully.", roles);
+    } catch (error) {
+      return helper.error(res, error.message);
+    }
+  },
 
   // createSidebar: async (req, res) => {
   //   try {
@@ -181,55 +187,65 @@ module.exports = {
 
 
 
-//  updateRolePermission: async (req, res) => {
-//   try {
-//     console.log('body---', req.body);
+  updateRolePermission: async (req, res) => {
+    try {
+      const {
+        roles,
+        userId
+      } = req.body;
 
-//     const { roles, typeId } = req.body; // Destructure roles and typeId from the request body
+      // Log and check the userId
+      console.log('userId:', userId);
 
-//     // Log and check if the typeId is valid
-//     console.log('typeId:', typeId);
-//     const mongoose = require('mongoose');
-//     const ObjectId = mongoose.Types.ObjectId;
+      if (!userId) {
+        return helper.error(res, "User ID is required.");
+      }
 
-//     if (!ObjectId.isValid(typeId)) {
-//       return helper.error(res, "Invalid typeId.");
-//     }
+      // Extract _id values from the roles array
+      const ids = roles.map(role => role._id);
 
-//     // Extract _id values from the roles array
-//     const ids = roles.map(role => role._id);
+      // Check if any role IDs were provided
+      if (!ids || ids.length === 0) {
+        return helper.error(res, "No role IDs provided.");
+      }
 
-//     console.log(ids);
+      console.log('Role IDs:', ids);
 
-//     if (!ids || ids.length === 0) {
-//       return helper.error(res, "No role IDs provided.");
-//     }
+      // Ensure the user exists before updating
+      const existingUser = await AdminUser.findOne({
+        _id: userId
+      });
 
-//     // Ensure the user exists before updating
-//     const existingUser = await AdminUser.findOne({ _id: ObjectId(typeId) });
+      if (!existingUser) {
+        return helper.error(res, "User not found or ID mismatch.");
+      }
 
-//     if (!existingUser) {
-//       return helper.error(res, "User not found or typeId mismatch.");
-//     }
+      // Update the user's sidebarIds field with the extracted role IDs
+      const updatedUser = await AdminUser.findOneAndUpdate({
+          _id: userId
+        }, {
+          $set: {
+            sidebarIds: ids
+          }
+        }, {
+          new: true
+        } // Return the updated user document
+      );
 
-//     // Find the user and update the sidebarIds field by matching the typeId
-//     const updatedUser = await AdminUser.findOneAndUpdate(
-//       { _id: ObjectId(typeId) }, // Match the user by typeId (converted to ObjectId)
-//       { $set: { sidebarIds: ids } }, // Update the sidebarIds field with the extracted _id values
-//       { new: true } // Return the updated user document
-//     );
+      console.log('Updated User:', updatedUser);
 
-//     console.log('updatedUser----', updatedUser);
+      return helper.success(res, "User sidebar IDs updated successfully.", updatedUser); // Return the updated user
 
-//     return helper.success(res, "User sidebar IDs updated successfully.", updatedUser); // Return the updated user
-//   } catch (error) {
-//     return helper.error(res, error.message); // Return the error message
-//   }
-// }
+    } catch (error) {
+      console.error('Error:', error.message);
+      return helper.error(res, "An error occurred while updating user permissions.");
+    }
+  }
 
-  
-  
-  
 
-  
+
+
+
+
+
 };

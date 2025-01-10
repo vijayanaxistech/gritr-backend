@@ -10,6 +10,10 @@ const sidebarSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    routeName:{
+      type: String,
+      required: false,
+    },
     createdAt: {
       type: Date,
       default: Date.now,

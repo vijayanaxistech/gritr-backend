@@ -229,7 +229,7 @@ module.exports = {
       let logData = await AdminUser.findOne({
         userName: v.inputs.username,
         isDeleted: false,
-      }).select('fullName email userName roleId isActive roleType password');
+      }).select('fullName email userName roleId isActive roleType password sidebarIds');
       
 
       if (!logData) {

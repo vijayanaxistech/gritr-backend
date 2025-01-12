@@ -1,24 +1,21 @@
 const { Validator } = require("node-input-validator");
 const AdminUser = require("../models/AdminUser");
-let RoleManagement = require("../models/Roles");
+const RoleManagement = require("../models/Roles");
 const UserLoggedFormation = require("../models/userLoggedFormation");
 const helper = require("../helpers/helper");
-let jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
+const requestIp = require("request-ip");
 
 const {
   JWTExpiresIn,
   JWTSecret,
-  TYPE_SYSTEM_ADMIN,
-  TYPE_SUPER_ADMIN,
-  TYPE_SUB_ADMIN,
-  TYPE_MASTER,
-  TYPE_CLIENT,
 } = require("../config/constants");
-let Role = require("../models/Roles");
-const requestIp = require("request-ip");
 
 module.exports = {
-
+  /**
+   * Creates a new user.
+   * Validates the input, checks for duplicate usernames, encrypts the password, and saves the user.
+   */
   createuser: async (req, res) => {
     try {
       // Validate required fields
@@ -29,191 +26,183 @@ module.exports = {
         password: "required|string",
         roleId: "required|string",
       });
-  
+
       let errors = v.errors;
       if (errors && errors.length > 0) {
         return helper.error(res, errors);
       }
-  
-      // Check if the userName is already taken
-      let checkUserName = await AdminUser.findOne({
-        userName: v.inputs.userName,
-      });
-  
+
+      // Check if the userName is already in use
+      let checkUserName = await AdminUser.findOne({ userName: v.inputs.userName });
       if (checkUserName) {
         return helper.error(res, "This userName is already in use");
       }
-  
+
       // Encrypt the password
       req.body.password = await helper.passwordEncrypt(req.body.password);
-      // Process the user creation
 
-         
-      
+      // Attach roleType to the user object
       if (req.body.roleId) {
-          let existingRole = await RoleManagement.findOne({
-                _id: req.body.roleId,
-          });      
-           
-          if (existingRole) {
-            req.body.roleType = existingRole.roleType;
-          }
+        let existingRole = await RoleManagement.findOne({ _id: req.body.roleId });
+        if (existingRole) {
+          req.body.roleType = existingRole.roleType;
         }
+      }
 
-       
+      // Create the user
       AdminUser.create(req.body)
-        .then((response) => {
-          return helper.success(res, "User Created Successfully.", response);
-        })
+        .then((response) => helper.success(res, "User Created Successfully.", response))
         .catch((e) => {
           throw e;
         });
     } catch (error) {
-      return helper.error(res, error.message); // Return the error message
+      return helper.error(res, error.message);
     }
   },
 
+  /**
+   * Retrieves a list of users along with their role details.
+   * Populates the role type and additional information for each user.
+   */
   getuserroleList: async (req, res) => {
     try {
-      // Step 1: Get the users with their roleIds
       const users = await AdminUser.find({ isActive: true });
-  
-      // Step 2: Retrieve the roleId for each user and map it to get the role information
       const rolesWithDisplayName = await Promise.all(
         users.map(async (user) => {
-          const role = await RoleManagement.findById(user.roleId); // assuming roleId is stored as ObjectId
+          const role = await RoleManagement.findById(user.roleId);
           return {
             userId: user._id,
             userName: user.userName,
             email: user.email,
             isActive: user.isActive,
-            roleType: role ? role.displayName : "Role not found", // Handling case if role is not found
-            createdAt:user.createdAt,
-            roleId:role._id,
+            roleType: role ? role.displayName : "Role not found",
+            createdAt: user.createdAt,
+            roleId: role?._id,
           };
         })
       );
-  
-      // Step 3: Send the result
       return helper.success(res, "Listing Successfully.", rolesWithDisplayName);
     } catch (error) {
       return helper.error(res, error.message);
     }
   },
-  
 
-
+  /**
+   * Retrieves a list of all users.
+   */
   getUserList: async (req, res) => {
     try {
-      const roles = await AdminUser.find({});
-      return helper.success(res, "Listing Successfully.", roles);
+      const users = await AdminUser.find({});
+      return helper.success(res, "Listing Successfully.", users);
     } catch (error) {
       return helper.error(res, error.message);
     }
   },
 
-  
+  /**
+   * Retrieves a user by ID.
+   * Throws an error if the user is not found.
+   */
   getUserById: async (req, res) => {
     try {
       const { id } = req.params;
       if (!id) {
         return helper.error(res, "User ID is required.");
-      }  
-   
-      //const user = await AdminUser.findById(id).select('+password').lean(); 
+      }
+
       const user = await AdminUser.findById(id);
-     
       if (!user) {
         return helper.error(res, "User not found.");
       }
-  
+
       return helper.success(res, "User fetched successfully.", user);
     } catch (error) {
       return helper.error(res, error.message);
     }
   },
-  
 
-    updateUserStatus: async (req, res) => {
+  /**
+   * Updates the active status of a user.
+   * Validates `isActive` and updates it along with the `updatedAt` timestamp.
+   */
+  updateUserStatus: async (req, res) => {
     try {
-      console.log(req);
-      // Validate the request body to ensure `isActive` is provided
       let v = new Validator(req.body, {
-        isActive: "required|boolean", // Validate `isActive` as a required boolean field
+        isActive: "required|boolean",
       });
-  
+
       let errors = v.errors;
       if (errors && errors.length > 0) {
         return helper.error(res, errors);
       }
-  
-      // Update only the `isActive` status
-      req.body.updatedAt = new Date(); // Add the updated timestamp
-  
+
+      req.body.updatedAt = new Date();
+
       const updatedRole = await AdminUser.findOneAndUpdate(
-        { _id: req.params.id }, // Find the role by ID
-        { isActive: v.inputs.isActive, updatedAt: req.body.updatedAt }, // Update the `isActive` field
-        { new: true } // Return the updated document
+        { _id: req.params.id },
+        { isActive: v.inputs.isActive, updatedAt: req.body.updatedAt },
+        { new: true }
       );
-  
+
       if (!updatedRole) {
-        return helper.error(res, "User not found"); // Handle case where the role doesn't exist
+        return helper.error(res, "User not found");
       }
-  
+
       return helper.success(res, "User status updated successfully.", updatedRole);
     } catch (error) {
-      return helper.error(res, error.message); // Return the error message
+      return helper.error(res, error.message);
     }
   },
 
-
+  /**
+   * Updates a user by ID.
+   * Excludes the password from being updated directly.
+   */
   updateUserById: async (req, res) => {
     try {
       const { id } = req.params;
       const updates = req.body;
-     
 
       if (!id) {
         return helper.error(res, "User ID is required.");
       }
-  
       if (!updates || Object.keys(updates).length === 0) {
         return helper.error(res, "Update data is required.");
       }
-      // Remove the password field from updates if it exists
-    delete updates.password;
-    if (req.body.roleId) {
-      let existingRole = await RoleManagement.findOne({
-            _id: req.body.roleId,
-      });      
-       
-      if (existingRole) {
-        req.body.roleType = existingRole.roleType;
+
+      delete updates.password;
+
+      if (req.body.roleId) {
+        let existingRole = await RoleManagement.findOne({ _id: req.body.roleId });
+        if (existingRole) {
+          req.body.roleType = existingRole.roleType;
+        }
       }
-    }
-     const user = await AdminUser.findByIdAndUpdate(id, updates, {
-        new: true, // Return the updated document
-        runValidators: true, // Run schema validations on the updates
+
+      const user = await AdminUser.findByIdAndUpdate(id, updates, {
+        new: true,
+        runValidators: true,
       });
-  
+
       if (!user) {
         return helper.error(res, "User not found.");
       }
-  
+
       return helper.success(res, "User updated successfully.", user);
     } catch (error) {
       return helper.error(res, error.message);
     }
   },
-  
-  
 
-  
+  /**
+   * Logs in a user.
+   * Validates credentials, checks account status, and returns a JWT token.
+   */
   login: async (req, res) => {
     try {
       let v = new Validator(req.body, {
         username: "required",
-        password: "required"
+        password: "required",
       });
 
       let errorsResponse = await helper.checkValidation(v);
@@ -221,168 +210,60 @@ module.exports = {
         return helper.error(res, errorsResponse);
       }
 
-      // let logData = await AdminUser.findOne({
-      //   userName: v.inputs.username,
-      //   isDeleted: false,
-      // }).populate("roleId", "roleType");
-
       let logData = await AdminUser.findOne({
         userName: v.inputs.username,
         isDeleted: false,
-      }).select('fullName email userName roleId isActive roleType password sidebarIds');
-      
+      }).select("fullName email userName roleId isActive roleType password");
 
-      if (!logData) {
-        throw "Username or Password did not match, Please try again.";
+      if (!logData || !logData.isActive) {
+        throw "Invalid credentials or inactive account.";
       }
 
-      if (!logData?.isActive) {
-        throw "Sorry, Your Account is InActive Please Contact Administrator";
-      }
-
-      let checkPassword = await helper.comparePass(
-        v.inputs.password,
-        logData.password
-      );
-
+      let checkPassword = await helper.comparePass(v.inputs.password, logData.password);
       if (!checkPassword) {
-        throw "Password did not match, Please try again.";
+        throw "Invalid password.";
       }
 
-      let token = jwt.sign(
-        {
-          data: {
-            id: logData._id,
-            fullName: logData.fullName,
-            email: logData.email,
-            userName: logData.userName,
-            roleId: logData.role,
-          },
-        },
+      const token = jwt.sign(
+        { data: { id: logData._id, roleId: logData.roleId } },
         JWTSecret,
         { expiresIn: JWTExpiresIn }
       );
 
-      logData = logData.toJSON();
-      logData.jwtToken = await helper.generateSignature();
-      logData.authToken = token;
-      logData.role = logData?.role?.roleType;
       await UserLoggedFormation.create({
-        userId: logData?._id,
-        deviceId: v.inputs.channel, // need to change later
-        token: token,
+        userId: logData._id,
+        token,
         ip: requestIp.getClientIp(req),
-        channel: v.inputs.channel,
       });
-      return helper.success(res, "User login successfully ", logData);
+
+      return helper.success(res, "User logged in successfully.", { authToken: token });
     } catch (error) {
-      console.log(error);
       return helper.error(res, error);
     }
   },
 
-  login2: async (req, res) => {
-    try {
-      const v = new Validator(req.body, {
-        username: "required",
-        password: "required",
-      });
-  
-      const errorsResponse = await helper.checkValidation(v);
-      if (errorsResponse) {
-        return helper.error(res, errorsResponse);
-      }
-  
-      let logData = await AdminUser.findOne({
-        userName: v.inputs.username,
-        isDeleted: false,
-      }).select('fullName email userName roleId isActive roleType password'); // Use .select() to limit fields
-  
-      if (!logData) {
-        throw { message: "Invalid username or password" }; // Standardize error messages
-      }
-  
-      if (!logData.isActive) {
-        throw { message: "Your account is inactive. Please contact administrator." };
-      }
-  
-      const checkPassword = await helper.comparePass(v.inputs.password, logData.password);
-  
-      if (!checkPassword) {
-        throw { message: "Password did not match. Please try again." };
-      }
-  
-      const token = jwt.sign(
-        {
-          data: {
-            id: logData._id,
-            fullName: logData.fullName,
-            email: logData.email,
-            userName: logData.userName,
-            roleId: logData.roleId, // Store the roleId in the token for authorization purposes
-          },
-        },
-        JWTSecret,
-        { expiresIn: JWTExpiresIn }
-      );
-  
-      logData = logData.toJSON();
-      logData.jwtToken = await helper.generateSignature();
-      logData.authToken = token;
-      logData.role = logData.roleType; // Simplified role assignment
-  
-      await UserLoggedFormation.create({
-        userId: logData._id,
-        deviceId: v.inputs.channel, // Ensure this field is unique per device/session
-        token: token,
-        ip: requestIp.getClientIp(req),
-        channel: v.inputs.channel,
-      });
-  
-      return helper.success(res, "User login successful", logData);
-    } catch (error) {
-      console.error(error);
-      return helper.error(res, error.message || "An error occurred during login");
-    }
-  },
-  
-
+  /**
+   * Logs out a user.
+   * Validates and removes the session token.
+   */
   logout: async (req, res) => {
     try {
-      // Validate that token is provided in the headers
       const authToken = req.headers.authorization;
+      if (!authToken) throw "Authorization token is required.";
 
-      if (!authToken) {
-        throw "Authorization token is required.";
-      }
-
-      const token = authToken.split(" ")[1]; // Bearer token extraction
-      if (!token) {
-        throw "Invalid token format.";
-      }
-
-      // Decode the token to extract user information
+      const token = authToken.split(" ")[1];
       const decodedToken = jwt.verify(token, JWTSecret);
-      if (!decodedToken?.data?.id) {
-        throw "Invalid token.";
-      }
 
-      // Find and delete the session associated with this token
       const session = await UserLoggedFormation.findOneAndDelete({
         userId: decodedToken.data.id,
-        token: token,
+        token,
       });
 
-      if (!session) {
-        throw "Session not found or already logged out.";
-      }
+      if (!session) throw "Session not found or already logged out.";
 
       return helper.success(res, "User logged out successfully.");
     } catch (error) {
-      console.log(error);
       return helper.error(res, error);
     }
   },
-
-
 };

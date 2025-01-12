@@ -204,44 +204,54 @@ module.exports = {
         username: "required",
         password: "required",
       });
-
+  
       let errorsResponse = await helper.checkValidation(v);
       if (errorsResponse) {
         return helper.error(res, errorsResponse);
       }
-
+  
       let logData = await AdminUser.findOne({
         userName: v.inputs.username,
         isDeleted: false,
-      }).select("fullName email userName roleId isActive roleType password");
-
+      }).select("fullName email userName roleId isActive roleType password sidebarIds");
+  
       if (!logData || !logData.isActive) {
         throw "Invalid credentials or inactive account.";
       }
-
+  
       let checkPassword = await helper.comparePass(v.inputs.password, logData.password);
       if (!checkPassword) {
         throw "Invalid password.";
       }
-
+  
       const token = jwt.sign(
         { data: { id: logData._id, roleId: logData.roleId } },
         JWTSecret,
         { expiresIn: JWTExpiresIn }
       );
-
+  
       await UserLoggedFormation.create({
         userId: logData._id,
         token,
         ip: requestIp.getClientIp(req),
       });
-
-      return helper.success(res, "User logged in successfully.", { authToken: token });
+  
+      // Return all data along with the token and sidebarIds
+      return helper.success(res, "User logged in successfully.", {
+        authToken: token,
+        fullName: logData.fullName,
+        email: logData.email,
+        userName: logData.userName,
+        roleId: logData.roleId,
+        sidebarIds: logData.sidebarIds, // Added sidebarIds
+        roleType: logData.roleType,
+        isActive: logData.isActive,
+      });
     } catch (error) {
       return helper.error(res, error);
     }
   },
-
+  
   /**
    * Logs out a user.
    * Validates and removes the session token.

@@ -3,7 +3,6 @@
 let userRoutes = require("./routes/users");
 
 let roleRoutes = require("./routes/role");
-let moduleRoutes = require("./routes/moduleAccess");
 
 
 module.exports = (app) => {

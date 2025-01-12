@@ -148,42 +148,42 @@ module.exports = {
     }
   },
 
-  // createSidebar: async (req, res) => {
-  //   try {
-  //     // Validate input
-  //     let v = new Validator(req.body, {
-  //       sidebar_name: "required|string",
-  //       description: "string|optional",
-  //       isActive: "boolean|optional",
-  //       links: "array|optional",
-  //     });
+  createSidebar: async (req, res) => {
+    try {
+      // Validate input
+      let v = new Validator(req.body, {
+        sidebar_name: "required|string",
+        description: "string|optional",
+        isActive: "boolean|optional",
+        links: "array|optional",
+      });
 
-  //     let errors = v.errors;
-  //     if (errors && errors.length > 0) {
-  //       return helper.error(res, errors);
-  //     }
+      let errors = v.errors;
+      if (errors && errors.length > 0) {
+        return helper.error(res, errors);
+      }
 
-  //     // Check if Sidebar with the same name already exists
-  //     let checkSidebarName = await Sidebar.findOne({
-  //       sidebar_name: v.inputs.sidebar_name,
-  //     });
+      // Check if Sidebar with the same name already exists
+      let checkSidebarName = await Sidebar.findOne({
+        sidebar_name: v.inputs.sidebar_name,
+      });
 
-  //     if (checkSidebarName) {
-  //       return helper.error(res, "This sidebar name is already in use.");
-  //     }
+      if (checkSidebarName) {
+        return helper.error(res, "This sidebar name is already in use.");
+      }
 
-  //     // Create new Sidebar
-  //     Sidebar.create(req.body)
-  //       .then((response) => {
-  //         return helper.success(res, "Sidebar Created Successfully.", response);
-  //       })
-  //       .catch((e) => {
-  //         throw e;
-  //       });
-  //   } catch (error) {
-  //     return helper.error(res, error.message); // Return the error message
-  //   }
-  // },
+      // Create new Sidebar
+      Sidebar.create(req.body)
+        .then((response) => {
+          return helper.success(res, "Sidebar Created Successfully.", response);
+        })
+        .catch((e) => {
+          throw e;
+        });
+    } catch (error) {
+      return helper.error(res, error.message); // Return the error message
+    }
+  },
 
 
 

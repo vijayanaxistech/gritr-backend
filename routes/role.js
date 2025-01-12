@@ -13,7 +13,7 @@ router.post('/updateStatus/:id',isAuth, roleManagement.updateStatus);
 router.get('/sidebarList',roleManagement.sidebarList);
 router.post('/updateRolePermission',isAuth,roleManagement.updateRolePermission);
 
-// router.post('/createSidebar', isAuth,roleManagement.createSidebar);
+router.post('/createSidebar', roleManagement.createSidebar);
 
 
 module.exports = router;

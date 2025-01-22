@@ -22,8 +22,8 @@ module.exports = {
 
       console.log('Search Filter:', searchFilter);
 
-      // Set a timeout for the query execution (5 seconds)
-      const timeoutDuration = 5000; // 5 seconds timeout
+      // Set a faster timeout for the query execution (e.g., 2 seconds timeout)
+      const timeoutDuration = 2000; // 2 seconds timeout
       const timeoutPromise = new Promise((_, reject) => 
         setTimeout(() => reject(new Error('Query timeout')), timeoutDuration)
       );
@@ -66,7 +66,7 @@ module.exports = {
     } catch (error) {
       // Handle query timeout error separately
       if (error.message === 'Query timeout') {
-        return helper.error(res, "Please refine your search or try again later.");
+        return helper.error(res, "Your search is taking longer than expected. Please refine your search or try again later.");
       }
 
       console.error("Error fetching business locations:", error);

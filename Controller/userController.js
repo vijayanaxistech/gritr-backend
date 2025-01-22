@@ -225,7 +225,7 @@ module.exports = {
       }
   
       const token = jwt.sign(
-        { data: { id: logData._id, roleId: logData.roleId } },
+        { data: { id: logData._id, roleId: logData.roleId, userName: logData.userName, } },
         JWTSecret,
         { expiresIn: JWTExpiresIn }
       );

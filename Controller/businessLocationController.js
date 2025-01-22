@@ -24,27 +24,28 @@ module.exports = {
 
       // Set a timeout for the query execution (5 seconds)
       const timeoutDuration = 5000; // 5 seconds timeout
-      const timeoutError = new Error('Query timeout');
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Query timeout')), timeoutDuration)
+      );
 
       // Fetch business locations in parallel, applying the search filter
       const businessLocationsPromise = BusinessLocation.find(searchFilter)
         .sort({ _id: 1 }) // Sort by _id in ascending order for pagination
         .skip(skip) // Skip records for the previous pages
-        .limit(pageSize) // Limit the number of records fetched
-        .maxTimeMS(timeoutDuration); // Set max execution time for the query
+        .limit(pageSize); // Limit the number of records fetched
 
       // Fetch the total count of business locations (without pagination)
-      const totalRecordsPromise = BusinessLocation.estimatedDocumentCount(searchFilter)
-        .maxTimeMS(timeoutDuration); // Ensure count query also respects the timeout
+      const totalRecordsPromise = BusinessLocation.estimatedDocumentCount(searchFilter);
 
-      // Use Promise.race to handle both promises concurrently with timeout
-      const [businessLocations, totalRecords] = await Promise.all([
-        businessLocationsPromise,
-        totalRecordsPromise,
+      // Use Promise.race to handle the timeout and queries concurrently
+      const [businessLocations, totalRecords] = await Promise.race([
+        Promise.all([businessLocationsPromise, totalRecordsPromise]),
+        timeoutPromise
       ]);
 
       console.log('Fetched business locations:', businessLocations.length);
 
+      // If no records are found
       if (businessLocations.length === 0) {
         return helper.success(res, "No records found for the given search criteria.", {
           data: [],
@@ -63,6 +64,7 @@ module.exports = {
         limit: pageSize,
       });
     } catch (error) {
+      // Handle query timeout error separately
       if (error.message === 'Query timeout') {
         return helper.error(res, "Please refine your search or try again later.");
       }
@@ -72,5 +74,3 @@ module.exports = {
     }
   },
 };
-
-

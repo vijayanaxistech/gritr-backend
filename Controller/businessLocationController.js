@@ -26,14 +26,21 @@ module.exports = {
       const timeoutDuration = 5000; // 5 seconds timeout
       const timeoutError = new Error('Query timeout');
 
-      // Fetch business locations and total records in parallel, applying the search filter
-      const [businessLocations, totalRecords] = await Promise.race([
-        BusinessLocation.find(searchFilter)
-          .sort({ _id: 1 }) // Sort by _id in ascending order for pagination
-          .skip(skip) // Skip records for the previous pages
-          .limit(pageSize) // Limit the number of records fetched
-          .maxTimeMS(timeoutDuration), // Set max execution time for the query
-        new Promise((_, reject) => setTimeout(() => reject(timeoutError), timeoutDuration)), // Timeout after 5 seconds
+      // Fetch business locations in parallel, applying the search filter
+      const businessLocationsPromise = BusinessLocation.find(searchFilter)
+        .sort({ _id: 1 }) // Sort by _id in ascending order for pagination
+        .skip(skip) // Skip records for the previous pages
+        .limit(pageSize) // Limit the number of records fetched
+        .maxTimeMS(timeoutDuration); // Set max execution time for the query
+
+      // Fetch the total count of business locations (without pagination)
+      const totalRecordsPromise = BusinessLocation.estimatedDocumentCount(searchFilter)
+        .maxTimeMS(timeoutDuration); // Ensure count query also respects the timeout
+
+      // Use Promise.race to handle both promises concurrently with timeout
+      const [businessLocations, totalRecords] = await Promise.all([
+        businessLocationsPromise,
+        totalRecordsPromise,
       ]);
 
       console.log('Fetched business locations:', businessLocations.length);
@@ -52,7 +59,7 @@ module.exports = {
       return helper.success(res, "Listing Successfully.", {
         data: businessLocations,
         lastId: lastFetchedId, // To fetch the next page based on this ID
-        totalRecords, // Approximate total record count
+        totalRecords, // Total record count
         limit: pageSize,
       });
     } catch (error) {

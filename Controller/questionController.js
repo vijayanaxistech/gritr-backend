@@ -7,17 +7,18 @@ module.exports = {
     // Create a new question
     createQuestion : async (req, res) => {
     try {
-        const { content, tags, category, authorId } = req.body;
+  
+        const { content, category } = req.body;
+        let  authorId  = req.user.id;
 
         // Validate the required fields
-        if (!content || !tags || !category || !authorId) {
+        if (!content || !category || !authorId) {
         return helper.error(res, 'All fields are required.');
         }
 
         // Create a new question document
         const newQuestion = new Question({
         content,
-        tags,
         category,
         authorId,
         });
@@ -38,7 +39,11 @@ module.exports = {
     // Get all questions
     getAllQuestions : async (req, res) => {
         try {
-        const questions = await Question.find();
+        
+        const questions = await Question.find({ 
+          isActive: true
+        });
+
         if (!questions || questions.length === 0) {
             return helper.error(res, 'No questions found', null, 404);
         }  

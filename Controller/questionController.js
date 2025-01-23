@@ -99,30 +99,44 @@ module.exports = {
     }
      },
 
-     // Archive a question by ID
-    archiveQuestionById : async (req, res) => {
+    // Archive a question by ID
+    archiveQuestionById: async (req, res) => {
         try {
-        const { id } = req.params;
-        const archivedQuestion = await Question.findByIdAndUpdate(
-            id,
-            { isArchived: true },
-            { new: true } 
-        ); 
-    
-        // If the question does not exist
-        if (!archivedQuestion) {
-            return helper.error(res, 'Question not found', null, 404);
-        }
-    
-        // Return success response
-        return helper.success(res, 'Question archived successfully', {
-            question: archivedQuestion,
-        });
+            const { id } = req.params;
+            const { adminId } = req.body; // Assuming you are passing the adminId in the body or from the session
+
+            // Archive the question by setting isArchived to true
+            const archivedQuestion = await Question.findByIdAndUpdate(
+                id,
+                { 
+                    isArchived: true,
+                    $push: {  // Add the action to the moderationHistory array
+                        moderationHistory: {
+                            action: 'Archived',   // The action taken (archived)
+                            adminId: adminId,     // Admin who performed the action
+                            timestamp: new Date(), // Timestamp of when the action occurred
+                        }
+                    }
+                },
+                { new: true } // Return the updated question
+            );
+
+            // If the question does not exist
+            if (!archivedQuestion) {
+                return helper.error(res, 'Question not found', null, 404);
+            }
+
+            // Return success response with the updated question
+            return helper.success(res, 'Question archived successfully', {
+                question: archivedQuestion,
+            });
+
         } catch (err) {
-        console.error(err);
-        return helper.error(res, 'Server error, please try again.', err, 500);
+            console.error(err);
+            return helper.error(res, 'Server error, please try again.', err, 500);
         }
     },
+
 
     
     deleteQuestionById : async (req, res) => {
@@ -147,6 +161,69 @@ module.exports = {
       console.error(err);
       return helper.error(res, 'Server error, please try again.', err, 500);
     }
+    },
+
+    markQuestionAsDuplicate: async (req, res) => {
+        try {
+            const { id } = req.params; 
+            const { duplicateOf, adminId } = req.body; // Assuming adminId is passed in the body
+
+            // Find the original question that the current question is marked as duplicate of
+            const originalQuestion = await Question.findById(duplicateOf);
+            if (!originalQuestion) {
+                return helper.error(res, 'Original question not found', null, 404);
+            }
+
+            // Update the question to mark it as a duplicate
+            const updatedQuestion = await Question.findByIdAndUpdate(
+                id,
+                { 
+                    duplicateOf, 
+                    $push: {  // Add the moderation action to the moderationHistory array
+                        moderationHistory: {
+                            action: 'Marked as Duplicate',  // The action being performed
+                            duplicateOf: duplicateOf,      // The ID of the original question
+                            adminId: adminId,              // The admin performing the action
+                            timestamp: new Date(),         // Timestamp of the action
+                        }
+                    }
+                },
+                { new: true } // Return the updated question document
+            );
+
+            if (!updatedQuestion) {
+                return helper.error(res, 'Question not found', null, 404);
+            }
+
+            // Return success response with the updated question
+            return helper.success(res, 'Question marked as duplicate successfully', {
+                question: updatedQuestion,
+            });
+
+        } catch (err) {
+            console.error(err);
+            return helper.error(res, 'An error occurred while processing your request.', err, 500);
+        }
+    },
+
+    
+
+    // Get the question's moderation history
+    getModerationHistory : async (req, res) => {
+        try {
+        const { id } = req.params;    
+        const question = await Question.findById(id);
+        if (!question) {
+            return helper.error(res, 'Question not found', null, 404);
+        }
+        
+        return helper.success(res, 'Moderation history retrieved successfully', {
+            moderationHistory: question.moderationHistory,
+        });
+        } catch (err) {
+        console.error(err);
+        return helper.error(res, 'An error occurred while processing your request.', err, 500);
+        }
     },
 
 }

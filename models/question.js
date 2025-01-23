@@ -21,11 +21,23 @@ const questionSchema = new mongoose.Schema({
    type: Boolean,
    default: false,
   },
+  duplicateOf: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Question', 
+    default: null 
+  },
   authorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'admin_user',
     required: true,
   },
+  moderationHistory: [
+    {
+      action: { type: String, required: true },
+      adminId: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin', required: true },
+      timestamp: { type: Date, default: Date.now },
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,

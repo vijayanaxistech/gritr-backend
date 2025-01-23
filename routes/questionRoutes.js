@@ -14,5 +14,9 @@ router.get('/:id',isAuth, questionController.getQuestionById);
 router.post('/editquestion/:id',isAuth, questionController.editQuestionById);
 router.patch('/:id/archive',isAuth,questionController.archiveQuestionById);
 router.delete('/:id',isAuth, questionController.deleteQuestionById);
+router.patch('/:id/duplicate',isAuth, questionController.markQuestionAsDuplicate);
+// Get a question's moderation history
+router.get('/:id/moderation', isAuth, questionController.getModerationHistory);
+
 
 module.exports = router;

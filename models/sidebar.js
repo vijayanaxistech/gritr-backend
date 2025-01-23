@@ -1,7 +1,7 @@
 "use strict";
 const mongoose = require("mongoose");
 
-const sidebarSchema = new mongoose.Schema(
+const SidebarSchema = new mongoose.Schema(
   {
     sidebar_name: {
       type: String,
@@ -58,4 +58,4 @@ const sidebarSchema = new mongoose.Schema(
 );
 
 // Exporting the Sidebar model
-module.exports = mongoose.model("Sidebar", sidebarSchema);
+module.exports = mongoose.model("Sidebar", SidebarSchema);

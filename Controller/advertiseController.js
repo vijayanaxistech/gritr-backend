@@ -24,25 +24,25 @@ module.exports = {
         }
     },
       
-    getAds : async (req, res) => {
-        const { category, city, state } = req.query;
-      
+    getAdById: async (req, res) => {
         try {
-          const ads = await Advertise.find({
-            active: true,
-            startTime: { $lte: new Date() }, // Ad has started
-            endTime: { $gte: new Date() }, // Ad has not ended yet
-            category: category || { $exists: true },
-            city: city || { $exists: true },
-            state: state || { $exists: true },
+          const { id } = req.params;         
+          const ad = await Advertise.findById(id);     
+          
+          if (!ad) {
+            return helper.error(res, 'Ad not found', null, 404);
+          }
+
+          return helper.success(res, 'Ad fetched successfully', {
+            ad,
           });
-      
-          return helper.success(res, 'Ads fetched successfully', ads); // Success response with data
-        } catch (error) {
-          console.error(error);
-          return helper.error(res, 'Error fetching ads', error.message); // Error response with message
+
+        } catch (err) {
+          console.error(err);
+          return helper.error(res, 'Server error, please try again.', err, 500);
         }
     },
+      
 
     updateAd : async (req, res) => {
         const { adId } = req.params;

@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const advertiseController = require('../Controller/advertiseController');
+const adsController = require('../Controller/advertiseController');
 const { isAuth } = require("../middleware/auth");
 
-router.post('/ads', isAuth ,advertiseController.createAd);
+router.post('/ads', isAuth ,adsController.createAd);
+router.get('/getAds/:id', isAuth ,adsController.getAdById);
 
 module.exports = router;

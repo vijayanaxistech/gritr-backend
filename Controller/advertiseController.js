@@ -4,9 +4,6 @@ const helper = require('../helpers/helper');
 module.exports = {
     createAd : async (req, res) => {
     try {
-        
-        console.log(req.body);
-
         const { imageUrl, hyperlink, category, city, state, startTime, endTime } = req.body;
           const newAd = new Advertise({
             imageUrl,

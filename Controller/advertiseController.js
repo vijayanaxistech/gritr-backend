@@ -44,31 +44,26 @@ module.exports = {
     },
       
 
-    updateAd : async (req, res) => {
-        const { adId } = req.params;
-        const { active, startTime, endTime } = req.body;
-      
-        try {
-          const ad = await Advertise.findById(adId);
-      
-          if (!ad) {
-            return helper.error(res, 'Ad not found', null, 404); // Ad not found, return 404
-          }
-      
-          ad.active = active || ad.active;
-          ad.startTime = startTime || ad.startTime;
-          ad.endTime = endTime || ad.endTime;
-      
-          await ad.save();
-          return helper.success(res, 'Ad updated successfully', ad); // Success response with updated ad
-        } catch (error) {
-          console.error(error);
-          return helper.error(res, 'Error updating ad', error.message); // Error response
-        }
+    updateAdById: async (req, res) => {
+      const  adId  = req.params.id; 
+      const { active } = req.body;  
+      try {     
+          const ad = await Advertise.findById(adId);          
+          if (!ad) {            
+              return helper.error(res, 'Ad not found', null, 404);
+          }        
+          ad.active = active !== undefined ? active : ad.active;         
+          await ad.save();        
+          return helper.success(res, 'Ad updated successfully', ad);
+      } catch (error) {
+          console.error('Error updating ad:', error);       
+          return helper.error(res, 'Error updating ad', error.message);
+      }
     },
+  
 
     deactivateAd : async (req, res) => {
-        const { adId } = req.params;
+        const adId  = req.params;
       
         try {
           const ad = await Advertise.findById(adId);

@@ -1,4 +1,4 @@
-const Advertise = require('../../models/Advertise');
+const Advertise = require('../../models/admin/Advertise');
 const helper = require('../../helpers/helper'); 
 
 module.exports = {

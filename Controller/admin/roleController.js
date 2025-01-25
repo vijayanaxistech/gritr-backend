@@ -1,7 +1,7 @@
-let RoleManagement = require("../../models/Roles");
-let Sidebar = require("../../models/sidebar");
+let RoleManagement = require("../../models/admin/Roles");
+let Sidebar = require("../../models/admin/sidebar");
 const helper = require("../../helpers/helper");
-const AdminUser = require("../../models/AdminUser");
+const AdminUser = require("../../models/admin/AdminUser");
 const { Validator } = require("node-input-validator");
 
 module.exports = {

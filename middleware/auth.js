@@ -1,8 +1,7 @@
 const jwt = require("jsonwebtoken");
-let userLoggedFormation = require("../models/userLoggedFormation");
+let userLoggedFormation = require("../models/admin/userLoggedFormation");
 let helper = require(`../helpers/helper`);
 let constants = require(`../config/constants`);
-let planValidity = require("../helpers/planValidity");
 
 exports.isAuth = async (req, res, next) => {
   try {

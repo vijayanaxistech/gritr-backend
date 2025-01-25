@@ -1,7 +1,7 @@
 const { Validator } = require("node-input-validator");
-const AdminUser = require("../../models/AdminUser");
-const RoleManagement = require("../../models/Roles");
-const UserLoggedFormation = require("../../models/userLoggedFormation");
+const AdminUser = require("../../models/admin/AdminUser");
+const RoleManagement = require("../../models/admin/Roles");
+const UserLoggedFormation = require("../../models/admin/userLoggedFormation");
 const helper = require("../../helpers/helper");
 const jwt = require("jsonwebtoken");
 const requestIp = require("request-ip");

@@ -1,5 +1,5 @@
 // controllers/questionController.js
-const Question = require('../../models/question');
+const Question = require('../../models/admin/question');
 const helper = require('../../helpers/helper');
 
 

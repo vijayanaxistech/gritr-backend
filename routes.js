@@ -1,19 +1,27 @@
 "use strict";
 
-let userRoutes = require("./routes/users");
-let roleRoutes = require("./routes/role");
-let businessLocation = require("./routes/businessLocationRoutes");
-let questionRoutes = require("./routes/questionRoutes");
-let advertisement = require("./routes/advertisement");
-
-
+// Import route files
+let userRoutes = require("./routes/admin/users");
+let roleRoutes = require("./routes/admin/role");
+let businessLocation = require("./routes/admin/businessLocationRoutes");
+let questionRoutes = require("./routes/admin/questionRoutes");
+let advertisement = require("./routes/admin/advertisement");
+//let frontUserRoutes = require("./routes/frontUserRoutes"); 
+//let registerRoutes = require("./routes/registerRoutes"); 
 
 module.exports = (app) => {
-  // admin section routes
-  app.use("/api/admin/user", userRoutes);
-  app.use("/api/admin/role", roleRoutes);
-  app.use("/api/admin/location",businessLocation );
-  app.use("/api/admin/question",questionRoutes);
-  app.use("/api/admin/advertisement",advertisement);
+  // Admin section routes
+  app.use("/api/admin/user", userRoutes);       
+  app.use("/api/admin/role", roleRoutes);        
+  app.use("/api/admin/location", businessLocation);
+  app.use("/api/admin/question", questionRoutes); 
+  app.use("/api/admin/advertisement", advertisement); 
   
+  // Front user routes
+  // app.use("/api/front/user", frontUserRoutes);  
+  // app.use("/api/register", registerRoutes);    
+
+
+
+
 };

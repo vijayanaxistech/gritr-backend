@@ -1,5 +1,5 @@
-const Advertise = require('../models/Advertise');
-const helper = require('../helpers/helper'); 
+const Advertise = require('../../models/Advertise');
+const helper = require('../../helpers/helper'); 
 
 module.exports = {
     createAd : async (req, res) => {

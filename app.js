@@ -15,7 +15,6 @@ const connectDB = require("./config/config.js");
 const swaggerDocument = require("./swagger.json");
 const env = require("dotenv");
 const routes = require("./routes.js");
-const expirationTask = require("./tasks/expirationTask");
 
 // Load environment variables
 env.config();

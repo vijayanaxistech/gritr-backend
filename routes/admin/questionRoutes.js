@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const questionController = require("../Controller/questionController");
-const { isAuth } = require("../middleware/auth");
+const questionController = require("../../Controller/admin/questionController");
+const { isAuth } = require("../../middleware/auth");
 
 /**
  * Routes for Question Management

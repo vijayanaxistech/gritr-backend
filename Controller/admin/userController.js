@@ -1,15 +1,15 @@
 const { Validator } = require("node-input-validator");
-const AdminUser = require("../models/AdminUser");
-const RoleManagement = require("../models/Roles");
-const UserLoggedFormation = require("../models/userLoggedFormation");
-const helper = require("../helpers/helper");
+const AdminUser = require("../../models/AdminUser");
+const RoleManagement = require("../../models/Roles");
+const UserLoggedFormation = require("../../models/userLoggedFormation");
+const helper = require("../../helpers/helper");
 const jwt = require("jsonwebtoken");
 const requestIp = require("request-ip");
 
 const {
   JWTExpiresIn,
   JWTSecret,
-} = require("../config/constants");
+} = require("../../config/constants");
 
 module.exports = {
   /**

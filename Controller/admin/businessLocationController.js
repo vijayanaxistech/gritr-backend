@@ -1,5 +1,5 @@
-const helper = require("../helpers/helper");
-const BusinessLocation = require('../models/businessLocation');
+const helper = require("../../helpers/helper");
+const BusinessLocation = require('../../models/businessLocation');
 
 module.exports = {
   getBusinessLocations: async (req, res) => {

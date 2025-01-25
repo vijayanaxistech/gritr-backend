@@ -1,7 +1,7 @@
 let express = require('express');
 let router = express.Router();
-let roleManagement = require('../Controller/roleController');
-const { isAuth } = require("../middleware/auth");
+let roleManagement = require('../../Controller/admin/roleController');
+const { isAuth } = require("../../middleware/auth");
 
 /**
  * @route   POST /create

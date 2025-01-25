@@ -1,6 +1,6 @@
 // controllers/questionController.js
-const Question = require('../models/question');
-const helper = require('../helpers/helper');
+const Question = require('../../models/question');
+const helper = require('../../helpers/helper');
 
 
 module.exports = {

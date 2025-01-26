@@ -7,7 +7,7 @@ let businessLocation = require("./routes/admin/businessLocationRoutes");
 let questionRoutes = require("./routes/admin/questionRoutes");
 let advertisement = require("./routes/admin/advertisement");
 //let frontUserRoutes = require("./routes/frontUserRoutes"); 
-//let registerRoutes = require("./routes/registerRoutes"); 
+let registerRoutes = require("./routes/front/registerRoutes"); 
 
 module.exports = (app) => {
   // Admin section routes
@@ -19,7 +19,7 @@ module.exports = (app) => {
   
   // Front user routes
   // app.use("/api/front/user", frontUserRoutes);  
-  // app.use("/api/register", registerRoutes);    
+  app.use("/api/front/register", registerRoutes);    
 
 
 

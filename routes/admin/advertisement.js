@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const adsController = require('../../Controller/admin/advertiseController');
-const { isAuth } = require("../../middleware/auth");
+const { adminAuth } = require("../../middleware/auth");
 
-router.post('/ads', isAuth ,adsController.createAd);
-router.get('/getAds/:id', isAuth ,adsController.getAdById);
-router.post("/editAds/:id", isAuth, adsController.updateAdById);
+router.post('/ads', adminAuth ,adsController.createAd);
+router.get('/getAds/:id', adminAuth ,adsController.getAdById);
+router.post("/editAds/:id", adminAuth, adsController.updateAdById);
 
 
 module.exports = router;

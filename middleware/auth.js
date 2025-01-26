@@ -2,6 +2,8 @@ const jwt = require("jsonwebtoken");
 let userLoggedFormation = require("../models/admin/userLoggedFormation");
 let helper = require(`../helpers/helper`);
 let constants = require(`../config/constants`);
+const AdminRole = require("../models/admin/Roles"); // Replace with the actual path to Admin_Role model
+
 
 exports.isAuth = async (req, res, next) => {
   try {
@@ -9,7 +11,6 @@ exports.isAuth = async (req, res, next) => {
       if (!token) {
       return helper.error(res, "Please Login to access this resource");
     }
-
     const decoded = jwt.verify(token, constants.JWTSecret);
     const user = await userLoggedFormation
       .findOne({
@@ -18,13 +19,12 @@ exports.isAuth = async (req, res, next) => {
       })
       .populate("userId");
 
-    if (!user || user.userId.isActive === false || !planValidity(user.userId)) {
+    if (!user || user.userId.isActive === false) {
       throw new Error("Account is inActive");
     }
     req.user = { ...decoded.data, masterIds: user?.userId?.masterIds };
     next();
   } catch (e) {
-    console.log(e);
     return res.status(401).json({
       success: false,
       error: "Your token is expired.",
@@ -36,64 +36,50 @@ exports.isAuth = async (req, res, next) => {
 
 exports.adminAuth = async (req, res, next) => {
   try {
-    const token = req.header("Authorization").replace("Bearer ", "");
-    const decoded = jwt.verify(token, constants.JWTSecret);
-    const user = await userLoggedFormation.findOne({
-      userId: decoded.data.userId,
-      token: token,
-    });
-    if (!user) {
-      throw new Error();
+    // Extract token from Authorization header
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+    if (!token) {
+      return helper.error(res, "Please Login to access this resource");
     }
-    req.token = token;
-    req.user = user;
+
+    // Verify and decode the token
+    const decoded = jwt.verify(token, constants.JWTSecret);
+
+    // Fetch user details using token and decoded ID
+    const user = await userLoggedFormation
+      .findOne({
+        userId: decoded?.data?.id,
+        token: token,
+      })
+      .populate("userId");
+
+    // Check if the user exists, account is active, and has admin privileges
+    if (!user || user.userId.isActive === false) {
+      throw new Error("Account is inactive");
+    }
+
+    if (
+      user.userId.roleType !== constants.TYPE_SUPER_ADMIN &&
+      user.userId.roleType !== constants.TYPE_CONTENT_ADMIN &&
+      user.userId.roleType !== constants.TYPE_ADMIN
+    ) {
+      return res.status(403).json({
+        success: false,
+        error: "Access restricted to admins only.",
+        code: 403,
+        data: {},
+      });
+    }
+
+    // Attach user details to the request object
+    req.user = { ...decoded.data, masterIds: user?.userId?.masterIds };
     next();
   } catch (e) {
     return res.status(401).json({
       success: false,
-      error: "Please be Authenticate.",
+      error: "Your token is expired or invalid.",
       code: 401,
       data: {},
     });
-  }
-};
-
-// exports.authPlain = async (req, res, next) => {
-//   try {
-//     const token = req.header("Authorization").replace("Bearer ", "");
-//     const decoded = jwt.verify(token, constants.JWTSecret);
-//     const user = await userLoggedFormation.findOne({
-//       userId: decoded.tokenData.user_id,
-//       token: token,
-//     });
-//     if (!user) {
-//       throw new Error();
-//     }
-//     req.token = token;
-//     req.user = user;
-//     next();
-//   } catch (e) {
-//     return helper.error(res, "Please be Authenticate.");
-//   }
-// };
-
-exports.authPlainJew = async (req, res, next) => {
-  try {
-    const token = req.header("Authorization").replace("Bearer ", "");
-    const decoded = jwt.verify(token, constants.JWTSecret);
-    const user = await userLoggedFormation
-      .findOne({
-        userId: decoded.data.userId,
-        token: token,
-      })
-      .populate("userId");
-    if (!user || user.userId.isActive === false || !planValidity(user.userId)) {
-      throw new Error();
-    }
-    req.token = token;
-    req.user = user;
-    next();
-  } catch (e) {
-    return helper.error(res, "Please be Authenticate.");
   }
 };

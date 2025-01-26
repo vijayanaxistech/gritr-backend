@@ -236,17 +236,17 @@ module.exports = {
         ip: requestIp.getClientIp(req),
       });
   
-      // Return all data along with the token and sidebarIds
       return helper.success(res, "User logged in successfully.", {
         authToken: token,
         fullName: logData.fullName,
         email: logData.email,
         userName: logData.userName,
         roleId: logData.roleId,
-        sidebarIds: logData.sidebarIds, // Added sidebarIds
+        sidebarIds: logData.sidebarIds, 
         roleType: logData.roleType,
         isActive: logData.isActive,
       });
+      
     } catch (error) {
       return helper.error(res, error);
     }

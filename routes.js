@@ -6,8 +6,7 @@ let roleRoutes = require("./routes/admin/role");
 let businessLocation = require("./routes/admin/businessLocationRoutes");
 let questionRoutes = require("./routes/admin/questionRoutes");
 let advertisement = require("./routes/admin/advertisement");
-//let frontUserRoutes = require("./routes/frontUserRoutes"); 
-let registerRoutes = require("./routes/front/registerRoutes"); 
+let authRoutes = require("./routes/front/authRoutes"); 
 
 module.exports = (app) => {
   // Admin section routes
@@ -18,8 +17,8 @@ module.exports = (app) => {
   app.use("/api/admin/advertisement", advertisement); 
   
   // Front user routes
-  // app.use("/api/front/user", frontUserRoutes);  
-  app.use("/api/front/register", registerRoutes);    
+  app.use("/api/front/login", authRoutes);    
+  app.use("/api/front/register", authRoutes);    
 
 
 

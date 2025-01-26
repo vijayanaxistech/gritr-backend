@@ -9,6 +9,7 @@ const registerController = require("../../Controller/front/registerRoutes");
  * @access  Protected
  */
 router.post("/registerUser", registerController.registerUser);
+router.post("/loginUser", registerController.loginUser);
 
 
 module.exports = router;

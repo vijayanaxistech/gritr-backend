@@ -1,6 +1,12 @@
 const { Validator } = require("node-input-validator");
 const User = require("../../models/front/User");
 const helper = require("../../helpers/helper");
+const jwt = require("jsonwebtoken");
+const {
+  JWTExpiresInFrontend,
+  JWTSecretFrontend,
+} = require("../../config/constants");
+
 
 module.exports = {
   /**
@@ -47,4 +53,61 @@ module.exports = {
       return helper.error(res, error.message);
     }
   },
+
+
+  /**
+   * Logs in a user.
+   * Validates the input, checks for matching email and password, and generates an auth token.
+  */
+  
+  loginUser: async (req, res) => {
+    try {
+      // Validate required fields
+      let v = new Validator(req.body, {
+        email: "required|email",
+        password: "required|string",
+      });
+
+      const matched = await v.check();
+      if (!matched) {
+        return helper.error(res, v.errors);
+      }
+
+      // Check if the user exists
+      let logData = await User.findOne({ email: v.inputs.email });
+      if (!logData) {
+        return helper.error(res, "Invalid email or password.");
+      }
+
+      // Compare passwords using helper.comparePass
+      let checkPassword = await helper.comparePass(v.inputs.password, logData.password);
+      if (!checkPassword) {
+        return helper.error(res, "Invalid email or password.");
+      }
+
+      // Create a JWT token
+      const token = jwt.sign(
+        { userId: logData._id, email: logData.email },
+        JWTSecretFrontend,
+        { expiresIn: JWTExpiresInFrontend }
+      );
+
+      // Success response with token
+      return helper.success(res, "Login successful.", {
+        token,
+        user: {
+          id: logData._id,
+          fullName: logData.fullName,
+          email: logData.email,
+          city: logData.city,
+        },
+      });
+    } catch (error) {
+      console.error("Error logging in user:", error);
+      return helper.error(res, error.message);
+    }
+  },
+
+
+
 };

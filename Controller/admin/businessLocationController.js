@@ -62,7 +62,7 @@ module.exports = {
     }
   },
 
-   getCity : async (req, res) => {
+  getCity: async (req, res) => {
     try {
         const { page, limit, search } = req.query;
 
@@ -87,10 +87,10 @@ module.exports = {
         // Query to fetch cities and the total count
         const cityQuery = UsCity.find(searchFilter)
             .select('city') // Fetch only the city field
-            .sort({ _id: 1 }) // Sort by _id
+            .sort({ city: 1 }) // Sort alphabetically by city
             .skip(skip)
             .limit(pageSize);
-        
+
         const totalRecordsPromise = UsCity.countDocuments(searchFilter);
 
         // Execute the queries with a race condition for timeout
@@ -110,15 +110,18 @@ module.exports = {
             });
         }
 
+        // Remove duplicates from the list of cities (just in case)
+        const uniqueCities = [...new Set(cities.map(city => city.city))];
+
         // Fetch the ID of the last city in the results
-        const lastFetchedId = cities[cities.length - 1]?._id;
+        const lastFetchedCity = uniqueCities[uniqueCities.length - 1];
 
         // Return the results
         return res.status(200).json({
             success: true,
             message: "Listing Successfully.",
-            data: cities,
-            lastId: lastFetchedId,
+            data: uniqueCities,
+            lastId: lastFetchedCity,
             totalRecords,
             limit: pageSize,
         });
@@ -136,7 +139,10 @@ module.exports = {
             message: "Error fetching cities. Please try again.",
         });
     }
-},
+  },
+
+
+
 
 
 

@@ -15,32 +15,42 @@ module.exports = {
    */
   registerUser: async (req, res) => {
     try {
-      // Validate required fields
+      // Define custom error messages for validation
+      const customMessages = {
+        "required": "The :attribute field is required.",
+        "string": "The :attribute must be a string.",
+        "email": "Please provide a valid email address.",
+        "minLength": "The :attribute must be at least 6 characters long.",
+      };
+  
+      // Validate required fields with custom messages
       let v = new Validator(req.body, {
         fullName: "required|string",
         email: "required|email",
-        password: "required|string|minLength:6",
+        password: "required|string|minLength:6", // Password validation with min length
         city: "required|string",
-      });
-
+      }, customMessages);
+  
       const matched = await v.check();
+  
       if (!matched) {
-        return helper.error(res, v.errors);
+        // If validation fails, return the errors with custom messages and a 400 status code
+        return helper.error(res, "Validation Error", v.errors, 400);
       }
-
+  
       // Check if the email is already in use
       let checkEmail = await User.findOne({ email: v.inputs.email });
       if (checkEmail) {
-        return helper.error(res, "This email is already in use");
+        return helper.error(res, "This email is already in use.", {}, 400);
       }
-
+  
       // Encrypt the password
       req.body.password = await helper.passwordEncrypt(req.body.password);
-
+  
       // Create and save the user
       const newUser = new User(req.body);
       await newUser.save();
-
+  
       // Success response
       return helper.success(res, "User registered successfully.", {
         id: newUser._id,
@@ -50,9 +60,11 @@ module.exports = {
       });
     } catch (error) {
       console.error("Error registering user:", error);
-      return helper.error(res, error.message);
+      return helper.error(res, error.message, {}, 500); // 500 for internal server error
     }
   },
+  
+  
 
 
   /**

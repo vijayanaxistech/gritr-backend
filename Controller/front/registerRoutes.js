@@ -1,5 +1,7 @@
 const { Validator } = require("node-input-validator");
-const User = require("../../models/front/User");
+const User = require("../../models/front/User")
+const FrontToken = require("../../models/front/frontToken");
+;
 const helper = require("../../helpers/helper");
 const jwt = require("jsonwebtoken");
 const {
@@ -76,31 +78,41 @@ module.exports = {
         email: "required|email",
         password: "required|string",
       });
-
+  
       const matched = await v.check();
       if (!matched) {
         return helper.error(res, v.errors);
       }
-
+  
       // Check if the user exists
       let logData = await User.findOne({ email: v.inputs.email });
       if (!logData) {
         return helper.error(res, "Invalid email or password.");
       }
-
+  
       // Compare passwords using helper.comparePass
       let checkPassword = await helper.comparePass(v.inputs.password, logData.password);
       if (!checkPassword) {
         return helper.error(res, "Invalid email or password.");
       }
-
+  
       // Create a JWT token
       const token = jwt.sign(
         { userId: logData._id, email: logData.email },
         JWTSecretFrontend,
         { expiresIn: JWTExpiresInFrontend }
       );
-
+  
+      // Store the token in the frontToken collection
+      const tokenData = {
+        userId: logData._id,
+        token,
+        expiresAt: new Date(Date.now() + parseInt(JWTExpiresInFrontend, 10) * 1000), // Fix: Properly calculate expiresAt
+      };
+  
+      // Save token data in the database
+      await FrontToken.create(tokenData);
+  
       // Success response with token
       return helper.success(res, "Login successful.", {
         token,
@@ -116,7 +128,5 @@ module.exports = {
       return helper.error(res, error.message);
     }
   },
-
-
 
 };

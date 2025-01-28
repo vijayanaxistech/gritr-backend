@@ -63,12 +63,9 @@ module.exports = {
       return helper.error(res, error.message, {}, 500); // 500 for internal server error
     }
   },
-  
-  
-
 
   /**
-   * Logs in a user.
+   * Login in a user.
    * Validates the input, checks for matching email and password, and generates an auth token.
   */
   

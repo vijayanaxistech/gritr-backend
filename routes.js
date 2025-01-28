@@ -7,6 +7,8 @@ let businessLocation = require("./routes/admin/businessLocationRoutes");
 let questionRoutes = require("./routes/admin/questionRoutes");
 let advertisement = require("./routes/admin/advertisement");
 let authRoutes = require("./routes/front/authRoutes"); 
+let verifyToken = require("./routes/front/verifyToken"); 
+
 
 module.exports = (app) => {
   // Admin section routes
@@ -19,6 +21,7 @@ module.exports = (app) => {
   // Front user routes
   app.use("/api/front/login", authRoutes);    
   app.use("/api/front/register", authRoutes);    
+  app.use("/api/front/verifyToken", verifyToken);    
 
 
 

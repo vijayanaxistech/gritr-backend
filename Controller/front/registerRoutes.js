@@ -107,7 +107,7 @@ module.exports = {
       const tokenData = {
         userId: logData._id,
         token,
-        expiresAt: new Date(Date.now() + parseInt(JWTExpiresInFrontend, 10) * 1000), // Fix: Properly calculate expiresAt
+        expiresAt: new Date(Date.now() + helper.parseExpiresIn(JWTExpiresInFrontend)),
       };
   
       // Save token data in the database
@@ -127,6 +127,6 @@ module.exports = {
       console.error("Error logging in user:", error);
       return helper.error(res, error.message);
     }
-  },
-
+  },  
 };
+

@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const registerController = require("../../Controller/front/registerRoutes");
-
 /**
  * @route   POST /api/front/register/registerUser
  * @desc    Register a new user
@@ -15,5 +14,6 @@ router.post("/registerUser", registerController.registerUser);
  * @access  Public
  */
 router.post("/loginUser", registerController.loginUser);
+
 
 module.exports = router;

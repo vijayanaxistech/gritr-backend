@@ -207,4 +207,37 @@ module.exports = {
     );
     return sdkJWT;
   },
+
+
+   /**
+   * Parses a time string into milliseconds.
+   * @param {string} expiresIn - Time string in the format (e.g., "1d", "2h", "30m", "45s").
+   * @returns {number} - Milliseconds equivalent of the time string.
+   */
+   parseExpiresIn: (expiresIn) => {
+    const regex = /(\d+)([smhd])/; // Matches number and time unit (s, m, h, d)
+    const match = expiresIn.match(regex);
+
+    if (!match) {
+      throw new Error("Invalid expiration format. Expected format: <number><unit>, e.g., '1d', '2h'.");
+    }
+
+    const value = parseInt(match[1], 10); // Extract the numeric value
+    const unit = match[2]; // Extract the unit (s, m, h, d)
+
+    switch (unit) {
+      case "s": // seconds
+        return value * 1000; // Convert seconds to milliseconds
+      case "m": // minutes
+        return value * 60 * 1000; // Convert minutes to milliseconds
+      case "h": // hours
+        return value * 60 * 60 * 1000; // Convert hours to milliseconds
+      case "d": // days
+        return value * 24 * 60 * 60 * 1000; // Convert days to milliseconds
+      default:
+        throw new Error("Unsupported time unit. Use 's', 'm', 'h', or 'd'.");
+    }
+  },
+
+
 };

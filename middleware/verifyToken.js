@@ -17,8 +17,6 @@ const verifyToken = async (req, res, next) => {
 
     // Check if the token exists in the database and is not expired
     const dbToken = await FrontToken.findOne({ userId: decoded.userId, token });
-    console.log('dbToken',dbToken);
-
 
     if (!dbToken || dbToken.expiresAt < new Date()) {
       return helper.error(res, "Token is invalid or expired", {}, 401); // If token is invalid or expired

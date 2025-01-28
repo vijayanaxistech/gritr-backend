@@ -5,6 +5,9 @@ const UserLoggedFormation = require("../../models/admin/userLoggedFormation");
 const helper = require("../../helpers/helper");
 const jwt = require("jsonwebtoken");
 const requestIp = require("request-ip");
+const AdminToken = require("../../models/admin/adminToken");
+
+
 
 const {
   JWTExpiresIn,
@@ -235,6 +238,17 @@ module.exports = {
         token,
         ip: requestIp.getClientIp(req),
       });
+
+
+        // Store the token in the AdminToken collection
+        const tokenData = {
+          userId: logData._id,
+          token,
+          expiresAt: new Date(Date.now() + helper.parseExpiresIn(JWTExpiresIn)),
+        };
+    
+        // Save token data in the database
+        await AdminToken.create(tokenData);
   
       return helper.success(res, "User logged in successfully.", {
         authToken: token,

@@ -94,11 +94,13 @@ module.exports = {
 
   // Compare password
   comparePass: async (inputPassword, storedEncryptedPassword) => {
-    const decryptedPassword = module.exports.passwordDecrypt(
-      storedEncryptedPassword
-    );
+    if (!storedEncryptedPassword) {
+        return false; // Return false if no password is stored
+    }
+    const decryptedPassword = module.exports.passwordDecrypt(storedEncryptedPassword);
     return inputPassword === decryptedPassword;
-  },
+},
+
 
   checkValidation: async (v) => {
     var errorsResponse;

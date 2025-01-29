@@ -22,6 +22,7 @@ async function findOrCreateGoogleUser(payload) {
       email: payload.email,
       fullName: payload.name,
       isGmailLogin: true,
+      password:null,
       isVerify: true,
     });
     await user.save();

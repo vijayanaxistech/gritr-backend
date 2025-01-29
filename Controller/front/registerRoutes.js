@@ -76,7 +76,7 @@ module.exports = {
       // Validate required fields
       let v = new Validator(req.body, {
         email: "required|email",
-        password: "required|string",
+        password: "required|string|minLength:6",
       });
   
       const matched = await v.check();

@@ -18,22 +18,39 @@ const userSchema = new mongoose.Schema(
         "Please enter a valid email",
       ],
     },
+    googleId: {
+      type: String, // Store the Google user ID for users logging in with Google
+      unique: true,
+      sparse: true,  // This allows both email-based login and Google-based login
+    },
     isActive: {
         type: Boolean,
         default: true,
+    },
+    isGmailLogin: {
+      type: Boolean,
+      default: false
+    },
+    isVerify: {
+      type: Boolean,
+      default: false
     },
     isDeleted: {
         type: Boolean,
         default: false,
     },
     password: {
-      type: String,
-      required: [true, "Password is required"],
+      type: String, 
       minlength: [6, "Password must be at least 6 characters long"],
+      required: function () {
+        return !this.googleId; // Password is required only if the user is not using Google login
+      },
     },
     city: {
       type: String,
-      required: [true, "City is required"],
+      required: function () {
+        return !this.googleId; // Password is required only if the user is not using Google login
+      },
       trim: true,
     }
   },

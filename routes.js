@@ -8,6 +8,8 @@ let questionRoutes = require("./routes/admin/questionRoutes");
 let advertisement = require("./routes/admin/advertisement");
 let authRoutes = require("./routes/front/authRoutes"); 
 let verifyToken = require("./routes/front/verifyToken");
+const googleSignInRoutes = require('./routes/front/googleSignIn');
+
 
 
 module.exports = (app) => {
@@ -24,6 +26,7 @@ module.exports = (app) => {
   app.use("/api/front/login", authRoutes);    
   app.use("/api/front/register", authRoutes);    
   app.use("/api/front/verifyToken", verifyToken);
+  app.use('/api/front/auth', googleSignInRoutes);
   
 
 

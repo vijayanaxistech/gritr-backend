@@ -51,6 +51,7 @@ async function googleSignIn(req, res) {
       status: true,
       code: 200,
       message: 'Login Successfully.',
+      token,
       user: {
         id: user._id,
         fullName: user.fullName,

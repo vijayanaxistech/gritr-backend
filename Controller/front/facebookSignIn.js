@@ -38,6 +38,11 @@ async function facebookSignIn(req, res) {
   try {
     // Verify and decode the Facebook token
     const payload = await verifyFacebookToken(accessToken);
+
+    let existingUser = await User.findOne({ email: payload.email });  
+      if (existingUser && existingUser.isFacebookLogin === false) {
+        return helper.error(res, 'This email is already registered with a different login method.');
+      }
     
     // Find or create the user based on Facebook data
     const user = await findOrCreateFacebookUser(payload);

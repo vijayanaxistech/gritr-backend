@@ -87,13 +87,13 @@ module.exports = {
       // Check if the user exists
       let logData = await User.findOne({ email: v.inputs.email });
       if (!logData) {
-        return helper.error(res, "Login unsuccessful. Please verify your email and password and try again!.");
+        return helper.error(res, "Invalid login. Please check your email and password!");
       }
   
       // Compare passwords using helper.comparePass
       let checkPassword = await helper.comparePass(v.inputs.password, logData.password);
       if (!checkPassword) {
-        return helper.error(res, "Login unsuccessful. Please verify your email and password and try again!.");
+        return helper.error(res, "Invalid login. Please check your email and password!");
       }
   
       // Create a JWT token

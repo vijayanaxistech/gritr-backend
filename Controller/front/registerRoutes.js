@@ -43,7 +43,7 @@ module.exports = {
       // Check if the email is already in use
       let checkEmail = await User.findOne({ email: v.inputs.email });
       if (checkEmail) {
-        return helper.error(res, "This email is already in use.", {}, 400);
+        return helper.error(res, "This email is already in use. Please try another.", {}, 400);
       }
   
       // Encrypt the password
@@ -54,7 +54,7 @@ module.exports = {
       await newUser.save();
   
       // Success response
-      return helper.success(res, "User registered successfully.", {
+      return helper.success(res, "You’ve successfully registered! Welcome to Gritr!", {
         id: newUser._id,
         fullName: newUser.fullName,
         email: newUser.email,

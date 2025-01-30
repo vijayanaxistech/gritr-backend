@@ -92,14 +92,57 @@ module.exports = {
     return decrypt;
   },
 
-  // Compare password
-  comparePass: async (inputPassword, storedEncryptedPassword) => {
-    if (!storedEncryptedPassword) {
-        return false; // Return false if no password is stored
+
+  // Encrypt data using bcrypt (for password storage)
+  passwordEncrypt: async (data) => {
+    const saltRounds = 10;  // You can adjust the number of salt rounds based on your security needs.
+    try {
+      // Hash the password using bcrypt
+      const hashedPassword = await bcrypt.hash(data, saltRounds);
+      return hashedPassword;
+    } catch (err) {
+      throw new Error("Error encrypting password: " + err.message);
     }
-    const decryptedPassword = module.exports.passwordDecrypt(storedEncryptedPassword);
-    return inputPassword === decryptedPassword;
-},
+  },
+
+
+  // Compare password
+  // comparePass: async (inputPassword, storedEncryptedPassword) => {
+  //   if (!storedEncryptedPassword) {
+  //       return false; // Return false if no password is stored
+  //   }
+  //   const decryptedPassword = module.exports.passwordDecrypt(storedEncryptedPassword);
+  //   return inputPassword === decryptedPassword;
+  // },
+
+
+
+    // Compare password using bcrypt (check if password exists, then compare)
+  comparePass: async (inputPassword, storedHashedPassword) => {
+      // Check if the stored hashed password is blank or falsy
+      if (!storedHashedPassword) {
+        return false; // Return false if no password is stored
+      }
+
+      try {
+        // Compare input password with the stored hashed password
+        const isMatch = await bcrypt.compare(inputPassword, storedHashedPassword);
+        return isMatch; // Returns true if passwords match, false otherwise
+      } catch (err) {
+        throw new Error("Error comparing passwords: " + err.message);
+      }
+  },
+
+
+
+
+
+// Decrypt data
+  passwordDecrypt: (data) => {
+    let key = constants.secret;
+    let decrypt = aes256.decrypt(key, data);
+    return decrypt;
+  },
 
 
   checkValidation: async (v) => {

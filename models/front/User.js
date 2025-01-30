@@ -23,17 +23,26 @@ const userSchema = new mongoose.Schema(
       unique: true,
       sparse: true,  // This allows both email-based login and Google-based login
     },
+    facebookId: {
+      type: String, // Store the Facebook user ID for users logging in with Facebook
+      unique: true,
+      sparse: true,  // This allows both email-based login and Facebook-based login
+    },
     isActive: {
         type: Boolean,
         default: true,
     },
     isGmailLogin: {
       type: Boolean,
-      default: false
+      default: false,  // Track if the user logged in using Gmail/Google
+    },
+    isFacebookLogin: {
+      type: Boolean,
+      default: false,  // Track if the user logged in using Facebook
     },
     isVerify: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isDeleted: {
         type: Boolean,
@@ -43,13 +52,13 @@ const userSchema = new mongoose.Schema(
       type: String, 
       minlength: [6, "Password must be at least 6 characters long"],
       required: function () {
-        return !this.googleId; // Password is required only if the user is not using Google login
+        return !this.googleId && !this.facebookId; // Password is required only if the user is not using Google or Facebook login
       },
     },
     city: {
       type: String,
       required: function () {
-        return !this.googleId; // Password is required only if the user is not using Google login
+        return !this.googleId && !this.facebookId; // City is required only if the user is not using Google or Facebook login
       },
       trim: true,
     }

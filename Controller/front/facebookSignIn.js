@@ -24,9 +24,9 @@ async function findOrCreateFacebookUser(payload) {
       facebookId: payload.id,
       email: payload.email,
       fullName: payload.name,
-      isGmailLogin: false, // Since this is Facebook login, mark as false
-      password: null, // Facebook login doesn't require a password
-      isVerify: true, // Mark user as verified by default
+      isFacebookLogin:true,     
+      password: null, 
+      isVerify: true,
     });
     await user.save();
   }

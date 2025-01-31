@@ -4,22 +4,18 @@ let surveysManagement = require('../../Controller/admin/surveysController');
 const { isAuth,adminAuth } = require("../../middleware/auth");
 
 // Survey Management Routes
-router.post('/create-surveys',adminAuth, surveysManagement.create);  // Create a new survey
-router.post('/edit-surveys/:id', adminAuth ,surveysManagement.editSurvey);  // Edit an existing survey
+router.post('/create-surveys',adminAuth, surveysManagement.create);
+router.post('/edit-surveys/:id', adminAuth ,surveysManagement.editSurvey);
+router.get('/getall',adminAuth, surveysManagement.getAllSurveys); 
+router.get('/getSurveyById/:id', adminAuth ,surveysManagement.getSurveyById);
+router.delete('/deletesurveys/:id',adminAuth, surveysManagement.deleteSurvey);
 
-
-
-
-// router.put('/api/surveys/:id', editSurvey);  // Edit an existing survey
-// router.get('/api/surveys', getAllSurveys);  // Get all surveys
-// router.get('/api/surveys/:id', getSurveyById);  // Get survey by ID
-// router.delete('/api/surveys/:id', deleteSurvey);  // Delete survey
-
-// // Flag Survey Routes
-// router.put('/api/surveys/:id/flag', flagSurvey);  // Flag survey as Product/Customer Experience
+// Flag Survey Routes
+router.post('/flagSurvey/:id/flag', adminAuth, surveysManagement.flagSurvey);
 
 // // Survey Approval Routes
-// router.put('/api/surveys/:id/approve', approveSurvey);  // Approve survey
+router.post('/approveSurvey/:id/approve',adminAuth,surveysManagement.approveSurvey);
+
 // router.put('/api/surveys/:id/reject', rejectSurvey);  // Reject survey
 // router.put('/api/surveys/:id/approve-similar', approveSimilarSurveys);  // Approve similar surveys
 

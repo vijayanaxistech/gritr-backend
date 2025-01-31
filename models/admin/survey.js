@@ -17,6 +17,14 @@ const SurveySchema = new Schema(
       type: String,
       default: '',
     },
+    isDeleted: {
+      type: Boolean,
+      default:false,
+    },    
+    isApproved: { 
+      type: Boolean, 
+      default: false 
+    }, 
     status: {
       type: String,
       enum: ['pending', 'approved', 'rejected'],

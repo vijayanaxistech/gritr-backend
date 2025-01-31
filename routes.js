@@ -9,6 +9,7 @@ let advertisement = require("./routes/admin/advertisement");
 let authRoutes = require("./routes/front/authRoutes"); 
 let verifyToken = require("./routes/front/verifyToken");
 const googleSignInRoutes = require('./routes/front/googleSignIn');
+const surveys = require('./routes/admin/surveys');
 
 
 
@@ -19,7 +20,9 @@ module.exports = (app) => {
   app.use("/api/admin/location", businessLocation);
   app.use("/api/admin/question", questionRoutes); 
   app.use("/api/admin/advertisement", advertisement); 
-  app.use("/api/admin/verifyAdminToken", verifyToken);    
+  app.use("/api/admin/verifyAdminToken", verifyToken);
+  app.use("/api/admin/surveys", surveys);
+      
 
 
   // Front user routes

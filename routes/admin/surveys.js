@@ -34,10 +34,10 @@ router.post('/:id/flag', adminAuth, surveysManagement.flagSurvey);
 // ============================
 
 // Approve a survey by ID (requires admin authentication)
-router.post('/:id/approve', adminAuth, surveysManagement.approveSurvey);
+//router.post('/:id/approve', adminAuth, surveysManagement.approveSurvey);
 
 // Reject a survey by ID (requires admin authentication)
-router.post('/rejectSurvey/:id/reject', adminAuth, surveysManagement.rejectSurvey);
+//router.post('/rejectSurvey/:id/reject', adminAuth, surveysManagement.rejectSurvey);
 
 // Approve surveys that are similar (requires admin authentication)
 router.post('/:id/approve-similar', adminAuth, surveysManagement.approveSimilarSurveys);

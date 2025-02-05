@@ -10,6 +10,13 @@ const { isAuth, adminAuth } = require("../../middleware/auth");
 // Create a new survey (requires admin authentication)
 router.post('/create-surveys', adminAuth, surveysManagement.create);
 
+/**
+ * @route   POST /updateSurveyStatus/:id
+ * @desc    Update the status of a user (e.g., activate or deactivate)
+ * @access  Protected
+ */
+router.post("/updateSurveyStatus/:id", adminAuth, surveysManagement.updateSurveyStatus);
+
 // Edit an existing survey by ID (requires admin authentication)
 router.post('/edit-surveys/:id', adminAuth, surveysManagement.editSurvey);
 

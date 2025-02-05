@@ -1,9 +1,10 @@
 const { Validator } = require("node-input-validator");
 const User = require("../../models/front/User")
 const FrontToken = require("../../models/front/frontToken");
-;
+const UserLoggedFormation = require("../../models/admin/userLoggedFormation");
 const helper = require("../../helpers/helper");
 const jwt = require("jsonwebtoken");
+const requestIp = require("request-ip");
 const {
   JWTExpiresInFrontend,
   JWTSecretFrontend,
@@ -95,6 +96,8 @@ module.exports = {
       if (!checkPassword) {
         return helper.error(res, "Invalid login. Please check your email and password!");
       }
+
+     
   
       // Create a JWT token
       const token = jwt.sign(
@@ -102,6 +105,12 @@ module.exports = {
         JWTSecretFrontend,
         { expiresIn: JWTExpiresInFrontend }
       );
+
+      await UserLoggedFormation.create({
+        userId: logData._id,
+        token,
+        ip: requestIp.getClientIp(req),
+      });
   
       // Store the token in the frontToken collection
       const tokenData = {

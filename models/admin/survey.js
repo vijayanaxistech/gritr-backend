@@ -58,14 +58,14 @@ const SurveySchema = new Schema(
     // Admin user who created the survey (required)
     createdBy: {
       type: Schema.Types.ObjectId,
-      ref: 'AdminUser', // Reference to the admin user who created the survey
+      ref: 'User', // Reference to the admin user who created the survey
       required: true,
     },
 
     // Admin user who last updated the survey (optional)
     updatedBy: {
       type: Schema.Types.ObjectId,
-      ref: 'AdminUser', // Reference to the admin user who last updated the survey
+      ref: 'User', // Reference to the admin user who last updated the survey
     },
 
     // List of questions in the survey

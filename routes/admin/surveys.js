@@ -8,7 +8,7 @@ const { isAuth, adminAuth } = require("../../middleware/auth");
 // ============================
 
 // Create a new survey (requires admin authentication)
-router.post('/create-surveys', adminAuth, surveysManagement.create);
+router.post('/create-surveys',isAuth, surveysManagement.create);
 
 /**
  * @route   POST /updateSurveyStatus/:id

@@ -7,24 +7,31 @@ const AdminRole = require("../models/admin/Roles"); // Replace with the actual p
 
 exports.isAuth = async (req, res, next) => {
   try {
+
     const token = req.header("Authorization")?.replace("Bearer ", "");
       if (!token) {
       return helper.error(res, "Please Login to access this resource");
-    }
-    const decoded = jwt.verify(token, constants.JWTSecret);
+    } 
+    
+    const decoded = jwt.verify(token, constants.JWTSecretFrontend);
+
+    //console.log('decoded',decoded);
+
     const user = await userLoggedFormation
       .findOne({
-        userId: decoded?.data?.id,
+        userId: decoded?.userId,
         token: token,
       })
       .populate("userId");
 
-    if (!user || user.userId.isActive === false) {
-      throw new Error("Account is inActive");
-    }
-    req.user = { ...decoded.data, masterIds: user?.userId?.masterIds };
+    // if (!user || user.userId.isActive === false) {
+    //   throw new Error("Account is inActive");
+    // }
+    req.user = { ...decoded.data, userId: user?._id };
     next();
   } catch (e) {
+    console.log(e);
+
     return res.status(401).json({
       success: false,
       error: "Your token is expired.",

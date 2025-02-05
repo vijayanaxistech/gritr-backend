@@ -18,6 +18,9 @@ module.exports = {
         surveyType: "required",
         region: "required",
       });
+      
+      console.log(req.user.userId);
+      
 
       const errors = v.errors;
       if (errors && errors.length > 0) {
@@ -33,7 +36,7 @@ module.exports = {
       // Create a new survey document with request data
       const survey = new Survey({
         ...req.body,
-        createdBy: req.user.id, // Store the ID of the logged-in user as creator
+        createdBy: req.user.userId, // Store the ID of the logged-in user as creator
       });
 
       // Save the new survey to the database

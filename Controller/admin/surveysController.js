@@ -1,6 +1,8 @@
 const Survey = require("../../models/admin/survey");
 const { Validator } = require("node-input-validator");
 const helper = require("../../helpers/helper");
+const BusinessLocation = require('../../models/admin/businessLocation');
+const UsCity = require('../../models/admin/UsCity');
 
 module.exports = {
   /**
@@ -321,4 +323,76 @@ module.exports = {
       return helper.error(res, error.message);
     }
   },
+
+  getCitySurvey: async (req, res) => {
+      try {
+          const { page, limit, search } = req.body;
+  
+          // Ensure valid pagination parameters
+          const pageNumber = Math.max(1, Number(page) || 1);
+          const pageSize = Math.max(1, Number(limit) || 10);
+          const skip = (pageNumber - 1) * pageSize;
+  
+          let searchFilter = {}; 
+      
+          if (search) {     
+              // Exact match for Greater City Area (case-insensitive)
+              const greaterCityMatch = await UsCity.findOne({ 
+                  greater_city_area: { $regex: `^${search}$`, $options: 'i' } 
+              });
+  
+
+              if (greaterCityMatch) {
+                  // If a Greater City Area is found, fetch all cities in that area
+                  searchFilter = { greater_city_area: greaterCityMatch.greater_city_area };
+              } else {
+                  // Otherwise, search for the city name
+                  searchFilter = { city: { $regex: search, $options: 'i' } };
+              }
+          }
+  
+          // Define a timeout for query execution
+          const timeoutDuration = 2000;
+          const timeoutPromise = new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('Query timeout')), timeoutDuration)
+          );
+  
+          // Query to fetch city data and the total count
+          const cityQuery = UsCity.find(searchFilter)
+              .select('city greater_city_area state_name county_fips') // Fetch only relevant fields
+              .sort({ city: 1 }) // Sort alphabetically by city
+              .skip(skip)
+              .limit(pageSize);
+  
+          const totalRecordsPromise = UsCity.countDocuments(searchFilter);
+  
+          // Execute the queries with a race condition for timeout
+          const [cities, totalRecords] = await Promise.race([
+              Promise.all([cityQuery, totalRecordsPromise]),
+              timeoutPromise,
+          ]);
+  
+          // Check if any results were found
+          if (cities.length === 0) {
+              return helper.success(res, "No records found for the given search criteria.", [], totalRecords, pageSize);
+          }
+  
+          // Fetch the ID of the last city in the results
+          const lastFetchedCity = cities[cities.length - 1]?.city || null;
+  
+          // Return formatted results using the helper.success method
+          return helper.success(res, "Listing Successfully.", cities, totalRecords, pageSize, lastFetchedCity);
+  
+      } catch (error) {
+          if (error.message === 'Query timeout') {
+              return helper.error(res, "The query took too long to execute. Please try again later.", 408);
+          }
+  
+          console.error("Error fetching cities:", error);
+          return helper.error(res, "Error fetching cities. Please try again.");
+      }
+  },
+  
+
+
 };

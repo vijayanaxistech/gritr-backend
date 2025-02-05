@@ -9,4 +9,5 @@ const { adminAuth } = require("../../middleware/auth");
 router.get('/business-locations',adminAuth, businessLocationController.getBusinessLocations);
 router.get('/cityList', businessLocationController.getCity);
 
+
 module.exports = router;

@@ -29,6 +29,9 @@ router.get('/:id', adminAuth, surveysManagement.getSurveyById);
 // Delete a survey by its ID (requires admin authentication)
 router.delete('/:id', adminAuth, surveysManagement.deleteSurvey);
 
+
+router.post('/cityListSurvey', surveysManagement.getCitySurvey);
+
 // ============================
 // Flag Survey Routes
 // ============================

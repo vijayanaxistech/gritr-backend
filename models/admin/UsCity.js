@@ -21,6 +21,8 @@ const UsCitySchema = new mongoose.Schema({
     id: { type: Number, unique: true },
     lat_rad: { type: Number },
     lng_rad: { type: Number },
+    greater_city_area: { type: String },
+
 },
 { timestamps: true }
 );

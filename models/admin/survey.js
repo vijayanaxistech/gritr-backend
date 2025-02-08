@@ -8,7 +8,7 @@ const SurveySchema = new Schema(
     surveyName: {
       type: String,
       required: true,
-      unique: true, // Ensure survey name is unique across all surveys
+      unique: false, // Ensure survey name is unique across all surveys
     },
 
     // Type of survey (Product or Customer Experience)
@@ -28,6 +28,11 @@ const SurveySchema = new Schema(
     isDeleted: {
       type: Boolean,
       default: false, // Default to not deleted
+    },
+
+    isDuplicate:{
+      type: Boolean,
+      default: false,
     },
 
     // Approval status of the survey

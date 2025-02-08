@@ -20,8 +20,12 @@ router.post("/updateSurveyStatus/:id", adminAuth, surveysManagement.updateSurvey
 // Edit an existing survey by ID (requires admin authentication)
 router.post('/edit-surveys/:id', adminAuth, surveysManagement.editSurvey);
 
+
+// Get all surveys for frontend (requires admin authentication)
+router.get('/getall', isAuth, surveysManagement.getAllSurveys);
+
 // Get all surveys (requires admin authentication)
-router.get('/getall', adminAuth, surveysManagement.getAllSurveys);
+router.get('/admin/getall', adminAuth, surveysManagement.getAllSurveys);
 
 // Get a specific survey by its ID (requires admin authentication)
 router.get('/:id', adminAuth, surveysManagement.getSurveyById);

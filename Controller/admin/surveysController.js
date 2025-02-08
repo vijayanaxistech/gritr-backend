@@ -19,8 +19,7 @@ module.exports = {
         region: "required",
       });
       
-      console.log(req.user.userId);
-      
+      console.log(req.body);      
 
       const errors = v.errors;
       if (errors && errors.length > 0) {
@@ -30,7 +29,10 @@ module.exports = {
       // Check if the survey name already exists in the database
       const checkSurveyName = await Survey.findOne({ surveyName: v.inputs.surveyName });
       if (checkSurveyName) {
-        return helper.error(res, "This survey name is already in use");
+        await Survey.updateOne(
+          { surveyName: v.inputs.surveyName },
+          { $set: { isDuplicate: true } }
+        );             
       }
 
       // Create a new survey document with request data

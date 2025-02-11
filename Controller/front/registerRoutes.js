@@ -197,23 +197,19 @@ module.exports = {
       if (!user) {
         return helper.error(res, "No user found with this email. Please use a registered email.", {});
       }
-
-
-      console.log('test1',email);
+  
 
       // 3️⃣ Check if a valid code already exists
       const existingCode = await VerificationCode.findOne({ email });
       if (existingCode && existingCode.expiresAt > new Date()) {
         return helper.success(res, "A verification code has already been sent. Please check your email.", {});
       }
-
-      console.log('test2',existingCode);
+   
 
       // 4️⃣ Generate a new 6-digit verification code
       const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
       const expirationTime = new Date(Date.now() + 10 * 60 * 1000); // Code expires in 10 minutes
 
-      console.log('test3');
 
       // 5️⃣ Store the verification code in the database
       await VerificationCode.findOneAndUpdate(
@@ -222,9 +218,7 @@ module.exports = {
         { upsert: true, new: true }
       );
 
-      console.log('test4');
-
-
+ 
       // 6️⃣ Send email with the verification code
       const mailOptions = {
         from: process.env.EMAIL_USER,
@@ -233,12 +227,7 @@ module.exports = {
         text: `Your verification code is: ${verificationCode}. This code will expire in 10 minutes.`,
       };
 
-
-      console.log('test6',mailOptions);
-
       await transporter.sendMail(mailOptions);
-
-      console.log('test5');
 
       return helper.success(res, "Verification code sent successfully", { email });
 

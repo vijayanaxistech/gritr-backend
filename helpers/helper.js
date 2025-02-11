@@ -78,6 +78,12 @@ module.exports = {
     };
   },
 
+
+  // Function to generate a 6-digit random code
+  generateVerificationCode : () => {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+  },
+
   /**
    * Validates if a user has enough credits.
    * @param {number} requiredCredit - The credit amount required.

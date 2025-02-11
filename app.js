@@ -8,6 +8,8 @@ const fileupload = require("express-fileupload");
 const compression = require("compression");
 const morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
+require("dotenv").config();
+
 
 // Import custom files
 const errorMiddleware = require("./middleware/error");

@@ -27,6 +27,7 @@ module.exports = (app) => {
 
   // Front user routes
   app.use("/api/front/login", authRoutes);
+  app.use("/api/front/checkEmail", authRoutes);
   app.use("/api/front/logout", authRoutes);    
   app.use("/api/front/register", authRoutes);    
   app.use("/api/front/verifyToken", verifyToken);

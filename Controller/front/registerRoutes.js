@@ -166,5 +166,34 @@ module.exports = {
   },
 
 
+  checkEmail: async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      // 1️⃣ Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        return helper.error(res, "Invalid email format", 400);
+      }
+
+      // 2️⃣ Check if email exists in DB
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        return helper.error(res, "No User found with this email. Please use a registered email.", {});
+      }
+
+      // 3️⃣ Email exists, return success response
+      return helper.success(res, "Email exists", { userId: user._id });
+
+    } catch (error) {
+      return helper.error(res, error.message || "Internal server error", 500);
+    }
+  },
+
+
+
+
+
 };
 

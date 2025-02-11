@@ -24,4 +24,16 @@ router.post("/loginUser", registerController.loginUser);
 router.post("/logoutuser", registerController.logout);
 
 
+/**
+ * @route   POST /api/front/checkEmail/checkEmailUser
+ * @desc    Login a user
+ * @access  Public
+ */
+router.post("/checkEmailUser", registerController.checkEmail);
+
+
+
+
+
+
 module.exports = router;

@@ -33,11 +33,20 @@ router.post("/checkEmailUser", registerController.checkEmail);
 
 
 /**
- * @route   POST /api/front/verifyCode/verifyCode
+ * @route   POST /api/front/verifyCode
  * @desc    Login a user
  * @access  Public
  */
 router.post("/", registerController.verifyCode);
+
+
+/**
+ * @route   POST /api/front/createNewPassword
+ * @desc    Login a user
+ * @access  Public
+ */
+
+router.post("/changePassword", registerController.createNewPassword);
 
 
 

@@ -14,11 +14,6 @@ const {
 } = require("../../config/constants");
 
 
-console.log("Email:", process.env.EMAIL_USER);
-console.log("Password:", process.env.EMAIL_PASS); // Do not use in production
-
-
-
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
@@ -262,6 +257,41 @@ module.exports = {
       }
   },
 
+
+  createNewPassword : async (req, res) => {
+    try {
+      // Validate required fields
+      let v = new Validator(req.body, {
+        email: "required|email",
+        newPassword: "required|string|minLength:6",
+      });
+  
+      const matched = await v.check();
+      if (!matched) {
+        return helper.error(res, v.errors);
+      }
+  
+      const { email, newPassword } = req.body;
+  
+      // Check if the user exists
+      let user = await User.findOne({ email });
+      if (!user) {
+        return helper.error(res, "Invalid email. User not found.");
+      }
+ 
+      const hashedPassword = await helper.passwordEncrypt(newPassword);  
+      // Update password in the database
+      await User.updateOne({ email }, { password: hashedPassword });
+  
+      // Remove old tokens related to password reset
+      await FrontToken.deleteMany({ userId: user._id });
+  
+      return helper.success(res, "Password has been updated successfully.");
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      return helper.error(res, error.message);
+    }
+  },
 
 
 };

@@ -32,6 +32,12 @@ router.post("/logoutuser", registerController.logout);
 router.post("/checkEmailUser", registerController.checkEmail);
 
 
+/**
+ * @route   POST /api/front/verifyCode/verifyCode
+ * @desc    Login a user
+ * @access  Public
+ */
+router.post("/", registerController.verifyCode);
 
 
 

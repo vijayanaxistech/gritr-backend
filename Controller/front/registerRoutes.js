@@ -238,6 +238,32 @@ module.exports = {
   },
 
 
+  
+  
+    verifyCode: async (req, res) => {
+      try {
+        const { email, code } = req.body;
+  
+        if (!email || !code) {
+          return helper.error(res, "Email and code are required", 400);
+        }
+  
+        // Find the verification code in the database using email
+        const existingCode = await VerificationCode.findOne({ email, code });
+  
+        if (!existingCode) {
+          return helper.error(res, "Invalid or expired code", 400);
+        }
+  
+        // Optionally, remove the code after verification to prevent reuse
+        await VerificationCode.deleteOne({ _id: existingCode._id });
+  
+        return helper.success(res, "Code verified successfully", 200);
+      } catch (error) {
+        console.error("Error verifying code:", error);
+        return helper.error(res, "Internal server error", 500);
+      }
+    },
 
 
 

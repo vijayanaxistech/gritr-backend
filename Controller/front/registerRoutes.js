@@ -136,6 +136,35 @@ module.exports = {
       console.error("Error logging in user:", error);
       return helper.error(res, error.message);
     }
-  },  
+  },
+  
+    /**
+   * Logs out a user.
+   * Validates and removes the session token.
+   */
+  logout: async (req, res) => {
+      try {
+        const authToken = req.headers.authorization;
+        if (!authToken) throw "Authorization token is required.";
+  
+        const token = authToken.split(" ")[1];
+        const decodedToken = jwt.verify(token, JWTSecretFrontend);
+
+        console.log(decodedToken);
+  
+        const session = await UserLoggedFormation.findOneAndDelete({
+          userId: decodedToken.userId,
+          token,
+        });
+  
+        if (!session) throw "Session not found or already logged out.";
+  
+        return helper.success(res, "User logged out successfully.");
+      } catch (error) {
+        return helper.error(res, error);
+      }
+  },
+
+
 };
 

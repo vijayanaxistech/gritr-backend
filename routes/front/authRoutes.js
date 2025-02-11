@@ -16,4 +16,12 @@ router.post("/registerUser", registerController.registerUser);
 router.post("/loginUser", registerController.loginUser);
 
 
+/**
+ * @route   POST /api/front/register/loginUser
+ * @desc    Login a user
+ * @access  Public
+ */
+router.post("/logoutuser", registerController.logout);
+
+
 module.exports = router;

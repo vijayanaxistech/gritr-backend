@@ -237,10 +237,7 @@ module.exports = {
     }
   },
 
-
-  
-  
-    verifyCode: async (req, res) => {
+  verifyCode: async (req, res) => {
       try {
         const { email, code } = req.body;
   
@@ -263,7 +260,7 @@ module.exports = {
         console.error("Error verifying code:", error);
         return helper.error(res, "Internal server error", 500);
       }
-    },
+  },
 
 
 

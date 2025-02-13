@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 // Define the schema for the Survey model
@@ -15,13 +15,13 @@ const SurveySchema = new Schema(
     surveyType: {
       type: String,
       required: true,
-      enum: ['Product', 'Customer Experience'], // Valid survey types
+      enum: ["Product", "Customer Experience"], // Valid survey types
     },
 
     // Description of the survey (optional)
     description: {
       type: String,
-      default: '', // Default to empty string if not provided
+      default: "", // Default to empty string if not provided
     },
 
     // Soft delete flag (marks the survey as deleted)
@@ -30,7 +30,7 @@ const SurveySchema = new Schema(
       default: false, // Default to not deleted
     },
 
-    isDuplicate:{
+    isDuplicate: {
       type: Boolean,
       default: false,
     },
@@ -44,8 +44,8 @@ const SurveySchema = new Schema(
     // Current status of the survey (pending, approved, rejected)
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected'], // Valid status values
-      default: 'pending', // Default to 'pending' when created
+      enum: ["pending", "approved", "rejected"], // Valid status values
+      default: "pending", // Default to 'pending' when created
     },
 
     // Region where the survey is applicable (required)
@@ -63,14 +63,14 @@ const SurveySchema = new Schema(
     // Admin user who created the survey (required)
     createdBy: {
       type: Schema.Types.ObjectId,
-      ref: 'User', // Reference to the admin user who created the survey
+      ref: "User", // Reference to the admin user who created the survey
       required: true,
     },
 
     // Admin user who last updated the survey (optional)
     updatedBy: {
       type: Schema.Types.ObjectId,
-      ref: 'User', // Reference to the admin user who last updated the survey
+      ref: "User", // Reference to the admin user who last updated the survey
     },
 
     // List of questions in the survey
@@ -82,7 +82,7 @@ const SurveySchema = new Schema(
         },
         questionType: {
           type: String,
-          enum: ['text', 'multiple_choice', 'rating'], // Valid question types
+          enum: ["text", "multiple_choice", "rating"], // Valid question types
           required: true, // Question type is required
         },
         options: [String], // Options for multiple choice questions
@@ -92,7 +92,7 @@ const SurveySchema = new Schema(
     // Flags for categorizing the survey (e.g., Product, Customer Experience)
     flags: {
       type: [String], // Array of flags
-      enum: ['Product', 'Customer Experience'], // Valid flags
+      enum: ["Product", "Customer Experience"], // Valid flags
     },
 
     // Survey approval details for different regions
@@ -101,12 +101,12 @@ const SurveySchema = new Schema(
         region: String, // Region for approval
         approvalStatus: {
           type: String,
-          enum: ['pending', 'approved', 'rejected'], // Approval status for the region
-          default: 'pending', // Default to 'pending' when added
+          enum: ["pending", "approved", "rejected"], // Approval status for the region
+          default: "pending", // Default to 'pending' when added
         },
         approvedBy: {
           type: Schema.Types.ObjectId,
-          ref: 'AdminUser', // Reference to the admin user who approved the survey
+          ref: "AdminUser", // Reference to the admin user who approved the survey
         },
         approvedAt: {
           type: Date, // Date when the survey was approved
@@ -120,4 +120,4 @@ const SurveySchema = new Schema(
 );
 
 // Export the Survey model
-module.exports = mongoose.model('Survey', SurveySchema);
+module.exports = mongoose.model("Survey", SurveySchema);

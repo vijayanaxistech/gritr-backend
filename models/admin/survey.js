@@ -4,73 +4,77 @@ const { Schema } = mongoose;
 // Define the schema for the Survey model
 const SurveySchema = new Schema(
   {
-    // Name of the survey (unique and required)
+    // Name of the survey (required)
     surveyName: {
       type: String,
       required: true,
-      unique: false, // Ensure survey name is unique across all surveys
     },
 
     // Type of survey (Product or Customer Experience)
     surveyType: {
       type: String,
       required: true,
-      enum: ["Product", "Customer Experience"], // Valid survey types
+      enum: ["Product", "Customer Experience"],
     },
 
     // Description of the survey (optional)
     description: {
       type: String,
-      default: "", // Default to empty string if not provided
+      default: "",
     },
 
-    // Soft delete flag (marks the survey as deleted)
-    isDeleted: {
-      type: Boolean,
-      default: false, // Default to not deleted
+    // Region(s) where the survey is applicable (supports multiple cities)
+    regions: {
+      type: [String],
+      required: true,
     },
 
+    // Duplicate survey reference
     isDuplicate: {
       type: Boolean,
       default: false,
     },
+    duplicateOf: {
+      type: Schema.Types.ObjectId,
+      ref: "Survey", // Reference to original survey if this is a duplicate
+      default: null,
+    },
 
-    // Approval status of the survey
+    // Survey approval tracking
     isApproved: {
       type: Boolean,
-      default: false, // Default to false (not approved yet)
+      default: false,
+    },
+    approvedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "AdminUser", // Admin who approved the survey
+    },
+    approvedAt: {
+      type: Date,
     },
 
-    // Current status of the survey (pending, approved, rejected)
+    // Status of the survey (includes 'archived' for soft deletes)
     status: {
       type: String,
-      enum: ["pending", "approved", "rejected"], // Valid status values
-      default: "pending", // Default to 'pending' when created
-    },
-
-    // Region where the survey is applicable (required)
-    region: {
-      type: String,
-      required: true,
+      enum: ["pending", "approved", "rejected", "archived"],
+      default: "pending",
     },
 
     // Reason for rejection (if applicable)
     rejectionReason: {
       type: String,
-      default: null, // Default to null if no rejection reason is provided
+      default: null,
     },
 
-    // Admin user who created the survey (required)
+    // Survey creator details
     createdBy: {
       type: Schema.Types.ObjectId,
-      ref: "User", // Reference to the admin user who created the survey
+      ref: "User",
       required: true,
     },
-
-    // Admin user who last updated the survey (optional)
-    updatedBy: {
+    lastModifiedBy: {
       type: Schema.Types.ObjectId,
-      ref: "User", // Reference to the admin user who last updated the survey
+      ref: "User",
     },
 
     // List of questions in the survey
@@ -78,41 +82,47 @@ const SurveySchema = new Schema(
       {
         questionText: {
           type: String,
-          required: true, // Question text is required
+          required: true,
         },
         questionType: {
           type: String,
-          enum: ["text", "multiple_choice", "rating"], // Valid question types
-          required: true, // Question type is required
+          enum: ["text", "multiple_choice", "rating"],
+          required: true,
         },
-        options: [String], // Options for multiple choice questions
+        options: [String],
       },
     ],
-
-    // Flags for categorizing the survey (e.g., Product, Customer Experience)
-    flags: {
-      type: [String], // Array of flags
-      enum: ["Product", "Customer Experience"], // Valid flags
-    },
 
     // Survey approval details for different regions
     approvals: [
       {
-        region: String, // Region for approval
+        region: String,
         approvalStatus: {
           type: String,
-          enum: ["pending", "approved", "rejected"], // Approval status for the region
-          default: "pending", // Default to 'pending' when added
+          enum: ["pending", "approved", "rejected"],
+          default: "pending",
         },
         approvedBy: {
           type: Schema.Types.ObjectId,
-          ref: "AdminUser", // Reference to the admin user who approved the survey
+          ref: "AdminUser",
         },
         approvedAt: {
-          type: Date, // Date when the survey was approved
+          type: Date,
         },
       },
     ],
+
+    // Flags for categorization
+    flags: {
+      type: [String],
+      enum: ["Product", "Customer Experience"],
+    },
+
+    // Soft delete flag (controlled via `status: "archived"`)
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true, // Automatically add createdAt and updatedAt fields

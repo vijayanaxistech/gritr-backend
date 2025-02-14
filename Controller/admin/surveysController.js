@@ -10,45 +10,6 @@ module.exports = {
    * @route   POST /surveys/create
    * @access  Protected (Admin)
    */
-  create1: async (req, res) => {
-    try {
-      // Validate request body to ensure required fields are present
-      const v = new Validator(req.body, {
-        surveyName: "required",
-        region: "required",
-      });
-
-      console.log(req.body);
-
-      const errors = v.errors;
-      if (errors && errors.length > 0) {
-        return helper.error(res, errors);
-      }
-
-      // Check if the survey name already exists in the database
-      const checkSurveyName = await Survey.findOne({
-        surveyName: v.inputs.surveyName,
-      });
-      if (checkSurveyName) {
-        await Survey.updateOne(
-          { surveyName: v.inputs.surveyName },
-          { $set: { isDuplicate: true } }
-        );
-      }
-
-      // Create a new survey document with request data
-      const survey = new Survey({
-        ...req.body,
-        createdBy: req.user.userId, // Store the ID of the logged-in user as creator
-      });
-
-      // Save the new survey to the database
-      await survey.save();
-      return helper.success(res, "Survey Created Successfully.", survey);
-    } catch (error) {
-      return helper.error(res, error.message);
-    }
-  },
 
   create: async (req, res) => {
     try {

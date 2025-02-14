@@ -329,38 +329,6 @@ module.exports = {
    * Updates the active status of a user.
    * Validates `isActive` and updates it along with the `updatedAt` timestamp.
    */
-  updateSurveyStatus1: async (req, res) => {
-    try {
-      let v = new Validator(req.body, {
-        isApproved: "required|boolean",
-      });
-
-      let errors = v.errors;
-      if (errors && errors.length > 0) {
-        return helper.error(res, errors);
-      }
-
-      req.body.updatedAt = new Date();
-
-      const updatedRole = await Survey.findOneAndUpdate(
-        { _id: req.params.id },
-        { isApproved: v.inputs.isApproved, updatedAt: req.body.updatedAt },
-        { new: true }
-      );
-
-      if (!updatedRole) {
-        return helper.error(res, "Survey not found");
-      }
-
-      return helper.success(
-        res,
-        "Survey status updated successfully.",
-        updatedRole
-      );
-    } catch (error) {
-      return helper.error(res, error.message);
-    }
-  },
 
   updateSurveyStatus: async (req, res) => {
     try {

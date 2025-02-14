@@ -4,19 +4,17 @@ let helper = require(`../helpers/helper`);
 let constants = require(`../config/constants`);
 const AdminRole = require("../models/admin/Roles"); // Replace with the actual path to Admin_Role model
 
-
 exports.isAuth = async (req, res, next) => {
   try {
-
     const token = req.header("Authorization")?.replace("Bearer ", "");
-      if (!token) {
+    if (!token) {
       return helper.error(res, "Please Login to access this resource");
-    } 
-    
+    }
+
     const decoded = jwt.verify(token, constants.JWTSecretFrontend);
 
     //console.log('decoded',decoded);
-
+    let userId = decoded?.userId;
     const user = await userLoggedFormation
       .findOne({
         userId: decoded?.userId,
@@ -27,7 +25,8 @@ exports.isAuth = async (req, res, next) => {
     // if (!user || user.userId.isActive === false) {
     //   throw new Error("Account is inActive");
     // }
-    req.user = { ...decoded.data, userId: user?._id };
+
+    req.user = { ...decoded.data, userId: decoded?.userId };
     next();
   } catch (e) {
     console.log(e);

@@ -13,8 +13,8 @@ const SurveySchema = new Schema(
     // Type of survey (Product or Customer Experience)
     surveyType: {
       type: String,
-      required: true,
-      enum: ["Product", "Customer Experience"],
+      required: false,
+      enum: ["Product", "Customer Experience", ""],
     },
 
     // Description of the survey (optional)
@@ -70,7 +70,7 @@ const SurveySchema = new Schema(
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
     lastModifiedBy: {
       type: Schema.Types.ObjectId,

@@ -17,9 +17,9 @@ module.exports = {
       // Validate request body to ensure required fields are present
       const v = new Validator(req.body, {
         surveyName: "required|string",
-        surveyType: "required|string",
-        regions: "required|array", // Use `regions` instead of `region`
-        questions: "required|array",
+        surveyType: "string",
+        regions: "required|array",
+        questions: "array",
       });
 
       const errors = v.errors;
@@ -49,6 +49,8 @@ module.exports = {
       const existingInOtherRegion = await Survey.findOne({
         surveyName: v.inputs.surveyName,
       });
+
+      console.log(req.user);
 
       // Set default survey properties
       const survey = new Survey({

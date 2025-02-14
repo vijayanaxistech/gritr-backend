@@ -363,6 +363,44 @@ module.exports = {
     }
   },
 
+  updateTagStatus: async (req, res) => {
+    try {
+      let v = new Validator(req.body, {
+        tags: "required|string|in:none,product,customerExperience", // Validate "tags" instead of "flags"
+      });
+
+      let errors = v.errors;
+      if (errors && errors.length > 0) {
+        return helper.error(res, errors);
+      }
+
+      req.body.updatedAt = new Date();
+
+      const updatedSurvey = await Survey.findOneAndUpdate(
+        { _id: req.params.id },
+        {
+          flags: v.inputs.tags, // Update "flags" field using "tags" from request body
+          updatedAt: req.body.updatedAt,
+        },
+        { new: true }
+      );
+
+      if (!updatedSurvey) {
+        return helper.error(res, "Survey not found");
+      }
+
+      console.log(updatedSurvey);
+
+      return helper.success(
+        res,
+        "Survey tag (flags) updated successfully.",
+        updatedSurvey
+      );
+    } catch (error) {
+      return helper.error(res, error.message);
+    }
+  },
+
   getCitySurvey: async (req, res) => {
     try {
       const { page, limit, search } = req.body;

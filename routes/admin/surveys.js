@@ -21,6 +21,12 @@ router.post(
   surveysManagement.updateSurveyStatus
 );
 
+router.post(
+  "/updateTagStatus/:id",
+  adminAuth,
+  surveysManagement.updateTagStatus
+);
+
 router.post("/mark-duplicate", adminAuth, surveysManagement.markDuplicate);
 
 // Edit an existing survey by ID (requires admin authentication)

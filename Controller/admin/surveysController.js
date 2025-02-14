@@ -329,7 +329,7 @@ module.exports = {
    * Updates the active status of a user.
    * Validates `isActive` and updates it along with the `updatedAt` timestamp.
    */
-  updateSurveyStatus: async (req, res) => {
+  updateSurveyStatus1: async (req, res) => {
     try {
       let v = new Validator(req.body, {
         isApproved: "required|boolean",
@@ -356,6 +356,39 @@ module.exports = {
         res,
         "Survey status updated successfully.",
         updatedRole
+      );
+    } catch (error) {
+      return helper.error(res, error.message);
+    }
+  },
+
+  updateSurveyStatus: async (req, res) => {
+    try {
+      let v = new Validator(req.body, {
+        status: "required|string|in:pending,approved,rejected",
+      });
+
+      let errors = v.errors;
+      if (errors && errors.length > 0) {
+        return helper.error(res, errors);
+      }
+
+      req.body.updatedAt = new Date();
+
+      const updatedSurvey = await Survey.findOneAndUpdate(
+        { _id: req.params.id },
+        { status: v.inputs.status, updatedAt: req.body.updatedAt },
+        { new: true }
+      );
+
+      if (!updatedSurvey) {
+        return helper.error(res, "Survey not found");
+      }
+
+      return helper.success(
+        res,
+        "Survey status updated successfully.",
+        updatedSurvey
       );
     } catch (error) {
       return helper.error(res, error.message);

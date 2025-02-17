@@ -9,12 +9,28 @@ const compression = require("compression");
 const morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
 const dotenv = require("dotenv");
+const os = require("os");
 
 // Force production environment
 process.env.NODE_ENV = "production";
 
 // Load production environment variables
 dotenv.config({ path: `.env.production` });
+
+// Function to get the server's local IP address
+const getLocalIP = () => {
+  const networkInterfaces = os.networkInterfaces();
+  for (const interfaceKey in networkInterfaces) {
+    const networkInterface = networkInterfaces[interfaceKey];
+    for (const iface of networkInterface) {
+      // Skip internal interfaces (e.g., "lo" on Unix systems)
+      if (!iface.internal && iface.family === "IPv4") {
+        return iface.address;
+      }
+    }
+  }
+  return null; // Return null if no external IP is found
+};
 
 // Import custom files
 const errorMiddleware = require("./middleware/error");
@@ -55,6 +71,9 @@ app.use(errorMiddleware);
 // Connect to the database and start the server
 connectDB()
   .then(() => {
+    const serverIp = getLocalIP();
+    console.log(`Server's local IP address: ${serverIp}`);
+
     console.log("Database connected successfully");
     app.listen(PORT, () => {
       console.log(`Server started successfully on ${process.env.BASE_URL}`);

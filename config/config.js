@@ -7,14 +7,17 @@ mongoose.Promise = global.Promise;
 
 const connectDB = async () => {
   try {
-    const dbURI = process.env.DB_URI;
+    const dbURI = `mongodb+srv://vijaypanchal05:AXss4q9zgwBg7OWe@cluster0.pnhhz.mongodb.net/gritr?retryWrites=true&w=majority&appName=Cluster0`;
 
     if (!dbURI) {
       throw new Error("DB_URI is not defined in environment variables.");
     }
 
     if (mongoose.connection.readyState === 0) {
-      await mongoose.connect(dbURI);
+      await mongoose.connect(dbURI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
       console.log(`MongoDB Connected: ${dbURI}`);
     } else {
       console.log("MongoDB connection already open");

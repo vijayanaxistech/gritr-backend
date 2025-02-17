@@ -8,23 +8,21 @@ const fileupload = require("express-fileupload");
 const compression = require("compression");
 const morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
-require("dotenv").config();
+const dotenv = require("dotenv");
 
+// Load environment variables dynamically
+const environment = process.env.NODE_ENV || "development";
+dotenv.config({ path: `.env.${environment}` });
 
 // Import custom files
 const errorMiddleware = require("./middleware/error");
 const connectDB = require("./config/config.js");
 const swaggerDocument = require("./swagger.json");
-const env = require("dotenv");
 const routes = require("./routes.js");
-
-// Load environment variables
-env.config();
 
 // Set up app and port
 const app = express();
 const PORT = process.env.PORT || 8186;
-const environment = process.env.NODE_ENV || "development";
 
 // Middleware setup
 app.use(cors());
@@ -35,11 +33,7 @@ app.use(fileupload());
 app.use(morgan("dev"));
 
 // Serve API documentation
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerDocument)
-);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, "public")));
@@ -55,7 +49,7 @@ connectDB()
   .then(() => {
     console.log("Database connected successfully");
     app.listen(PORT, () => {
-      console.log(`Server started successfully on http://localhost:${PORT}`);
+      console.log(`Server started successfully on ${process.env.BASE_URL}`);
     });
   })
   .catch((err) => {

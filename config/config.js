@@ -14,10 +14,7 @@ const connectDB = async () => {
     }
 
     if (mongoose.connection.readyState === 0) {
-      await mongoose.connect(dbURI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
+      await mongoose.connect(dbURI);
       console.log(`MongoDB Connected: ${dbURI}`);
     } else {
       console.log("MongoDB connection already open");

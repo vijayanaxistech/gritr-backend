@@ -32,6 +32,9 @@ const getLocalIP = () => {
   return null; // Return null if no external IP is found
 };
 
+const serverIp = getLocalIP();
+console.log(`Server's local IP address: ${serverIp}`);
+
 // Import custom files
 const errorMiddleware = require("./middleware/error");
 const connectDB = require("./config/config.js");
@@ -71,7 +74,6 @@ app.use(errorMiddleware);
 // Connect to the database and start the server
 connectDB()
   .then(() => {
-    const serverIp = getLocalIP();
     console.log(`Server's local IP address: ${serverIp}`);
 
     console.log("Database connected successfully");

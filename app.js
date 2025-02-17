@@ -10,9 +10,11 @@ const morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
 const dotenv = require("dotenv");
 
-// Load environment variables dynamically
-const environment = process.env.NODE_ENV || "development";
-dotenv.config({ path: `.env.${environment}` });
+// Force production environment
+process.env.NODE_ENV = "production";
+
+// Load production environment variables
+dotenv.config({ path: `.env.production` });
 
 // Import custom files
 const errorMiddleware = require("./middleware/error");
@@ -30,10 +32,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(compression());
 app.use(fileupload());
-app.use(morgan("dev"));
 
-// Serve API documentation
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// Disable logging (morgan) in production for performance
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
+
+// Serve API documentation (disabled in production)
+if (process.env.NODE_ENV === "development") {
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+}
 
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, "public")));

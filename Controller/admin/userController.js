@@ -7,12 +7,7 @@ const jwt = require("jsonwebtoken");
 const requestIp = require("request-ip");
 const AdminToken = require("../../models/admin/adminToken");
 
-
-
-const {
-  JWTExpiresIn,
-  JWTSecret,
-} = require("../../config/constants");
+const { JWTExpiresIn, JWTSecret } = require("../../config/constants");
 
 module.exports = {
   /**
@@ -36,7 +31,9 @@ module.exports = {
       }
 
       // Check if the userName is already in use
-      let checkUserName = await AdminUser.findOne({ userName: v.inputs.userName });
+      let checkUserName = await AdminUser.findOne({
+        userName: v.inputs.userName,
+      });
       if (checkUserName) {
         return helper.error(res, "This userName is already in use");
       }
@@ -46,7 +43,9 @@ module.exports = {
 
       // Attach roleType to the user object
       if (req.body.roleId) {
-        let existingRole = await RoleManagement.findOne({ _id: req.body.roleId });
+        let existingRole = await RoleManagement.findOne({
+          _id: req.body.roleId,
+        });
         if (existingRole) {
           req.body.roleType = existingRole.roleType;
         }
@@ -54,7 +53,9 @@ module.exports = {
 
       // Create the user
       AdminUser.create(req.body)
-        .then((response) => helper.success(res, "User Created Successfully.", response))
+        .then((response) =>
+          helper.success(res, "User Created Successfully.", response)
+        )
         .catch((e) => {
           throw e;
         });
@@ -151,7 +152,11 @@ module.exports = {
         return helper.error(res, "User not found");
       }
 
-      return helper.success(res, "User status updated successfully.", updatedRole);
+      return helper.success(
+        res,
+        "User status updated successfully.",
+        updatedRole
+      );
     } catch (error) {
       return helper.error(res, error.message);
     }
@@ -176,7 +181,9 @@ module.exports = {
       delete updates.password;
 
       if (req.body.roleId) {
-        let existingRole = await RoleManagement.findOne({ _id: req.body.roleId });
+        let existingRole = await RoleManagement.findOne({
+          _id: req.body.roleId,
+        });
         if (existingRole) {
           req.body.roleType = existingRole.roleType;
         }
@@ -207,65 +214,74 @@ module.exports = {
         username: "required",
         password: "required",
       });
-  
+
       let errorsResponse = await helper.checkValidation(v);
       if (errorsResponse) {
         return helper.error(res, errorsResponse);
       }
-  
+
       let logData = await AdminUser.findOne({
         userName: v.inputs.username,
         isDeleted: false,
-      }).select("fullName email userName roleId isActive roleType password sidebarIds");
-  
+      }).select(
+        "fullName email userName roleId isActive roleType password sidebarIds"
+      );
+
       if (!logData || !logData.isActive) {
         throw "Invalid credentials or inactive account.";
       }
-  
-      let checkPassword = await helper.comparePass(v.inputs.password, logData.password);
+
+      let checkPassword = await helper.comparePass(
+        v.inputs.password,
+        logData.password
+      );
       if (!checkPassword) {
         throw "Invalid password.";
       }
-  
+
       const token = jwt.sign(
-        { data: { id: logData._id, roleId: logData.roleId, userName: logData.userName, } },
+        {
+          data: {
+            id: logData._id,
+            roleId: logData.roleId,
+            userName: logData.userName,
+          },
+        },
         JWTSecret,
         { expiresIn: JWTExpiresIn }
       );
-  
+
       await UserLoggedFormation.create({
         userId: logData._id,
         token,
         ip: requestIp.getClientIp(req),
       });
 
+      // Store the token in the AdminToken collection
+      const tokenData = {
+        userId: logData._id,
+        token,
+        expiresAt: new Date(Date.now() + helper.parseExpiresIn(JWTExpiresIn)),
+      };
 
-        // Store the token in the AdminToken collection
-        const tokenData = {
-          userId: logData._id,
-          token,
-          expiresAt: new Date(Date.now() + helper.parseExpiresIn(JWTExpiresIn)),
-        };
-    
-        // Save token data in the database
-        await AdminToken.create(tokenData);
-  
+      // Save token data in the database
+      await AdminToken.create(tokenData);
+
       return helper.success(res, "User logged in successfully.", {
         authToken: token,
         fullName: logData.fullName,
         email: logData.email,
         userName: logData.userName,
         roleId: logData.roleId,
-        sidebarIds: logData.sidebarIds, 
+        sidebarIds: logData.sidebarIds,
         roleType: logData.roleType,
         isActive: logData.isActive,
       });
-      
     } catch (error) {
       return helper.error(res, error);
     }
   },
-  
+
   /**
    * Logs out a user.
    * Validates and removes the session token.

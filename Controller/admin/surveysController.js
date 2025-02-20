@@ -134,7 +134,7 @@ module.exports = {
    * @route   GET /surveys
    * @access  Protected (Admin)
    */
-  getAllSurveys: async (req, res) => {
+  getAllSurveys1: async (req, res) => {
     try {
       let { surveyType, region, page, limit, sortBy, order, search } =
         req.query;
@@ -163,6 +163,44 @@ module.exports = {
       return helper.success(res, "Distinct surveys fetched successfully", {
         surveys,
       });
+    } catch (error) {
+      return helper.error(res, error.message); // Handle errors
+    }
+  },
+
+  getAllSurveys: async (req, res) => {
+    try {
+      let { surveyType, region, page, limit, sortBy, order, search } =
+        req.query;
+
+      // Initialize filter to exclude deleted surveys
+      let matchStage = { isDeleted: false };
+
+      // Apply filters
+      if (surveyType) matchStage.surveyType = surveyType;
+      if (region) matchStage.region = region;
+      if (search) matchStage.surveyName = { $regex: search, $options: "i" };
+
+      // Sorting configuration
+      let sortStage = {};
+      if (sortBy) {
+        sortStage[sortBy] = order === "desc" ? -1 : 1;
+      } else {
+        sortStage.createdAt = -1; // Default sorting
+      }
+
+      // Pagination
+      const pageNumber = parseInt(page) || 1;
+      const pageSize = parseInt(limit) || 10;
+      const skip = (pageNumber - 1) * pageSize;
+
+      // Query to get all surveys
+      const surveys = await Survey.find(matchStage)
+        .sort(sortStage)
+        .skip(skip)
+        .limit(pageSize);
+
+      return helper.success(res, "Surveys fetched successfully", { surveys });
     } catch (error) {
       return helper.error(res, error.message); // Handle errors
     }

@@ -139,45 +139,28 @@ module.exports = {
         req.query;
 
       // Initialize filter to exclude deleted surveys
-      let filter = { isDeleted: false };
+      let matchStage = { isDeleted: false };
 
-      // Apply filters for surveyType and region if present
-      if (surveyType) filter.surveyType = surveyType;
-      if (region) filter.region = region;
+      // Apply filters
+      if (surveyType) matchStage.surveyType = surveyType;
+      if (region) matchStage.region = region;
+      if (search) matchStage.surveyName = { $regex: search, $options: "i" };
 
-      // Apply search filter if provided
-      if (search) {
-        filter.surveyName = { $regex: search, $options: "i" }; // Case-insensitive search
-      }
-
-      // Parse pagination parameters
-      page = parseInt(page) || 1;
-      limit = parseInt(limit) || 10;
-
-      // Sorting options based on provided query params
-      let sortOptions = {};
-      if (sortBy) {
-        sortOptions[sortBy] = order === "desc" ? -1 : 1;
-      } else {
-        sortOptions.createdAt = -1; // Default sort by creation date descending
-      }
-
-      // Fetch surveys based on filters, pagination, and sorting
-      const surveys = await Survey.find(filter)
-        .sort(sortOptions)
-        .skip((page - 1) * limit)
-        .limit(limit);
-
-      // Count total surveys for pagination
-      const totalSurveys = await Survey.countDocuments(filter);
-
-      return helper.success(res, "Surveys fetched successfully", {
-        surveys,
-        pagination: {
-          totalSurveys,
-          currentPage: page,
-          totalPages: Math.ceil(totalSurveys / limit),
+      // Aggregation to get distinct surveys by surveyName
+      const surveys = await Survey.aggregate([
+        { $match: matchStage },
+        {
+          $group: {
+            _id: "$surveyName",
+            doc: { $first: "$$ROOT" }, // Get the first document for each distinct surveyName
+          },
         },
+        { $replaceRoot: { newRoot: "$doc" } }, // Replace root to return full document
+        { $sort: { createdAt: -1 } }, // Default sorting
+      ]);
+
+      return helper.success(res, "Distinct surveys fetched successfully", {
+        surveys,
       });
     } catch (error) {
       return helper.error(res, error.message); // Handle errors

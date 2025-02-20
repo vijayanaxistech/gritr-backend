@@ -25,62 +25,6 @@ module.exports = {
    * @access  Protected (Admin)
    */
 
-  create1: async (req, res) => {
-    try {
-      // Validate request body to ensure required fields are present
-      const v = new Validator(req.body, {
-        surveyName: "required|string",
-        surveyType: "string",
-        regions: "required|array",
-        questions: "array",
-      });
-
-      const errors = v.errors;
-      if (errors && errors.length > 0) {
-        return helper.error(res, errors);
-      }
-
-      // Ensure `regions` is always an array
-      const regionsArray = Array.isArray(v.inputs.regions)
-        ? v.inputs.regions
-        : [v.inputs.regions];
-
-      // Check if a similar survey already exists in any of the provided regions
-      const existingSurvey = await Survey.findOne({
-        surveyName: v.inputs.surveyName,
-        regions: { $in: regionsArray }, // Corrected query to use `regions`
-      });
-
-      if (existingSurvey) {
-        return helper.error(
-          res,
-          "A similar survey already exists in one of these regions."
-        );
-      }
-
-      // Check if the survey exists in another region (for auto-approval)
-      const existingInOtherRegion = await Survey.findOne({
-        surveyName: v.inputs.surveyName,
-      });
-
-      console.log(req.user);
-
-      // Set default survey properties
-      const survey = new Survey({
-        ...req.body,
-        createdBy: req.user.userId, // Ensure the logged-in user ID is stored
-        isApproved: existingInOtherRegion ? true : false, // Auto-approve if exists elsewhere
-        status: "pending",
-      });
-
-      // Save the new survey to the database
-      await survey.save();
-      return helper.success(res, "Survey Created Successfully.", survey);
-    } catch (error) {
-      return helper.error(res, error.message);
-    }
-  },
-
   create: async (req, res) => {
     try {
       // Validate request body
@@ -111,36 +55,28 @@ module.exports = {
         );
       }
 
-      // Check if a similar survey already exists in any of the provided regions
+      // Check if a similar survey already exists
       const existingSurvey = await Survey.findOne({
         surveyName: v.inputs.surveyName,
-        regions: { $in: regionsArray },
       });
 
-      if (existingSurvey) {
-        return helper.error(
-          res,
-          "A similar survey already exists in one of these regions."
-        );
-      }
-
-      // Check if the survey exists in another region (for auto-approval)
-      const existingInOtherRegion = await Survey.findOne({
-        surveyName: v.inputs.surveyName,
-      });
-
-      console.log(req.user);
-
-      // Set default survey properties
+      // Create a new survey with isDuplicate: true if a duplicate is found
       const survey = new Survey({
         ...req.body,
         createdBy: req.user.userId,
-        isApproved: existingInOtherRegion ? true : false,
+        isApproved: false,
         status: "pending",
+        isDuplicate: existingSurvey ? true : false, // Mark as duplicate if needed
       });
 
       // Save the new survey to the database
       await survey.save();
+
+      // Respond accordingly
+      if (existingSurvey) {
+        return helper.success(res, "Duplicate survey found and saved.", survey);
+      }
+
       return helper.success(res, "Survey Created Successfully.", survey);
     } catch (error) {
       return helper.error(res, error.message);

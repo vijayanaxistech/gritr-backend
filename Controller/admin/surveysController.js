@@ -33,6 +33,7 @@ module.exports = {
         surveyType: "string",
         regions: "required|array",
         questions: "array",
+        geo_area_id: "required",
       });
 
       const errors = v.errors;
@@ -460,7 +461,7 @@ module.exports = {
 
       // Query to fetch city data and the total count
       const cityQuery = UsCity.find(searchFilter)
-        .select("city greater_city_area state_name county_fips")
+        .select("city greater_city_area state_name county_fips geo_area_id")
         .sort({ city: 1 }) // Sort alphabetically by city
         .skip(skip)
         .limit(pageSize);

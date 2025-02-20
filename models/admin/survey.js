@@ -23,6 +23,13 @@ const SurveySchema = new Schema(
       default: "",
     },
 
+    // Geo area ID (Unique and Indexed)
+    geo_area_id: {
+      type: Number,
+      unique: true,
+      index: true,
+    },
+
     // Region(s) where the survey is applicable (supports multiple cities)
     regions: {
       type: [String],

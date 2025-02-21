@@ -10,6 +10,7 @@ const { isAuth } = require("../../middleware/auth");
  */
 router.post("/registerUser", registerController.registerUser);
 router.post("/updateUserProfile", isAuth, registerController.updateUserProfile);
+router.post("/updateStatus", isAuth, registerController.updateProfileStatus);
 
 /**
  * @route   POST /api/front/register/loginUser

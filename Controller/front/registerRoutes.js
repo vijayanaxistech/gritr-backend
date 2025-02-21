@@ -152,6 +152,35 @@ module.exports = {
     }
   },
 
+  updateProfileStatus: async (req, res) => {
+    try {
+      const { id, isActive } = req.body;
+
+      if (typeof isActive !== "boolean") {
+        return helper.error(res, "Invalid value for isActive", {}, 400);
+      }
+
+      const updatedUser = await User.findByIdAndUpdate(
+        id,
+        { isActive },
+        { new: true }
+      );
+
+      if (!updatedUser) {
+        return helper.error(res, "User not found", {}, 404);
+      }
+
+      return helper.success(
+        res,
+        "User active status updated successfully",
+        updatedUser
+      );
+    } catch (error) {
+      console.error("Error updating user active status:", error);
+      return helper.error(res, error.message, {}, 500);
+    }
+  },
+
   /**
    * Login in a user.
    * Validates the input, checks for matching email and password, and generates an auth token.
@@ -170,12 +199,18 @@ module.exports = {
         return helper.error(res, v.errors);
       }
 
-      // Check if the user exists
+      // Check if the email exists
       let logData = await User.findOne({ email: v.inputs.email });
+
       if (!logData) {
+        return helper.error(res, "Email not found.");
+      }
+
+      // Check if the user is active and not deleted
+      if (!logData.isActive || logData.isDeleted) {
         return helper.error(
           res,
-          "Invalid login. Please check your email and password!"
+          "Your account is inactive or has been deleted."
         );
       }
 
@@ -185,10 +220,7 @@ module.exports = {
         logData.password
       );
       if (!checkPassword) {
-        return helper.error(
-          res,
-          "Invalid login. Please check your email and password!"
-        );
+        return helper.error(res, "Invalid password. Please try again.");
       }
 
       // Create a JWT token

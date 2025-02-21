@@ -90,6 +90,68 @@ module.exports = {
     }
   },
 
+  updateUserProfile: async (req, res) => {
+    try {
+      console.log(req.body);
+
+      // Validate input fields
+      let v = new Validator(req.body, {
+        fullName: "string",
+        email: "email",
+        password: "string|minLength:6",
+        city: "string",
+      });
+
+      console.log("test");
+
+      const matched = await v.check();
+      if (!matched) {
+        return helper.error(res, "Validation Error", v.errors, 400);
+      }
+
+      const userId = req.body.id; // Use only req.params.id, ignore body.id
+      let user = await User.findById(userId);
+      if (!user) {
+        return helper.error(res, "User not found", {}, 404);
+      }
+
+      // Check if the email is being updated and already exists
+      if (req.body.email && req.body.email !== user.email) {
+        let checkEmail = await User.findOne({ email: req.body.email });
+        if (checkEmail) {
+          return helper.error(
+            res,
+            "This email is already in use. Please try another.",
+            {},
+            400
+          );
+        }
+      }
+
+      // Encrypt the password if it's being updated
+      if (req.body.password) {
+        req.body.password = await helper.passwordEncrypt(req.body.password);
+      }
+
+      // Remove 'id' from the request body to prevent accidental overwrites
+      const { id, ...updatableFields } = req.body;
+
+      // Update user fields
+      Object.assign(user, updatableFields);
+      await user.save();
+
+      return helper.success(res, "Profile updated successfully!", {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        city: user.city,
+      });
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      return helper.error(res, error.message, {}, 500);
+    }
+  },
+
   /**
    * Login in a user.
    * Validates the input, checks for matching email and password, and generates an auth token.
@@ -315,6 +377,28 @@ module.exports = {
     } catch (error) {
       console.error("Error resetting password:", error);
       return helper.error(res, error.message);
+    }
+  },
+
+  getuserInfo: async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      // Find user by ID
+      const user = await User.findById(id);
+
+      if (!user) {
+        return helper.error(res, "User not found", 404);
+      }
+
+      return helper.success(
+        res,
+        "User information retrieved successfully",
+        user
+      );
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+      return helper.error(res, "Server error", 500);
     }
   },
 };

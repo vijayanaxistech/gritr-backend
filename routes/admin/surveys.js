@@ -48,6 +48,8 @@ router.delete("/:id", adminAuth, surveysManagement.deleteSurvey);
 
 router.post("/cityListSurvey", surveysManagement.getCitySurvey);
 
+router.post("/getChildCitySurvey", surveysManagement.getChildCitySurvey);
+
 // ============================
 // Flag Survey Routes
 // ============================

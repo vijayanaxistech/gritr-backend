@@ -4,91 +4,45 @@ const { Schema } = mongoose;
 // Define the schema for the Survey model
 const SurveySchema = new Schema(
   {
-    // Name of the survey (required)
-    surveyName: {
-      type: String,
-      required: true,
-    },
-
-    // Type of survey (Product or Customer Experience)
+    surveyName: { type: String, required: true },
     surveyType: {
       type: String,
-      required: false,
       enum: ["Product", "Customer Experience", ""],
+      required: false,
     },
-
-    // Description of the survey (optional)
-    description: {
+    description: { type: String, default: "" },
+    geo_area_id: { type: Number },
+    regions: { type: [String], required: true },
+    state: {
       type: String,
-      default: "",
+    },
+    city: {
+      type: String,
     },
 
-    // Geo area ID (Unique and Indexed)
-    geo_area_id: {
-      type: Number,
-    },
+    isDuplicate: { type: Boolean, default: false },
+    duplicateOf: { type: Schema.Types.ObjectId, ref: "Survey", default: null },
 
-    // Region(s) where the survey is applicable (supports multiple cities)
-    regions: {
-      type: [String],
-      required: true,
-    },
+    isGreaterCity: { type: Boolean, default: false },
+    greaterCityName: { type: String, default: null }, // Stores the name of the Greater City if applicable
 
-    // Duplicate survey reference
-    isDuplicate: {
-      type: Boolean,
-      default: false,
-    },
-    duplicateOf: {
-      type: Schema.Types.ObjectId,
-      ref: "Survey", // Reference to original survey if this is a duplicate
-      default: null,
-    },
+    isApproved: { type: Boolean, default: false },
+    approvedBy: { type: Schema.Types.ObjectId, ref: "AdminUser" },
+    approvedAt: { type: Date },
 
-    // Survey approval tracking
-    isApproved: {
-      type: Boolean,
-      default: false,
-    },
-    approvedBy: {
-      type: Schema.Types.ObjectId,
-      ref: "AdminUser", // Admin who approved the survey
-    },
-    approvedAt: {
-      type: Date,
-    },
-
-    // Status of the survey (includes 'archived' for soft deletes)
     status: {
       type: String,
       enum: ["pending", "approved", "rejected", "archived"],
       default: "pending",
     },
+    rejectionReason: { type: String, default: null },
 
-    // Reason for rejection (if applicable)
-    rejectionReason: {
-      type: String,
-      default: null,
-    },
+    createdBy: { type: Schema.Types.ObjectId, ref: "User", required: false },
+    lastModifiedBy: { type: Schema.Types.ObjectId, ref: "User" },
 
-    // Survey creator details
-    createdBy: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: false,
-    },
-    lastModifiedBy: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
-
-    // List of questions in the survey
     questions: [
       {
-        questionText: {
-          type: String,
-          required: true,
-        },
+        questionText: { type: String, required: true },
         questionType: {
           type: String,
           enum: ["text", "multiple_choice", "rating"],
@@ -98,7 +52,6 @@ const SurveySchema = new Schema(
       },
     ],
 
-    // Survey approval details for different regions
     approvals: [
       {
         region: String,
@@ -107,30 +60,16 @@ const SurveySchema = new Schema(
           enum: ["pending", "approved", "rejected"],
           default: "pending",
         },
-        approvedBy: {
-          type: Schema.Types.ObjectId,
-          ref: "AdminUser",
-        },
-        approvedAt: {
-          type: Date,
-        },
+        approvedBy: { type: Schema.Types.ObjectId, ref: "AdminUser" },
+        approvedAt: { type: Date },
       },
     ],
 
-    // Flags for categorization
-    flags: {
-      type: [String],
-      enum: ["Product", "Customer Experience"],
-    },
-
-    // Soft delete flag (controlled via `status: "archived"`)
-    isDeleted: {
-      type: Boolean,
-      default: false,
-    },
+    flags: { type: [String], enum: ["Product", "Customer Experience"] },
+    isDeleted: { type: Boolean, default: false },
   },
   {
-    timestamps: true, // Automatically add createdAt and updatedAt fields
+    timestamps: true, // Automatically adds createdAt and updatedAt fields
   }
 );
 

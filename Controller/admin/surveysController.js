@@ -1,9 +1,9 @@
-const Survey = require("../../models/admin/survey");
 const User = require("../../models/front/User");
 const { Validator } = require("node-input-validator");
 const helper = require("../../helpers/helper");
 const BusinessLocation = require("../../models/admin/businessLocation");
 const UsCity = require("../../models/admin/UsCity");
+const Survey = require("../../models/admin/survey");
 
 const cleanQuestion = (text, regions) => {
   if (!text) return ""; // Handle empty or undefined input
@@ -25,7 +25,7 @@ module.exports = {
    * @access  Protected (Admin)
    */
 
-  create: async (req, res) => {
+  create1: async (req, res) => {
     try {
       // Validate request body
       const v = new Validator(req.body, {
@@ -35,6 +35,8 @@ module.exports = {
         questions: "array",
         geo_area_id: "required",
       });
+
+      console.log(req.body);
 
       const errors = v.errors;
       if (errors && errors.length > 0) {
@@ -56,6 +58,23 @@ module.exports = {
         );
       }
 
+      // Check the first region dynamically from the database
+      const firstRegion = regionsArray[0] || ""; // Ensure it's a string
+      let manage = { isGreaterCity: false, greaterCityName: null };
+
+      // Match both uppercase and lowercase variations of "Greater"
+      if (firstRegion.match(/^greater/i)) {
+        manage = {
+          isGreaterCity: true,
+          greaterCityName: firstRegion, // Keep the original format
+        };
+      }
+
+      // Ensure greaterCityName is always entered (force input)
+      if (!manage.greaterCityName) {
+        return helper.error(res, "Greater City Name is required.");
+      }
+
       // Check if a similar survey already exists
       const existingSurvey = await Survey.findOne({
         surveyName: v.inputs.surveyName,
@@ -67,7 +86,8 @@ module.exports = {
         createdBy: req.user.userId,
         isApproved: false,
         status: "pending",
-        isDuplicate: existingSurvey ? true : false, // Mark as duplicate if needed
+        isDuplicate: existingSurvey ? true : false,
+        ...manage, // Dynamically insert greater city info
       });
 
       // Save the new survey to the database
@@ -79,6 +99,106 @@ module.exports = {
       }
 
       return helper.success(res, "Survey Created Successfully.", survey);
+    } catch (error) {
+      return helper.error(res, error.message);
+    }
+  },
+
+  create: async (req, res) => {
+    try {
+      // Validate request body
+      const v = new Validator(req.body, {
+        surveyName: "required|string",
+        surveyType: "string",
+        regions: "required|array",
+        questions: "array",
+        geo_area_id: "required",
+        greater_city_area: "string",
+        isGreaterCity: "boolean",
+      });
+
+      console.log(req.body);
+
+      const errors = v.errors;
+      if (errors && Object.keys(errors).length > 0) {
+        return helper.error(res, errors);
+      }
+
+      // Ensure `regions` is always an array
+      const regionsArray = Array.isArray(v.inputs.regions)
+        ? v.inputs.regions
+        : [v.inputs.regions];
+
+      // Extract city and state from the first region string
+      let city = null;
+      let state = null;
+
+      if (regionsArray.length > 0) {
+        const regionParts = regionsArray[0]
+          .split(",")
+          .map((part) => part.trim()); // Split by comma and trim spaces
+
+        let potentialCity = regionParts[0] || null; // First part as city
+        state = regionParts[1] || null; // Second part as state
+
+        // Ensure city does not start with "Greater" (case insensitive)
+        if (potentialCity && !/^greater\s/i.test(potentialCity)) {
+          city = potentialCity;
+        } else {
+          city = state; // Assign state to city if the first part is "Greater something"
+          state = regionParts[2] || null; // Move the state to the next part if available
+        }
+      }
+
+      // Clean surveyName using dynamic regions
+      v.inputs.surveyName = cleanQuestion(v.inputs.surveyName, regionsArray);
+
+      // Clean questions using dynamic regions
+      if (Array.isArray(v.inputs.questions)) {
+        v.inputs.questions = v.inputs.questions.map((q) =>
+          cleanQuestion(q, regionsArray)
+        );
+      }
+
+      // Use `greater_city_area` and `isGreaterCity` directly from request body
+      const manage = {
+        isGreaterCity: v.inputs.isGreaterCity || false,
+        greaterCityName: v.inputs.greater_city_area || null,
+      };
+
+      // Ensure greaterCityName is provided if `isGreaterCity` is true
+      if (manage.isGreaterCity && !manage.greaterCityName) {
+        return helper.error(res, "Greater City Name is required.");
+      }
+
+      // Check if a similar survey already exists
+      const existingSurvey = await Survey.findOne({
+        surveyName: v.inputs.surveyName,
+      });
+
+      // Create a new survey with isDuplicate: true if a duplicate is found
+      const survey = new Survey({
+        ...req.body,
+        createdBy: req.user.userId,
+        isApproved: false,
+        city: city, // Extracted first part as city
+        state: state, // Extracted second part as state
+        status: "pending",
+        isDuplicate: !!existingSurvey,
+        ...manage, // Dynamically insert greater city info
+      });
+
+      // Save the new survey to the database
+      await survey.save();
+
+      // Respond accordingly
+      return helper.success(
+        res,
+        existingSurvey
+          ? "Duplicate survey found and saved."
+          : "Survey Created Successfully.",
+        survey
+      );
     } catch (error) {
       return helper.error(res, error.message);
     }

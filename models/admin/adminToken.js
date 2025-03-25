@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const adminTokenSchema = new mongoose.Schema({
   userId: {
@@ -11,4 +11,4 @@ const adminTokenSchema = new mongoose.Schema({
   expiresAt: { type: Date, required: true },
 });
 
-module.exports = mongoose.model("adminToken", adminTokenSchema);
+export default mongoose.model("adminToken", adminTokenSchema);

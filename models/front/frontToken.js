@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose"; // Using ES module import
 
 const frontTokenSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -8,4 +7,7 @@ const frontTokenSchema = new mongoose.Schema({
   expiresAt: { type: Date, required: true },
 });
 
-module.exports = mongoose.model("frontToken", frontTokenSchema);
+// Export the model using ES module export
+const FrontToken = mongoose.model("frontToken", frontTokenSchema);
+
+export default FrontToken;

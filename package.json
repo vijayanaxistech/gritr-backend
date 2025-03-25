@@ -2,6 +2,7 @@
   "name": "GRITR",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -41,8 +42,12 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.2.0",
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.13.13",
     "eslint": "^9.2.0",
     "globals": "^15.1.0",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
   }
 }

@@ -1,10 +1,10 @@
-const jwt = require("jsonwebtoken");
-let userLoggedFormation = require("../models/admin/userLoggedFormation");
-let helper = require(`../helpers/helper`);
-let constants = require(`../config/constants`);
-const AdminRole = require("../models/admin/Roles"); // Replace with the actual path to Admin_Role model
+import jwt from "jsonwebtoken";
+import userLoggedFormation from "../models/admin/userLoggedFormation.js";
+import helper from "../helpers/helper.js";
+import constants from "../config/constants.js";
+import AdminRole from "../models/admin/Roles.js"; // Replace with the actual path to Admin_Role model
 
-exports.isAuth = async (req, res, next) => {
+export const isAuth = async (req, res, next) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (!token) {
@@ -12,8 +12,6 @@ exports.isAuth = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, constants.JWTSecretFrontend);
-
-    //console.log('decoded',decoded);
     let userId = decoded?.userId;
     const user = await userLoggedFormation
       .findOne({
@@ -22,15 +20,10 @@ exports.isAuth = async (req, res, next) => {
       })
       .populate("userId");
 
-    // if (!user || user.userId.isActive === false) {
-    //   throw new Error("Account is inActive");
-    // }
-
     req.user = { ...decoded.data, userId: decoded?.userId };
     next();
   } catch (e) {
     console.log(e);
-
     return res.status(401).json({
       success: false,
       error: "Your token is expired.",
@@ -40,18 +33,14 @@ exports.isAuth = async (req, res, next) => {
   }
 };
 
-exports.adminAuth = async (req, res, next) => {
+export const adminAuth = async (req, res, next) => {
   try {
-    // Extract token from Authorization header
     const token = req.header("Authorization")?.replace("Bearer ", "");
     if (!token) {
       return helper.error(res, "Please Login to access this resource");
     }
 
-    // Verify and decode the token
     const decoded = jwt.verify(token, constants.JWTSecret);
-
-    // Fetch user details using token and decoded ID
     const user = await userLoggedFormation
       .findOne({
         userId: decoded?.data?.id,
@@ -59,7 +48,6 @@ exports.adminAuth = async (req, res, next) => {
       })
       .populate("userId");
 
-    // Check if the user exists, account is active, and has admin privileges
     if (!user || user.userId.isActive === false) {
       throw new Error("Account is inactive");
     }
@@ -77,7 +65,6 @@ exports.adminAuth = async (req, res, next) => {
       });
     }
 
-    // Attach user details to the request object
     req.user = { ...decoded.data, masterIds: user?.userId?.masterIds };
     next();
   } catch (e) {

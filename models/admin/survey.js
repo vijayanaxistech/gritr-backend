@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose"; // Use `import` instead of `require`
 const { Schema } = mongoose;
 
 // Define the schema for the Survey model
@@ -74,4 +74,4 @@ const SurveySchema = new Schema(
 );
 
 // Export the Survey model
-module.exports = mongoose.model("Survey", SurveySchema);
+export default mongoose.model("Survey", SurveySchema);

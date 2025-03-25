@@ -1,11 +1,11 @@
-const express = require('express');
-const router = express.Router();
-const adsController = require('../../Controller/admin/advertiseController');
-const { adminAuth } = require("../../middleware/auth");
+import express from "express";
+import adsController from "../../Controller/admin/advertiseController.js";
+import { adminAuth } from "../../middleware/auth.js"; // ✅ FIXED: Now properly imports
 
-router.post('/ads', adminAuth ,adsController.createAd);
-router.get('/getAds/:id', adminAuth ,adsController.getAdById);
+const router = express.Router();
+
+router.post("/ads", adminAuth, adsController.createAd);
+router.get("/getAds/:id", adminAuth, adsController.getAdById);
 router.post("/editAds/:id", adminAuth, adsController.updateAdById);
 
-
-module.exports = router;
+export default router;

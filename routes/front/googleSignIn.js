@@ -1,12 +1,11 @@
-const express = require('express');
+import express from "express"; // Using import
 const router = express.Router();
-const { googleSignIn } = require('../../Controller/front/googleSignIn');
 
-const { facebookSignIn } = require('../../Controller/front/facebookSignIn');
+// Use import instead of require for controllers
+import { googleSignIn } from "../../Controller/front/googleSignIn.js";
+import { facebookSignIn } from "../../Controller/front/facebookSignIn.js";
 
+router.post("/google-signin", googleSignIn);
+router.post("/facebook-signin", facebookSignIn);
 
-router.post('/google-signin', googleSignIn);
-router.post('/facebook-signin', facebookSignIn);
-
-
-module.exports = router;
+export default router;

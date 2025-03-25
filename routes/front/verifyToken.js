@@ -1,15 +1,14 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const verifyToken = require("../../middleware/verifyToken");
-const verifyAdminToken = require("../../middleware/verifyAdminToken");
+import verifyToken from "../../middleware/verifyToken.js";
+import verifyAdminToken from "../../middleware/verifyAdminToken.js"; // Use import instead of require
 
 /**
  * @route   POST /api/front/register/verifyToken
  * @desc    Verify if the token is valid
  * @access  Private (Protected by token verification)
  */
-router.post("/verifyToken", verifyToken); 
-router.post("/verifyAdminToken", verifyAdminToken);  
+router.post("/verifyToken", verifyToken);
+router.post("/verifyAdminToken", verifyAdminToken);
 
-
-module.exports = router;
+export default router; // ✅ ESM Default Export

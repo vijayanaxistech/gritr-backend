@@ -1,35 +1,21 @@
 "use strict";
+import userRoutes from "./routes/admin/users.js"; // Add `.js`
+import roleRoutes from "./routes/admin/role.js"; // Add `.js`
+import businessLocation from "./routes/admin/businessLocationRoutes.js";
+import questionRoutes from "./routes/admin/questionRoutes.js";
+import surveys from "./routes/admin/surveys.js"; // Add `.js`
+import verifyToken from "./routes/front/verifyToken.js"; // Add `.js`
+import googleSignInRoutes from "./routes/front/googleSignIn.js"; // Add `.js`
 
-// Import route files
-let userRoutes = require("./routes/admin/users");
-let roleRoutes = require("./routes/admin/role");
-let businessLocation = require("./routes/admin/businessLocationRoutes");
-let questionRoutes = require("./routes/admin/questionRoutes");
-let advertisement = require("./routes/admin/advertisement");
-let authRoutes = require("./routes/front/authRoutes");
-let verifyToken = require("./routes/front/verifyToken");
-const googleSignInRoutes = require("./routes/front/googleSignIn");
-const surveys = require("./routes/admin/surveys");
-
-module.exports = (app) => {
-  // Admin section routes
+const routes = (app) => {
   app.use("/api/admin/user", userRoutes);
   app.use("/api/admin/role", roleRoutes);
   app.use("/api/admin/location", businessLocation);
   app.use("/api/admin/question", questionRoutes);
-  app.use("/api/admin/advertisement", advertisement);
+  //app.use("/api/admin/advertisement", advertisement);
   app.use("/api/admin/verifyAdminToken", verifyToken);
   app.use("/api/admin/surveys", surveys);
-
-  // Front user routes
-  app.use("/api/front/login", authRoutes);
-  app.use("/api/front/user", authRoutes);
-  app.use("/api/front/checkEmail", authRoutes);
-  app.use("/api/front/verifyCode", authRoutes);
-  app.use("/api/front/createNewPassword", authRoutes);
-  app.use("/api/front/logout", authRoutes);
-  app.use("/api/front/register", authRoutes);
-  app.use("/api/front/updateProfile", authRoutes);
-  app.use("/api/front/verifyToken", verifyToken);
   app.use("/api/front/auth", googleSignInRoutes);
 };
+
+export default routes;

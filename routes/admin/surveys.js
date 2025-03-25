@@ -1,7 +1,7 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-let surveysManagement = require("../../Controller/admin/surveysController");
-const { isAuth, adminAuth } = require("../../middleware/auth");
+import surveysManagement from "../../Controller/admin/surveysController.js";
+import { isAuth, adminAuth } from "../../middleware/auth.js"; // Using ES module import
 
 // ============================
 // Survey Management Routes
@@ -85,4 +85,4 @@ router.post(
 // // Bulk Create AI Questions
 // router.post('/api/surveys/:surveyId/questions/bulk', bulkCreateQuestions);  // Bulk create questions using AI
 
-module.exports = router;
+export default router; // ✅ ESM Default Export

@@ -1,48 +1,25 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
+
 let Schema = mongoose.Schema;
-const mongoosePaginate = require("mongoose-paginate-v2"); // Require mongoose-paginate-v2
 
 const adminUserSchema = new mongoose.Schema(
   {
-    fullName: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-    },
-    userName: {
-      type: String,
-      required: true,
-    },
-    password: { type: String, required: true, select: false },  // `select: false` will prevent the password from being returned by default
-
+    fullName: { type: String, required: true },
+    email: { type: String, required: true },
+    userName: { type: String, required: true },
+    password: { type: String, required: true, select: false },
     sidebarIds: [],
-    roleId: {
-      type: Schema.Types.ObjectId,
-      ref: "Role",
-    },
-    roleType: {
-      type: Number,
-      required: false,
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    isDeleted: {
-      type: Boolean,
-      default: false,
-    },
+    roleId: { type: Schema.Types.ObjectId, ref: "Role" },
+    roleType: { type: Number },
+    isActive: { type: Boolean, default: true },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
 
-// Apply pagination plugin
 adminUserSchema.plugin(mongoosePaginate);
 
-// Override toJSON to remove sensitive data
 adminUserSchema.methods.toJSON = function () {
   var obj = this.toObject();
   delete obj.password;
@@ -50,5 +27,5 @@ adminUserSchema.methods.toJSON = function () {
   return obj;
 };
 
-// Export the model with "Admin_User" name
-module.exports = mongoose.model("Admin_User", adminUserSchema);
+// ✅ Use ES Module export
+export default mongoose.model("Admin_User", adminUserSchema);

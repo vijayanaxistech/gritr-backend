@@ -1,5 +1,7 @@
-const mongoose = require("mongoose");
-require("dotenv").config({
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config({
   path: `.env.${process.env.NODE_ENV || "development"}`,
 });
 
@@ -7,8 +9,6 @@ mongoose.Promise = global.Promise;
 
 const connectDB = async () => {
   try {
-    //const dbURI = `mongodb+srv://vijaypanchal05:AXss4q9zgwBg7OWe@cluster0.pnhhz.mongodb.net/gritr?retryWrites=true&w=majority&appName=Cluster0`;
-
     const dbURI = process.env.DB_URI;
     if (!dbURI) {
       throw new Error("DB_URI is not defined in environment variables.");
@@ -29,4 +29,5 @@ const connectDB = async () => {
   }
 };
 
-module.exports = connectDB;
+// ✅ Use ES Module export instead of module.exports
+export default connectDB;

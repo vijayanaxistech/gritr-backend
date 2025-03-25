@@ -1,9 +1,8 @@
-const User = require("../../models/front/User");
-const { Validator } = require("node-input-validator");
-const helper = require("../../helpers/helper");
-const BusinessLocation = require("../../models/admin/businessLocation");
-const UsCity = require("../../models/admin/UsCity");
-const Survey = require("../../models/admin/survey");
+import User from "../../models/front/User.js"; // Make sure to include the `.js` extension
+import { Validator } from "node-input-validator";
+import helper from "../../helpers/helper.js"; // Add the .js extension
+import UsCity from "../../models/admin/UsCity.js"; // Add the .js extension
+import Survey from "../../models/admin/survey.js"; // Use import instead of require
 
 const cleanQuestion = (text, regions) => {
   if (!text) return ""; // Handle empty or undefined input
@@ -18,7 +17,8 @@ const cleanQuestion = (text, regions) => {
   return text.replace(regex, "").trim(); // Remove location phrases
 };
 
-module.exports = {
+const surveyController = {
+  /**
   /**
    * @desc    Create a new survey
    * @route   POST /surveys/create
@@ -678,3 +678,4 @@ module.exports = {
     }
   },
 };
+export default surveyController;

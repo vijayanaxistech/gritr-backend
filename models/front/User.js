@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose"; // Using ES module import
 
 const userSchema = new mongoose.Schema(
   {
@@ -19,14 +19,14 @@ const userSchema = new mongoose.Schema(
       ],
     },
     googleId: {
-      type: String, // Store the Google user ID for users logging in with Google
+      type: String,
       unique: true,
-      sparse: true, // This allows both email-based login and Google-based login
+      sparse: true,
     },
     facebookId: {
-      type: String, // Store the Facebook user ID for users logging in with Facebook
+      type: String,
       unique: true,
-      sparse: true, // This allows both email-based login and Facebook-based login
+      sparse: true,
     },
     isActive: {
       type: Boolean,
@@ -34,11 +34,11 @@ const userSchema = new mongoose.Schema(
     },
     isGmailLogin: {
       type: Boolean,
-      default: false, // Track if the user logged in using Gmail/Google
+      default: false,
     },
     isFacebookLogin: {
       type: Boolean,
-      default: false, // Track if the user logged in using Facebook
+      default: false,
     },
     isVerify: {
       type: Boolean,
@@ -52,13 +52,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       minlength: [6, "Password must be at least 6 characters long"],
       required: function () {
-        return !this.googleId && !this.facebookId; // Password is required only if the user is not using Google or Facebook login
+        return !this.googleId && !this.facebookId;
       },
     },
     city: {
       type: String,
       required: function () {
-        return !this.googleId && !this.facebookId; // City is required only if the user is not using Google or Facebook login
+        return !this.googleId && !this.facebookId;
       },
       trim: true,
     },
@@ -66,4 +66,4 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("User", userSchema);
+export default mongoose.model("User", userSchema); // Default export

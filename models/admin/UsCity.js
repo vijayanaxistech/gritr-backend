@@ -1,5 +1,5 @@
 "use strict";
-const mongoose = require("mongoose");
+import mongoose from "mongoose"; // Use `import` instead of `require`
 
 const UsCitySchema = new mongoose.Schema(
   {
@@ -32,4 +32,5 @@ UsCitySchema.index({ state_id: 1 });
 UsCitySchema.index({ city: 1 });
 UsCitySchema.index({ lat: 1, lng: 1 });
 
-module.exports = mongoose.model("UsCity", UsCitySchema);
+// Default export
+export default mongoose.model("UsCity", UsCitySchema);

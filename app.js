@@ -1,24 +1,29 @@
 // Import third-party libraries
-const express = require("express");
-const createError = require("http-errors");
-const path = require("path");
-const fs = require("fs");
-const cors = require("cors");
-const fileupload = require("express-fileupload");
-const compression = require("compression");
-const morgan = require("morgan");
-const swaggerUi = require("swagger-ui-express");
-const dotenv = require("dotenv");
+import express from "express";
+import createError from "http-errors";
+import path from "path";
+import fs from "fs";
+import cors from "cors";
+import fileupload from "express-fileupload";
+import compression from "compression";
+import morgan from "morgan";
+import swaggerUi from "swagger-ui-express";
+import dotenv from "dotenv";
+
+// ES Modules doesn't support __dirname by default, so define it manually
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables dynamically
 const environment = process.env.NODE_ENV || "development";
 dotenv.config({ path: `.env.${environment}` });
 
 // Import custom files
-const errorMiddleware = require("./middleware/error");
-const connectDB = require("./config/config.js");
-const swaggerDocument = require("./swagger.json");
-const routes = require("./routes.js");
+import errorMiddleware from "./middleware/error.js";
+import connectDB from "./config/config.js";
+import swaggerDocument from "./swagger.json" assert { type: "json" };
+import routes from "./routes.js"; // Ensure routes.js also uses ES Modules
 
 // Set up app and port
 const app = express();

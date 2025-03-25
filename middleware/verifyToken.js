@@ -1,11 +1,14 @@
 // middleware/verifyToken.js
-const jwt = require('jsonwebtoken');
-const FrontToken = require("../models/front/frontToken");
-const { JWTSecretFrontend } = require("../config/constants");
-const helper = require("../helpers/helper");  // Assuming this is your helper module
+import jwt from "jsonwebtoken"; // Importing jwt using ES modules
+import FrontToken from "../models/front/frontToken.js"; // Importing the model using ES modules
+import constants from "../config/constants.js"; // Import the default export (the constants object)
+
+const { JWTSecretFrontend } = constants; // Access JWTSecretFrontend from the constants object
+
+import helper from "../helpers/helper.js"; // Correct import syntax for ES modules
 
 const verifyToken = async (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1]; // Extract token from Authorization header
+  const token = req.headers.authorization?.split(" ")[1]; // Extract token from Authorization header
 
   if (!token) {
     return helper.error(res, "Token not provided", {}, 401); // If no token is provided
@@ -26,11 +29,10 @@ const verifyToken = async (req, res, next) => {
     req.userId = decoded.userId;
 
     // Send a success response indicating the token is valid
-    return helper.success(res, "Token is valid", {});  // Success response
-
+    return helper.success(res, "Token is valid", {}); // Success response
   } catch (error) {
     return helper.error(res, "Invalid or expired token", {}, 401); // Catch any errors
   }
 };
 
-module.exports = verifyToken;
+export default verifyToken;

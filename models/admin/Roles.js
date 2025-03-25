@@ -1,5 +1,4 @@
-"use strict";
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const roleSchema = new mongoose.Schema(
   {
@@ -10,7 +9,7 @@ const roleSchema = new mongoose.Schema(
     displayName: {
       type: String,
       required: true,
-    },    
+    },
     roleType: {
       type: Number,
     },
@@ -29,8 +28,9 @@ const roleSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
-   },
+  },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Admin_Role", roleSchema);
+// ✅ Use `export default` instead of `module.exports`
+export default mongoose.model("Admin_Role", roleSchema);

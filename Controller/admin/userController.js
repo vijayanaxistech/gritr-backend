@@ -42,35 +42,6 @@ const userController = {
       return helper.error(res, error.message);
     }
   },
-
-  getUserRoleList: async (req, res) => {
-    try {
-      const users = await AdminUser.find({ isActive: true }).lean();
-
-      const rolesWithDisplayName = await Promise.all(
-        users.map(async (user) => {
-          const role = await RoleManagement.findById(user.roleId);
-          return {
-            ...user,
-            roleType: role ? role.displayName : "Role not found",
-          };
-        })
-      );
-
-      return helper.success(res, "Listing Successfully.", rolesWithDisplayName);
-    } catch (error) {
-      return helper.error(res, error.message);
-    }
-  },
-
-  getUserList: async (req, res) => {
-    try {
-      const users = await AdminUser.find({});
-      return helper.success(res, "Listing Successfully.", users);
-    } catch (error) {
-      return helper.error(res, error.message);
-    }
-  },
 };
 
 export default userController;

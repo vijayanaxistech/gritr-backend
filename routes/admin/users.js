@@ -9,7 +9,7 @@ router.post("/createuser", userController.createUser);
 //router.post("/updateUserById/:id", adminAuth, userController.updateUserById);
 
 //router.get("/getuserroleList", adminAuth, userController.getuserroleList);
-//router.post("/login", userController.login);
+router.post("/login", userController.login);
 //router.post("/logout", adminAuth, userController.logout);
 //router.get("/getUserList", adminAuth, userController.getUserList);
 

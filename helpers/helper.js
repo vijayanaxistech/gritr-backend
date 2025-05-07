@@ -74,7 +74,7 @@ const helper = {
 
   comparePass: async (inputPassword, storedHashedPassword) => {
     if (!storedHashedPassword) return false;
-
+    console.log(inputPassword);
     try {
       return await bcrypt.compare(inputPassword, storedHashedPassword);
     } catch (err) {

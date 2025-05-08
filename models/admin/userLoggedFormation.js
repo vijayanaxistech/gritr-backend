@@ -1,10 +1,10 @@
 "use strict";
-const mongoose = require("mongoose");
-const mongoosePaginate = require("mongoose-paginate-v2"); // Require mongoose-paginate-v2
+import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2"; // Use import instead of require
 
 let Schema = mongoose.Schema;
 
-let userLoggedFormation = new Schema(
+let userLoggedFormationSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
@@ -22,7 +22,7 @@ let userLoggedFormation = new Schema(
     token: {
       type: String,
     },
-    deviceId:{
+    deviceId: {
       type: String,
     },
     createdAt: {
@@ -32,6 +32,9 @@ let userLoggedFormation = new Schema(
   },
   { timestamps: true }
 );
-userLoggedFormation.plugin(mongoosePaginate);
 
-module.exports = mongoose.model("userLoggedFormation", userLoggedFormation);
+// Apply pagination plugin
+userLoggedFormationSchema.plugin(mongoosePaginate);
+
+// Correct schema reference in the model export
+export default mongoose.model("UserLoggedFormation", userLoggedFormationSchema);

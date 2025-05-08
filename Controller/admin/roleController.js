@@ -1,10 +1,10 @@
-let RoleManagement = require("../models/Roles");
-let Sidebar = require("../models/sidebar");
-const helper = require("../helpers/helper");
-const AdminUser = require("../models/AdminUser");
-const { Validator } = require("node-input-validator");
+import RoleManagement from "../../models/admin/Roles.js";
+import Sidebar from "../../models/admin/sidebar.js";
+import helper from "../../helpers/helper.js";
+import AdminUser from "../../models/admin/AdminUser.js";
+import { Validator } from "node-input-validator";
 
-module.exports = {
+const roleManagement = {
   /**
    * @desc    Create a new role
    * @route   POST /roles/create
@@ -74,11 +74,9 @@ module.exports = {
 
       req.body.updatedAt = new Date();
       // Update the role
-      RoleManagement.findOneAndUpdate(
-        { _id: req.params.id },
-        req.body,
-        { new: true }
-      )
+      RoleManagement.findOneAndUpdate({ _id: req.params.id }, req.body, {
+        new: true,
+      })
         .then((response) => {
           return helper.success(res, "Role Updated Successfully.", response);
         })
@@ -133,7 +131,11 @@ module.exports = {
         return helper.error(res, "Role not found");
       }
 
-      return helper.success(res, "Role status updated successfully.", updatedRole);
+      return helper.success(
+        res,
+        "Role status updated successfully.",
+        updatedRole
+      );
     } catch (error) {
       return helper.error(res, error.message);
     }
@@ -226,9 +228,17 @@ module.exports = {
         { new: true }
       );
 
-      return helper.success(res, "User sidebar IDs updated successfully.", updatedUser);
+      return helper.success(
+        res,
+        "User sidebar IDs updated successfully.",
+        updatedUser
+      );
     } catch (error) {
-      return helper.error(res, "An error occurred while updating user permissions.");
+      return helper.error(
+        res,
+        "An error occurred while updating user permissions."
+      );
     }
   },
 };
+export default roleManagement; // ✅ This makes it work with ES modules

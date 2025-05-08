@@ -1,7 +1,6 @@
-"use strict";
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const sidebarSchema = new mongoose.Schema(
+const SidebarSchema = new mongoose.Schema(
   {
     sidebar_name: {
       type: String,
@@ -10,7 +9,7 @@ const sidebarSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    routeName:{
+    routeName: {
       type: String,
       required: false,
     },
@@ -57,5 +56,6 @@ const sidebarSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Exporting the Sidebar model
-module.exports = mongoose.model("Sidebar", sidebarSchema);
+const Sidebar = mongoose.model("Sidebar", SidebarSchema);
+
+export default Sidebar; // ✅ Use ES module export

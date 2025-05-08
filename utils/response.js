@@ -7,6 +7,7 @@ const response = (res, obj, req) => {
       expiry: req.user?.jwsUserId?.edate
     }
   }
-  return res.status(200).json({ auth: Authenticate.getEncKey(newExpiryKey) });
+  //return res.status(200).json({ auth: Authenticate.getEncKey(newExpiryKey) });
+  return res.status(200).json({ auth: newExpiryKey });
 }
 module.exports = response

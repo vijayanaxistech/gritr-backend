@@ -1,29 +1,33 @@
 // Import third-party libraries
-const express = require("express");
-const createError = require("http-errors");
-const path = require("path");
-const fs = require("fs");
-const cors = require("cors");
-const fileupload = require("express-fileupload");
-const compression = require("compression");
-const morgan = require("morgan");
-const swaggerUi = require("swagger-ui-express");
+import express from "express";
+import createError from "http-errors";
+import path from "path";
+import fs from "fs";
+import cors from "cors";
+import fileupload from "express-fileupload";
+import compression from "compression";
+import morgan from "morgan";
+import swaggerUi from "swagger-ui-express";
+import dotenv from "dotenv";
+
+// ES Modules doesn't support __dirname by default, so define it manually
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load environment variables dynamically
+const environment = process.env.NODE_ENV || "development";
+dotenv.config({ path: `.env.${environment}` });
 
 // Import custom files
-const errorMiddleware = require("./middleware/error");
-const connectDB = require("./config/config.js");
-const swaggerDocument = require("./swagger.json");
-const env = require("dotenv");
-const routes = require("./routes.js");
-const expirationTask = require("./tasks/expirationTask");
-
-// Load environment variables
-env.config();
+import errorMiddleware from "./middleware/error.js";
+import connectDB from "./config/config.js";
+//import swaggerDocument from "./swagger.json" assert { type: "json" };
+import routes from "./routes.js"; // Ensure routes.js also uses ES Modules
 
 // Set up app and port
 const app = express();
 const PORT = process.env.PORT || 8186;
-const environment = process.env.NODE_ENV || "development";
 
 // Middleware setup
 app.use(cors());
@@ -34,11 +38,7 @@ app.use(fileupload());
 app.use(morgan("dev"));
 
 // Serve API documentation
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerDocument)
-);
+//app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, "public")));
@@ -54,7 +54,7 @@ connectDB()
   .then(() => {
     console.log("Database connected successfully");
     app.listen(PORT, () => {
-      console.log(`Server started successfully on http://localhost:${PORT}`);
+      console.log(`Server started successfully on ${process.env.BASE_URL}`);
     });
   })
   .catch((err) => {

@@ -1,23 +1,15 @@
-const bcrypt = require("bcrypt");
-const path = require("path");
-const uuid = require("uuid").v4;
-const uniqueId = uuid();
-const KJUR = require("jsrsasign");
-const { getEncKey } = require("../utils/authHelper");
-const AdminUser = require("../models/AdminUser");
-let aes256 = require("aes256");
-const constants = require("../config/constants");
+import bcrypt from "bcrypt";
+import path from "path";
+import { v4 as uuidv4 } from "uuid";
+import KJUR from "jsrsasign";
+import AdminUser from "../models/admin/AdminUser.js"; // ✅ Now works
+import aes256 from "aes256";
+import constants from "../config/constants.js";
 
-module.exports = {
+const helper = {
   error: function (res, err) {
     let code =
-      typeof err === "object"
-        ? err.statusCode
-          ? err.statusCode
-          : err.code
-          ? err.code
-          : 403
-        : 403;
+      typeof err === "object" ? err.statusCode || err.code || 403 : 403;
     let message = typeof err === "object" ? err.message : err;
 
     let resObj = {
@@ -26,8 +18,6 @@ module.exports = {
       code: code,
       data: {},
     };
-
-    // res.status(code).json({ auth: getEncKey(resObj) });
     res.status(code).json(resObj);
   },
 
@@ -38,7 +28,6 @@ module.exports = {
       message: message,
       data: body,
     };
-    // return res.status(200).json({ auth: getEncKey(resObj) });
     return res.status(200).json(resObj);
   },
 
@@ -66,38 +55,31 @@ module.exports = {
     };
   },
 
-  // comparePass: async (requestPass, dbPass) => {
-  //   const match = await bcrypt.compare(requestPass, dbPass);
-  //   return match;
-  // },
+  generateVerificationCode: () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  },
 
   validateCredit: async (requiredCredit, userCredit) => {
-    if (requiredCredit > userCredit) {
-      return false;
+    return requiredCredit <= userCredit;
+  },
+
+  passwordEncrypt: async (data) => {
+    const saltRounds = 10;
+    try {
+      return await bcrypt.hash(data, saltRounds);
+    } catch (err) {
+      throw new Error("Error encrypting password: " + err.message);
     }
-    return true;
   },
 
-  // Encrypt data
-  passwordEncrypt: (data) => {
-    let key = constants.secret;
-    let encrypted = aes256.encrypt(key, data);
-    return encrypted;
-  },
-
-  // Decrypt data
-  passwordDecrypt: (data) => {
-    let key = constants.secret;
-    let decrypt = aes256.decrypt(key, data);
-    return decrypt;
-  },
-
-  // Compare password
-  comparePass: async (inputPassword, storedEncryptedPassword) => {
-    const decryptedPassword = module.exports.passwordDecrypt(
-      storedEncryptedPassword
-    );
-    return inputPassword === decryptedPassword;
+  comparePass: async (inputPassword, storedHashedPassword) => {
+    if (!storedHashedPassword) return false;
+    console.log(inputPassword);
+    try {
+      return await bcrypt.compare(inputPassword, storedHashedPassword);
+    } catch (err) {
+      throw new Error("Error comparing passwords: " + err.message);
+    }
   },
 
   checkValidation: async (v) => {
@@ -107,7 +89,7 @@ module.exports = {
         var valdErrors = v.errors;
         var respErrors = [];
         Object.keys(valdErrors).forEach(function (key) {
-          if (valdErrors && valdErrors[key] && valdErrors[key].message) {
+          if (valdErrors[key] && valdErrors[key].message) {
             respErrors.push(valdErrors[key].message);
           }
         });
@@ -130,47 +112,32 @@ module.exports = {
 
   fileUpload: async (fileName, name = "images") => {
     let extension = path.extname(fileName.name);
-    let fileImage = uuid() + extension;
+    let fileImage = uuidv4() + extension;
     fileName.mv(
       process.cwd() + `/public/uploads/${name}/` + fileImage,
       function (err) {
-        if (err) {
-          throw err;
-        }
+        if (err) throw err;
       }
     );
-    let imgPath = `/uploads/${name}/${fileImage}`;
-    return imgPath;
+    return `/uploads/${name}/${fileImage}`;
   },
 
   getBcryptHash: async (keyword) => {
     const saltRounds = 10;
-    var myPromise = await new Promise(function (resolve, reject) {
-      bcrypt.hash(keyword, saltRounds, function (err, hash) {
-        if (!err) {
-          resolve(hash);
-        } else {
-          reject("0");
-        }
-      });
-    });
-    keyword = myPromise;
-    return keyword;
+    try {
+      return await bcrypt.hash(keyword, saltRounds);
+    } catch (err) {
+      throw new Error("Error hashing keyword: " + err.message);
+    }
   },
 
   getGenerateBcryptHashLink: async (keyword) => {
-    var myPromise = await new Promise(function (resolve, reject) {
-      bcrypt.hash(uniqueId, saltRounds, (error, hash) => {
-        if (error) {
-          console.error("Error hashing unique identifier:", error);
-          reject(error);
-        } else {
-          resolve(hash);
-        }
-      });
-    });
-    keyword = myPromise;
-    return keyword;
+    const saltRounds = 10;
+    try {
+      return await bcrypt.hash(uuidv4(), saltRounds);
+    } catch (err) {
+      throw new Error("Error hashing unique identifier: " + err.message);
+    }
   },
 
   logger: async (message) => {
@@ -199,12 +166,40 @@ module.exports = {
     const sHeader = JSON.stringify(oHeader);
     const sPayload = JSON.stringify(oPayload);
 
-    const sdkJWT = KJUR.jws.JWS.sign(
+    return KJUR.jws.JWS.sign(
       "HS256",
       sHeader,
       sPayload,
       "56GKWj1E61hYG7TRrucSwEtKlsJ2fi7W"
     );
-    return sdkJWT;
+  },
+
+  parseExpiresIn: (expiresIn) => {
+    const regex = /(\d+)([smhd])/;
+    const match = expiresIn.match(regex);
+
+    if (!match) {
+      throw new Error(
+        "Invalid expiration format. Expected format: <number><unit>, e.g., '1d', '2h'."
+      );
+    }
+
+    const value = parseInt(match[1], 10);
+    const unit = match[2];
+
+    switch (unit) {
+      case "s":
+        return value * 1000;
+      case "m":
+        return value * 60 * 1000;
+      case "h":
+        return value * 60 * 60 * 1000;
+      case "d":
+        return value * 24 * 60 * 60 * 1000;
+      default:
+        throw new Error("Unsupported time unit.");
+    }
   },
 };
+
+export default helper;

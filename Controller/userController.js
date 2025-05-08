@@ -12,10 +12,7 @@ const {
 } = require("../config/constants");
 
 module.exports = {
-  /**
-   * Creates a new user.
-   * Validates the input, checks for duplicate usernames, encrypts the password, and saves the user.
-   */
+
   createuser: async (req, res) => {
     try {
       // Validate required fields

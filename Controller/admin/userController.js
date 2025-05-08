@@ -75,17 +75,14 @@ const userController = {
         return helper.error(res, "Incorrect password");
       }
 
-      console.log("passwordMatch", passwordMatch);
 
       const clientIp = requestIp.getClientIp(req);
-      console.log(user);
       const tokenPayload = {
         _id: user._id,
         roleId: user.roleId,
         roleType: user.roleType,
         userName: user.userName,
       };
-      console.log(tokenPayload);
 
       // const token = jwt.sign(tokenPayload, constants.JWTSecret, {
       //   expiresIn: "1d",
@@ -113,8 +110,12 @@ const userController = {
         loginTime: new Date(),
       });
 
+      //userId
+
+
+
       return helper.success(res, "Login successful", {
-        token,
+        authToken:token,
         user,
       });
     } catch (error) {

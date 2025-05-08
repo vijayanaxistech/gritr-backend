@@ -14,12 +14,15 @@ const verifyAdminToken = async (req, res, next) => {
   try {
     // Verify the JWT token
     const decoded = jwt.verify(token, JWTSecret);
+    console.log(decoded._id); 
 
     // Check if the token exists in the database and is not expired
     const dbToken = await AdminToken.findOne({
-      userId: decoded.data.id,
+      userId: decoded._id,
       token,
     });
+
+    console.log('dbToken',dbToken);
 
     if (!dbToken || dbToken.expiresAt < new Date()) {
       return helper.error(res, "Token is invalid or expired", {}, 401); // If token is invalid or expired
@@ -31,7 +34,7 @@ const verifyAdminToken = async (req, res, next) => {
     // Send a success response indicating the token is valid
     return helper.success(res, "Token is valid", {}); // Success response
   } catch (error) {
-    return helper.error(res, "Invalid or expired token", {}, 401); // Catch any errors
+    return helper.error(res, "Invalid or expired token333", {}, 401); // Catch any errors
   }
 };
 

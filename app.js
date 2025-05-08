@@ -22,7 +22,7 @@ dotenv.config({ path: `.env.${environment}` });
 // Import custom files
 import errorMiddleware from "./middleware/error.js";
 import connectDB from "./config/config.js";
-import swaggerDocument from "./swagger.json" assert { type: "json" };
+//import swaggerDocument from "./swagger.json" assert { type: "json" };
 import routes from "./routes.js"; // Ensure routes.js also uses ES Modules
 
 // Set up app and port
@@ -38,7 +38,7 @@ app.use(fileupload());
 app.use(morgan("dev"));
 
 // Serve API documentation
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+//app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, "public")));

@@ -13,4 +13,7 @@ router.post("/login", userController.login);
 //router.post("/logout", adminAuth, userController.logout);
 //router.get("/getUserList", adminAuth, userController.getUserList);
 
+router.post("/fetchWixPosts1", userController.fetchWixPosts1);
+router.post("/fetchWixPosts", userController.fetchWixPosts);
+
 export default router;

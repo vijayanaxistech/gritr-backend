@@ -7,11 +7,7 @@ import jwt from "jsonwebtoken";
 import requestIp from "request-ip";
 import AdminToken from "../../models/admin/adminToken.js";
 import constants from "../../config/constants.js";
-import { Parser } from "json2csv";
 import axios from "axios";
-import fs from "fs";
-import path from "path";
-import dayjs from "dayjs";
 
 const userController = {
   createUser: async (req, res) => {
@@ -122,7 +118,7 @@ const userController = {
     }
   },
 
-  fetchWixPosts1: async (req, res) => {
+  fetchWixPosts: async (req, res) => {
     try {
       // Prepare data for the API request
       const { limit = 40, offset = 0 } = req.body; // Default to 40 and 0 if not provided
@@ -176,91 +172,6 @@ const userController = {
       return res.status(200).json(response.data);
     } catch (error) {
       // Handle any errors that occur during the request
-      return res.status(500).json({ error: error.message });
-    }
-  },
-
-  fetchWixPosts: async (req, res) => {
-    try {
-      const { limit = 40, offset = 0 } = req.body;
-
-      const requestData = {
-        query: {
-          filter: {
-            language: "en",
-            $and: [
-              {
-                lastPublishedDate: {
-                  $gte: "2025-01-01T18:30:00.000Z",
-                },
-              },
-              {
-                lastPublishedDate: {
-                  $lte: "2025-05-05T18:29:59.999Z",
-                },
-              },
-            ],
-          },
-          sort: [],
-          paging: { limit, offset },
-        },
-        fieldsets: ["METRICS", "URL", "TRANSLATIONS"],
-      };
-
-      const config = {
-        method: "post",
-        url: "https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query",
-        headers: {
-          authorization:
-            "R2NP7hpV-bqM8xIbayfmdsVloRlVq39s8VdIItaTwbA.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA3VDEwOjA2OjE3LjI1OVoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDdUMTQ6MDY6MTcuMjU5WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9",
-          "X-XSRF-TOKEN":
-            "R2NP7hpV-bqM8xIbayfmdsVloRlVq39s8VdIItaTwbA.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA3VDEwOjA2OjE3LjI1OVoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDdUMTQ6MDY6MTcuMjU5WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9",
-          "Content-Type": "application/json",
-          Cookie: "XSRF-TOKEN=1746614101|IOkaR7uos9FI",
-        },
-        data: JSON.stringify(requestData),
-      };
-
-      const { data } = await axios(config);
-
-      const formattedData = data.posts.map((post) => ({
-        post_title: post.title,
-        post_content: post.content?.replace(/\n/g, " ") || "",
-        post_excerpt: post.excerpt || "",
-        post_status: post.status || "draft",
-        post_date: dayjs(post.lastPublishedDate).format("DD-MM-YYYY HH:mm"),
-        post_author: 1,
-        post_category: post.category?.join(",") || "",
-        post_tags: post.tags?.join(",") || "",
-        post_featured_image: post.media?.wixMedia?.image?.url || "",
-        post_slug: post.slug,
-        comment_status: post.allowComments ? "open" : "closed",
-      }));
-
-      const fields = [
-        "post_title",
-        "post_content",
-        "post_excerpt",
-        "post_status",
-        "post_date",
-        "post_author",
-        "post_category",
-        "post_tags",
-        "post_featured_image",
-        "post_slug",
-        "comment_status",
-      ];
-
-      const parser = new Parser({ fields });
-      const csv = parser.parse(formattedData);
-
-      const outputPath = `D:/exports/wix_posts_limit-${limit}_offset-${offset}.csv`;
-      fs.writeFileSync(outputPath, csv);
-
-      return res
-        .status(200)
-        .json({ message: "CSV exported successfully.", path: outputPath });
-    } catch (error) {
       return res.status(500).json({ error: error.message });
     }
   },

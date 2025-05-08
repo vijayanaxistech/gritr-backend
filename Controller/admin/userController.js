@@ -183,7 +183,7 @@ const userController = {
   fetchWixPosts: async (req, res) => {
     try {
       const { limit = 40, offset = 0 } = req.body;
-
+  
       const requestData = {
         query: {
           filter: {
@@ -206,64 +206,111 @@ const userController = {
         },
         fieldsets: ["METRICS", "URL", "TRANSLATIONS"],
       };
-
+  
       const config = {
         method: "post",
         url: "https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query",
         headers: {
-          authorization:
-            "R2NP7hpV-bqM8xIbayfmdsVloRlVq39s8VdIItaTwbA.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA3VDEwOjA2OjE3LjI1OVoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDdUMTQ6MDY6MTcuMjU5WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9",
-          "X-XSRF-TOKEN":
-            "R2NP7hpV-bqM8xIbayfmdsVloRlVq39s8VdIItaTwbA.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA3VDEwOjA2OjE3LjI1OVoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDdUMTQ6MDY6MTcuMjU5WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9",
+          authorization: "YOUR_TOKEN_HERE",
+          "X-XSRF-TOKEN": "YOUR_TOKEN_HERE",
           "Content-Type": "application/json",
-          Cookie: "XSRF-TOKEN=1746614101|IOkaR7uos9FI",
+          Cookie: "XSRF-TOKEN=YOUR_COOKIE_HERE",
         },
         data: JSON.stringify(requestData),
       };
-
+  
       const { data } = await axios(config);
-
+  
       const formattedData = data.posts.map((post) => ({
-        post_title: post.title,
-        post_content: post.content?.replace(/\n/g, " ") || "",
-        post_excerpt: post.excerpt || "",
-        post_status: post.status || "draft",
-        post_date: dayjs(post.lastPublishedDate).format("DD-MM-YYYY HH:mm"),
-        post_author: 1,
-        post_category: post.category?.join(",") || "",
-        post_tags: post.tags?.join(",") || "",
-        post_featured_image: post.media?.wixMedia?.image?.url || "",
-        post_slug: post.slug,
-        comment_status: post.allowComments ? "open" : "closed",
+        ID: "",
+        Title: post.title,
+        Content: post.content?.replace(/\n/g, " ") || "",
+        Excerpt: post.excerpt || "",
+        Date: dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
+        "Post Type": "post",
+        Permalink: post.slug,
+        "Image URL": post.media?.wixMedia?.image?.url || "",
+        "Image Title": "",
+        "Image Caption": "",
+        "Image Description": "",
+        "Image Alt Text": "",
+        "Image Featured": "1",
+        "Attachment URL": post.media?.wixMedia?.image?.url || "",
+        Categories: post.category?.join(",") || "",
+        Tags: post.tags?.join(",") || "",
+        Status: post.status || "draft",
+        "Author ID": "1",
+        "Author Username": "admin",
+        "Author Email": "admin@example.com",
+        "Author First Name": "Admin",
+        "Author Last Name": "",
+        Slug: post.slug,
+        Format: "standard",
+        Template: "",
+        Parent: "",
+        "Parent Slug": "",
+        Order: "0",
+        "Comment Status": post.allowComments ? "open" : "closed",
+        "Ping Status": "open",
+        "Post Modified Date": dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
       }));
-
+  
       const fields = [
-        "post_title",
-        "post_content",
-        "post_excerpt",
-        "post_status",
-        "post_date",
-        "post_author",
-        "post_category",
-        "post_tags",
-        "post_featured_image",
-        "post_slug",
-        "comment_status",
+        "ID",
+        "Title",
+        "Content",
+        "Excerpt",
+        "Date",
+        "Post Type",
+        "Permalink",
+        "Image URL",
+        "Image Title",
+        "Image Caption",
+        "Image Description",
+        "Image Alt Text",
+        "Image Featured",
+        "Attachment URL",
+        "Categories",
+        "Tags",
+        "Status",
+        "Author ID",
+        "Author Username",
+        "Author Email",
+        "Author First Name",
+        "Author Last Name",
+        "Slug",
+        "Format",
+        "Template",
+        "Parent",
+        "Parent Slug",
+        "Order",
+        "Comment Status",
+        "Ping Status",
+        "Post Modified Date"
       ];
-
+  
       const parser = new Parser({ fields });
       const csv = parser.parse(formattedData);
-
+  
       const outputPath = `D:/exports/wix_posts_limit-${limit}_offset-${offset}.csv`;
       fs.writeFileSync(outputPath, csv);
-
+  
       return res
         .status(200)
         .json({ message: "CSV exported successfully.", path: outputPath });
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
-  },
+  }
 };
 
 export default userController;
+
+
+const cleanText = (text) => {
+  return he
+    .decode(text || "")
+    .replace(/\n/g, " ")
+    .replace(/[^\x20-\x7E]+/g, "") // remove non-ASCII chars
+    .trim();
+};

@@ -727,10 +727,10 @@ fetchWixPosts: async (req, res) => {
     const fields = [
       "ID", "Title", "Content", "Excerpt", "Date", "Post Type", "Permalink",
       "Image URL", "Image Title", "Image Caption", "Image Description", "Image Alt Text",
-      "Image Featured", "Attachment URL", "Categories", "Tags", "Status",
+      "Image Featured", "Attachment URL", "Tags", "Status",
       "Author ID", "Author Username", "Author Email", "Author First Name", "Author Last Name",
       "Slug", "Format", "Template", "Parent", "Parent Slug", "Order",
-      "Comment Status", "Ping Status", "Post Modified Date"
+      "Comment Status", "Ping Status", "Post Modified Date", "Categories"
     ];
 
     const parser = new Parser({ fields });

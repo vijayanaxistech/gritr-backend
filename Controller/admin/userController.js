@@ -184,7 +184,9 @@ const userController = {
   fetchWixPosts: async (req, res) => {
     try {
       const { limit = 40, offset = 0 } = req.body;
-  
+
+      const YOUR_AUTH_HEADER= "4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9";
+      const YOUR_XSRF_TOKEN = "4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9";
       const requestData = {
         query: {
           filter: {
@@ -212,20 +214,45 @@ const userController = {
         method: "post",
         url: "https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query",
         headers: {
-          authorization: "YOUR_TOKEN_HERE",
-          "X-XSRF-TOKEN": "YOUR_TOKEN_HERE",
+          authorization: YOUR_AUTH_HEADER,
+          "X-XSRF-TOKEN": YOUR_XSRF_TOKEN,
           "Content-Type": "application/json",
-          Cookie: "XSRF-TOKEN=YOUR_COOKIE_HERE",
+          Cookie: "XSRF-TOKEN=YOUR_COOKIE",
         },
         data: JSON.stringify(requestData),
       };
   
       const { data } = await axios(config);
+      const ids = data.posts.map(post => post.id);
+      console.log('Post IDs:', ids);
+  
+      const draftContents = {};
+  
+      // Fetch draft content for each ID
+      for (const id of ids) {
+        try {
+          const draftConfig = {
+            method: 'get',
+            url: `https://manage.wix.com/_api/communities-blog-node-api/v3/draft-posts/${id}?draftPostId=${id}&fieldsets=RICH_CONTENT&fieldsets=URL&fieldsets=TRANSLATIONS`,
+            headers: {
+              authorization: YOUR_AUTH_HEADER,
+              "X-XSRF-TOKEN": YOUR_XSRF_TOKEN,
+              Cookie: "XSRF-TOKEN=YOUR_COOKIE"
+            }
+          };
+  
+          const draftResponse = await axios(draftConfig);
+          draftContents[id] = draftResponse.data?.draftPost?.title || "";
+        } catch (err) {
+          console.error(`Failed to fetch draft content for ID ${id}:`, err.message);
+          draftContents[id] = "";
+        }
+      }
   
       const formattedData = data.posts.map((post) => ({
         ID: "",
         Title: post.title,
-        Content: post.content?.replace(/\n/g, " ") || "",
+        Content: draftContents[post.id]?.replace(/\n/g, " ") || "",
         Excerpt: post.excerpt || "",
         Date: dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
         "Post Type": "post",
@@ -257,37 +284,12 @@ const userController = {
       }));
   
       const fields = [
-        "ID",
-        "Title",
-        "Content",
-        "Excerpt",
-        "Date",
-        "Post Type",
-        "Permalink",
-        "Image URL",
-        "Image Title",
-        "Image Caption",
-        "Image Description",
-        "Image Alt Text",
-        "Image Featured",
-        "Attachment URL",
-        "Categories",
-        "Tags",
-        "Status",
-        "Author ID",
-        "Author Username",
-        "Author Email",
-        "Author First Name",
-        "Author Last Name",
-        "Slug",
-        "Format",
-        "Template",
-        "Parent",
-        "Parent Slug",
-        "Order",
-        "Comment Status",
-        "Ping Status",
-        "Post Modified Date"
+        "ID", "Title", "Content", "Excerpt", "Date", "Post Type", "Permalink",
+        "Image URL", "Image Title", "Image Caption", "Image Description", "Image Alt Text",
+        "Image Featured", "Attachment URL", "Categories", "Tags", "Status",
+        "Author ID", "Author Username", "Author Email", "Author First Name", "Author Last Name",
+        "Slug", "Format", "Template", "Parent", "Parent Slug", "Order",
+        "Comment Status", "Ping Status", "Post Modified Date"
       ];
   
       const parser = new Parser({ fields });
@@ -296,13 +298,17 @@ const userController = {
       const outputPath = `D:/exports/wix_posts_limit-${limit}_offset-${offset}.csv`;
       fs.writeFileSync(outputPath, csv);
   
-      return res
-        .status(200)
-        .json({ message: "CSV exported successfully.", path: outputPath });
+      return res.status(200).json({ message: "CSV exported successfully.", path: outputPath });
+  
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
   }
+  
+
+
+ 
+  
 };
 
 export default userController;

@@ -512,7 +512,7 @@ const userController = {
 
 
 
-fetchWixPosts : async (req, res) => {
+fetchWixPosts: async (req, res) => {
   try {
     const { limit = 40, offset = 0 } = req.body;
 
@@ -555,10 +555,36 @@ fetchWixPosts : async (req, res) => {
     };
 
     const { data } = await axios(config);
-    const ids = data.posts.map(post => post.id);
-    console.log('Post IDs:', ids);
 
+    const ids = data.posts.map(post => post.id);
     const draftContents = {};
+    
+    // Get all unique category IDs from all posts
+    const allCategoryIds = [...new Set(data.posts.flatMap(post => post.categoryIds || []))];
+    
+    // Create a map to store category ID to name mapping
+    const categoryMap = {};
+    
+    // Fetch category details for each unique category ID
+    for (const categoryId of allCategoryIds) {
+      try {
+        const categoryConfig = {
+          method: 'get',
+          url: `https://manage.wix.com/_api/communities-blog-node-api/v3/categories/${categoryId}?fieldsets=SEO&categoryId=${categoryId}`,
+          headers: {
+            authorization: YOUR_AUTH_HEADER,
+            "X-XSRF-TOKEN": YOUR_XSRF_TOKEN,
+            Cookie: "XSRF-TOKEN=YOUR_COOKIE"
+          }
+        };
+        
+        const categoryResponse = await axios(categoryConfig);
+        categoryMap[categoryId] = categoryResponse.data?.category?.label || `Unknown Category (${categoryId})`;
+      } catch (err) {
+        console.error(`Failed to fetch category ${categoryId}:`, err.message);
+        categoryMap[categoryId] = `Unknown Category (${categoryId})`;
+      }
+    }
 
     const processRichContent = (richContent) => {
       if (!richContent || !richContent.nodes) return "";
@@ -595,32 +621,31 @@ fetchWixPosts : async (req, res) => {
             }
             break;
 
-    case "TABLE":
-  if (node.nodes?.length) {
-    htmlContent += `<table border="1">`;
-    node.nodes.forEach(row => {
-      if (row.type === "TABLE_ROW" && row.nodes?.length) {
-        htmlContent += `<tr>`;
-        row.nodes.forEach(cell => {
-          const cellContent = (cell.nodes || []).map(cellNode => {
-            if (cellNode.type === "PARAGRAPH") {
-              return (cellNode.nodes || []).map(textNode =>
-                textNode.type === "TEXT" && textNode.textData?.text
-                  ? textNode.textData.text
-                  : ""
-              ).join("");
+          case "TABLE":
+            if (node.nodes?.length) {
+              htmlContent += `<table border="1">`;
+              node.nodes.forEach(row => {
+                if (row.type === "TABLE_ROW" && row.nodes?.length) {
+                  htmlContent += `<tr>`;
+                  row.nodes.forEach(cell => {
+                    const cellContent = (cell.nodes || []).map(cellNode => {
+                      if (cellNode.type === "PARAGRAPH") {
+                        return (cellNode.nodes || []).map(textNode =>
+                          textNode.type === "TEXT" && textNode.textData?.text
+                            ? textNode.textData.text
+                            : ""
+                        ).join("");
+                      }
+                      return "";
+                    }).join("");
+                    htmlContent += `<td>${cellContent}</td>`;
+                  });
+                  htmlContent += `</tr>`;
+                }
+              });
+              htmlContent += `</table>`;
             }
-            return "";
-          }).join("");
-          htmlContent += `<td>${cellContent}</td>`;
-        });
-        htmlContent += `</tr>`;
-      }
-    });
-    htmlContent += `</table>`;
-  }
-  break;
-
+            break;
 
           default:
             break;
@@ -643,10 +668,6 @@ fetchWixPosts : async (req, res) => {
         };
 
         const draftResponse = await axios(draftConfig);
-
-
-        console.log('draftResponse',draftResponse);
-
         draftContents[id] = processRichContent(draftResponse.data?.draftPost?.richContent) || "";
       } catch (err) {
         console.error(`Failed to fetch draft content for ID ${id}:`, err.message);
@@ -656,7 +677,10 @@ fetchWixPosts : async (req, res) => {
 
     const formattedData = data.posts.map((post) => {
       const coverImageUrl = post.coverMedia?.image?.url || "";
-
+      
+      // Map category IDs to their names
+      const categoryNames = (post.categoryIds || []).map(id => categoryMap[id] || `Unknown Category (${id})`);
+      
       let content = `<h1>${post.title}</h1>`;
       if (coverImageUrl) {
         content += `<img src="${coverImageUrl}" alt="${post.title}" />`;
@@ -679,8 +703,7 @@ fetchWixPosts : async (req, res) => {
         "Image Description": "",
         "Image Alt Text": "",
         "Image Featured": "1",
-        "Attachment URL": post.media?.wixMedia?.image?.url || "",
-        Categories: post.category?.join(",") || "",
+        "Attachment URL": post.media?.wixMedia?.image?.url || "",       
         Tags: post.tags?.join(",") || "",
         Status: post.status || "draft",
         "Author ID": "1",
@@ -697,6 +720,7 @@ fetchWixPosts : async (req, res) => {
         "Comment Status": post.allowComments ? "open" : "closed",
         "Ping Status": "open",
         "Post Modified Date": dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
+         Categories: categoryNames.join(", "), // Use the mapped category names
       };
     });
 
@@ -713,10 +737,7 @@ fetchWixPosts : async (req, res) => {
     const csv = parser.parse(formattedData);
 
     const outputPath = `D:/exports/wix_posts_limit-${limit}_offset-${offset}.csv`;
-
-    // ✅ Fix: Write with UTF-8 encoding
     fs.writeFileSync(outputPath, '\uFEFF' + csv, { encoding: "utf8" });
-
 
     return res.status(200).json({ message: "CSV exported successfully.", path: outputPath });
 

@@ -595,6 +595,33 @@ fetchWixPosts : async (req, res) => {
             }
             break;
 
+    case "TABLE":
+  if (node.nodes?.length) {
+    htmlContent += `<table border="1">`;
+    node.nodes.forEach(row => {
+      if (row.type === "TABLE_ROW" && row.nodes?.length) {
+        htmlContent += `<tr>`;
+        row.nodes.forEach(cell => {
+          const cellContent = (cell.nodes || []).map(cellNode => {
+            if (cellNode.type === "PARAGRAPH") {
+              return (cellNode.nodes || []).map(textNode =>
+                textNode.type === "TEXT" && textNode.textData?.text
+                  ? textNode.textData.text
+                  : ""
+              ).join("");
+            }
+            return "";
+          }).join("");
+          htmlContent += `<td>${cellContent}</td>`;
+        });
+        htmlContent += `</tr>`;
+      }
+    });
+    htmlContent += `</table>`;
+  }
+  break;
+
+
           default:
             break;
         }
@@ -616,6 +643,10 @@ fetchWixPosts : async (req, res) => {
         };
 
         const draftResponse = await axios(draftConfig);
+
+
+        console.log('draftResponse',draftResponse);
+
         draftContents[id] = processRichContent(draftResponse.data?.draftPost?.richContent) || "";
       } catch (err) {
         console.error(`Failed to fetch draft content for ID ${id}:`, err.message);

@@ -580,18 +580,18 @@ fetchWixPosts : async (req, res) => {
             break;
 
           case "IMAGE":
-            if (node.imageData && node.imageData.image && node.imageData.image.src) {
-              const src = node.imageData.image.src.id || "";
-              const width = node.imageData.image.width || "";
-              const height = node.imageData.image.height || "";
-              htmlContent += `<img src="${src}" width="${width}" height="${height}" />`;
+            if (node.imageData?.image?.src?.id?.startsWith("https://")) {
+             const src = node.imageData.image.src.id;
+             const width = node.imageData.image.width || "";
+             const height = node.imageData.image.height || "";
+            htmlContent += `<img src="${src}" width="${width}" height="${height}" />`;
             }
             break;
 
           case "VIDEO":
             if (node.videoData && node.videoData.video && node.videoData.video.src) {
               const videoUrl = node.videoData.video.src.url || "";
-              htmlContent += `<div class="video-embed"><iframe src="${videoUrl}" frameborder="0" allowfullscreen></iframe></div>`;
+              htmlContent += `<div class="video-embed">${videoUrl}</div>`;
             }
             break;
 

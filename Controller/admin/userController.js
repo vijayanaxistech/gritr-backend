@@ -181,12 +181,13 @@ const userController = {
     }
   },
 
-  fetchWixPosts: async (req, res) => {
+  fetchWixPosts1: async (req, res) => {
     try {
       const { limit = 40, offset = 0 } = req.body;
 
-      const YOUR_AUTH_HEADER= "4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9";
+      const YOUR_AUTH_HEADER = "4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9";
       const YOUR_XSRF_TOKEN = "4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9";
+      
       const requestData = {
         query: {
           filter: {
@@ -209,7 +210,7 @@ const userController = {
         },
         fieldsets: ["METRICS", "URL", "TRANSLATIONS"],
       };
-  
+
       const config = {
         method: "post",
         url: "https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query",
@@ -221,13 +222,13 @@ const userController = {
         },
         data: JSON.stringify(requestData),
       };
-  
+
       const { data } = await axios(config);
       const ids = data.posts.map(post => post.id);
       console.log('Post IDs:', ids);
-  
+
       const draftContents = {};
-  
+
       // Fetch draft content for each ID
       for (const id of ids) {
         try {
@@ -240,49 +241,63 @@ const userController = {
               Cookie: "XSRF-TOKEN=YOUR_COOKIE"
             }
           };
-  
+
           const draftResponse = await axios(draftConfig);
-          draftContents[id] = draftResponse.data?.draftPost?.title || "";
+          draftContents[id] = draftResponse.data?.draftPost?.richContent?.html || "";
         } catch (err) {
           console.error(`Failed to fetch draft content for ID ${id}:`, err.message);
           draftContents[id] = "";
         }
       }
-  
-      const formattedData = data.posts.map((post) => ({
-        ID: "",
-        Title: post.title,
-        Content: draftContents[post.id]?.replace(/\n/g, " ") || "",
-        Excerpt: post.excerpt || "",
-        Date: dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
-        "Post Type": "post",
-        Permalink: post.slug,
-        "Image URL": post.media?.wixMedia?.image?.url || "",
-        "Image Title": "",
-        "Image Caption": "",
-        "Image Description": "",
-        "Image Alt Text": "",
-        "Image Featured": "1",
-        "Attachment URL": post.media?.wixMedia?.image?.url || "",
-        Categories: post.category?.join(",") || "",
-        Tags: post.tags?.join(",") || "",
-        Status: post.status || "draft",
-        "Author ID": "1",
-        "Author Username": "admin",
-        "Author Email": "admin@example.com",
-        "Author First Name": "Admin",
-        "Author Last Name": "",
-        Slug: post.slug,
-        Format: "standard",
-        Template: "",
-        Parent: "",
-        "Parent Slug": "",
-        Order: "0",
-        "Comment Status": post.allowComments ? "open" : "closed",
-        "Ping Status": "open",
-        "Post Modified Date": dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
-      }));
-  
+
+      const formattedData = data.posts.map((post) => {
+        // Get cover image URL if available
+        const coverImageUrl = post.coverMedia?.image?.url || "";
+        
+        // Build content with title, image (if exists), and draft content
+        let content = post.title;
+        if (coverImageUrl) {
+          content += `<br><img src="${coverImageUrl}" alt="${post.title}" />`;
+        }
+        if (draftContents[post.id]) {
+          content += draftContents[post.id];
+        }
+
+        return {
+          ID: "",
+          Title: post.title,
+          Content: content,
+          Excerpt: post.excerpt || "",
+          Date: dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
+          "Post Type": "post",
+          Permalink: post.slug,
+          "Image URL": coverImageUrl || post.media?.wixMedia?.image?.url || "",
+          "Image Title": "",
+          "Image Caption": "",
+          "Image Description": "",
+          "Image Alt Text": "",
+          "Image Featured": "1",
+          "Attachment URL": post.media?.wixMedia?.image?.url || "",
+          Categories: post.category?.join(",") || "",
+          Tags: post.tags?.join(",") || "",
+          Status: post.status || "draft",
+          "Author ID": "1",
+          "Author Username": "admin",
+          "Author Email": "admin@example.com",
+          "Author First Name": "Admin",
+          "Author Last Name": "",
+          Slug: post.slug,
+          Format: "standard",
+          Template: "",
+          Parent: "",
+          "Parent Slug": "",
+          Order: "0",
+          "Comment Status": post.allowComments ? "open" : "closed",
+          "Ping Status": "open",
+          "Post Modified Date": dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
+        };
+      });
+
       const fields = [
         "ID", "Title", "Content", "Excerpt", "Date", "Post Type", "Permalink",
         "Image URL", "Image Title", "Image Caption", "Image Description", "Image Alt Text",
@@ -291,21 +306,204 @@ const userController = {
         "Slug", "Format", "Template", "Parent", "Parent Slug", "Order",
         "Comment Status", "Ping Status", "Post Modified Date"
       ];
-  
+
       const parser = new Parser({ fields });
       const csv = parser.parse(formattedData);
-  
+
       const outputPath = `D:/exports/wix_posts_limit-${limit}_offset-${offset}.csv`;
       fs.writeFileSync(outputPath, csv);
-  
+
       return res.status(200).json({ message: "CSV exported successfully.", path: outputPath });
+
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  },
   
+  fetchWixPosts: async (req, res) => {
+    try {
+      const { limit = 40, offset = 0 } = req.body;
+
+      const YOUR_AUTH_HEADER = "4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9";
+      const YOUR_XSRF_TOKEN = "4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9";
+      
+      const requestData = {
+        query: {
+          filter: {
+            language: "en",
+            $and: [
+              {
+                lastPublishedDate: {
+                  $gte: "2025-01-01T18:30:00.000Z",
+                },
+              },
+              {
+                lastPublishedDate: {
+                  $lte: "2025-05-05T18:29:59.999Z",
+                },
+              },
+            ],
+          },
+          sort: [],
+          paging: { limit, offset },
+        },
+        fieldsets: ["METRICS", "URL", "TRANSLATIONS"],
+      };
+
+      const config = {
+        method: "post",
+        url: "https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query",
+        headers: {
+          authorization: YOUR_AUTH_HEADER,
+          "X-XSRF-TOKEN": YOUR_XSRF_TOKEN,
+          "Content-Type": "application/json",
+          Cookie: "XSRF-TOKEN=YOUR_COOKIE",
+        },
+        data: JSON.stringify(requestData),
+      };
+
+      const { data } = await axios(config);
+      const ids = data.posts.map(post => post.id);
+      console.log('Post IDs:', ids);
+
+      const draftContents = {};
+
+      // Function to process richContent nodes
+      const processRichContent = (richContent) => {
+        if (!richContent || !richContent.nodes) return "";
+        
+        let htmlContent = "";
+        
+        richContent.nodes.forEach(node => {
+          switch (node.type) {
+            case "PARAGRAPH":
+              if (node.nodes && node.nodes.length > 0) {
+                node.nodes.forEach(subNode => {
+                  if (subNode.type === "TEXT" && subNode.textData && subNode.textData.text) {
+                    htmlContent += `<p>${subNode.textData.text}</p>`;
+                  }
+                });
+              } else {
+                htmlContent += "<p></p>"; // Empty paragraph
+              }
+              break;
+              
+            case "IMAGE":
+              if (node.imageData && node.imageData.image && node.imageData.image.src) {
+                const src = node.imageData.image.src.id || "";
+                const width = node.imageData.image.width || "";
+                const height = node.imageData.image.height || "";
+                htmlContent += `<img src="${src}" width="${width}" height="${height}" />`;
+              }
+              break;
+              
+            case "VIDEO":
+              if (node.videoData && node.videoData.video && node.videoData.video.src) {
+                const videoUrl = node.videoData.video.src.url || "";
+                htmlContent += `<div class="video-embed"><iframe src="${videoUrl}" frameborder="0" allowfullscreen></iframe></div>`;
+              }
+              break;
+              
+            // Add more cases for other content types as needed
+            default:
+              // Handle other node types or ignore them
+              break;
+          }
+        });
+        
+        return htmlContent;
+      };
+
+      // Fetch draft content for each ID
+      for (const id of ids) {
+        try {
+          const draftConfig = {
+            method: 'get',
+            url: `https://manage.wix.com/_api/communities-blog-node-api/v3/draft-posts/${id}?draftPostId=${id}&fieldsets=RICH_CONTENT&fieldsets=URL&fieldsets=TRANSLATIONS`,
+            headers: {
+              authorization: YOUR_AUTH_HEADER,
+              "X-XSRF-TOKEN": YOUR_XSRF_TOKEN,
+              Cookie: "XSRF-TOKEN=YOUR_COOKIE"
+            }
+          };
+
+          const draftResponse = await axios(draftConfig);
+          draftContents[id] = processRichContent(draftResponse.data?.draftPost?.richContent) || "";
+        } catch (err) {
+          console.error(`Failed to fetch draft content for ID ${id}:`, err.message);
+          draftContents[id] = "";
+        }
+      }
+
+      const formattedData = data.posts.map((post) => {
+        // Get cover image URL if available
+        const coverImageUrl = post.coverMedia?.image?.url || "";
+        
+        // Build content with title, image (if exists), and draft content
+        let content = `<h1>${post.title}</h1>`;
+        if (coverImageUrl) {
+          content += `<img src="${coverImageUrl}" alt="${post.title}" />`;
+        }
+        if (draftContents[post.id]) {
+          content += draftContents[post.id];
+        }
+
+        return {
+          ID: "",
+          Title: post.title,
+          Content: content,
+          Excerpt: post.excerpt || "",
+          Date: dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
+          "Post Type": "post",
+          Permalink: post.slug,
+          "Image URL": coverImageUrl || post.media?.wixMedia?.image?.url || "",
+          "Image Title": "",
+          "Image Caption": "",
+          "Image Description": "",
+          "Image Alt Text": "",
+          "Image Featured": "1",
+          "Attachment URL": post.media?.wixMedia?.image?.url || "",
+          Categories: post.category?.join(",") || "",
+          Tags: post.tags?.join(",") || "",
+          Status: post.status || "draft",
+          "Author ID": "1",
+          "Author Username": "admin",
+          "Author Email": "admin@example.com",
+          "Author First Name": "Admin",
+          "Author Last Name": "",
+          Slug: post.slug,
+          Format: "standard",
+          Template: "",
+          Parent: "",
+          "Parent Slug": "",
+          Order: "0",
+          "Comment Status": post.allowComments ? "open" : "closed",
+          "Ping Status": "open",
+          "Post Modified Date": dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
+        };
+      });
+
+      const fields = [
+        "ID", "Title", "Content", "Excerpt", "Date", "Post Type", "Permalink",
+        "Image URL", "Image Title", "Image Caption", "Image Description", "Image Alt Text",
+        "Image Featured", "Attachment URL", "Categories", "Tags", "Status",
+        "Author ID", "Author Username", "Author Email", "Author First Name", "Author Last Name",
+        "Slug", "Format", "Template", "Parent", "Parent Slug", "Order",
+        "Comment Status", "Ping Status", "Post Modified Date"
+      ];
+
+      const parser = new Parser({ fields });
+      const csv = parser.parse(formattedData);
+
+      const outputPath = `D:/exports/wix_posts_limit-${limit}_offset-${offset}.csv`;
+      fs.writeFileSync(outputPath, csv);
+
+      return res.status(200).json({ message: "CSV exported successfully.", path: outputPath });
+
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
   }
-  
-
 
  
   

@@ -705,14 +705,35 @@ const userController = {
               }
               break;
 
+            // case 'VIDEO':
+            //   if (
+            //     node.videoData &&
+            //     node.videoData.video &&
+            //     node.videoData.video.src
+            //   ) {
+            //     const videoUrl = node.videoData.video.src.url || '';
+            //     htmlContent += `<div class="video-embed">${videoUrl}</div>`;
+            //   }
+            //   break;
             case 'VIDEO':
               if (
                 node.videoData &&
                 node.videoData.video &&
-                node.videoData.video.src
+                node.videoData.video.src &&
+                node.videoData.video.src.url
               ) {
-                const videoUrl = node.videoData.video.src.url || '';
-                htmlContent += `<div class="video-embed">${videoUrl}</div>`;
+                const originalUrl = node.videoData.video.src.url;
+                let embedUrl = originalUrl;
+
+                // Convert YouTube watch URL to embed URL
+                const match = originalUrl.match(
+                  /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+                );
+                if (match && match[1]) {
+                  embedUrl = `https://www.youtube.com/embed/${match[1]}`;
+                }
+
+                htmlContent += `<iframe width="560" height="315" src="${embedUrl}" frameborder="0" allowfullscreen></iframe>`;
               }
               break;
 

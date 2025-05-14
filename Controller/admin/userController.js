@@ -1,31 +1,27 @@
-import { Validator } from "node-input-validator";
-import AdminUser from "../../models/admin/AdminUser.js";
-import RoleManagement from "../../models/admin/Roles.js";
-import UserLoggedFormation from "../../models/admin/userLoggedFormation.js";
-import helper from "../../helpers/helper.js";
-import jwt from "jsonwebtoken";
-import requestIp from "request-ip";
-import AdminToken from "../../models/admin/adminToken.js";
-import constants from "../../config/constants.js";
-import { Parser } from "json2csv";
-import axios from "axios";
-import fs from "fs";
-import path from "path";
-import dayjs from "dayjs";
-
-
-
-
+import { Validator } from 'node-input-validator';
+import AdminUser from '../../models/admin/AdminUser.js';
+import RoleManagement from '../../models/admin/Roles.js';
+import UserLoggedFormation from '../../models/admin/userLoggedFormation.js';
+import helper from '../../helpers/helper.js';
+import jwt from 'jsonwebtoken';
+import requestIp from 'request-ip';
+import AdminToken from '../../models/admin/adminToken.js';
+import constants from '../../config/constants.js';
+import { Parser } from 'json2csv';
+import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+import dayjs from 'dayjs';
 
 const userController = {
   createUser: async (req, res) => {
     try {
       const v = new Validator(req.body, {
-        fullName: "required|string",
-        email: "required|email",
-        userName: "required|string",
-        password: "required|string|minLength:6",
-        roleId: "required|string",
+        fullName: 'required|string',
+        email: 'required|email',
+        userName: 'required|string',
+        password: 'required|string|minLength:6',
+        roleId: 'required|string',
       });
 
       if (!(await v.check())) {
@@ -36,7 +32,7 @@ const userController = {
         userName: req.body.userName,
       });
       if (existingUser) {
-        return helper.error(res, "This userName is already in use");
+        return helper.error(res, 'This userName is already in use');
       }
 
       req.body.password = await helper.passwordEncrypt(req.body.password);
@@ -47,7 +43,7 @@ const userController = {
       }
 
       const newUser = await AdminUser.create(req.body);
-      return helper.success(res, "User Created Successfully.", newUser);
+      return helper.success(res, 'User Created Successfully.', newUser);
     } catch (error) {
       return helper.error(res, error.message);
     }
@@ -56,8 +52,8 @@ const userController = {
   login: async (req, res) => {
     try {
       const v = new Validator(req.body, {
-        username: "required|string",
-        password: "required|string",
+        username: 'required|string',
+        password: 'required|string',
       });
 
       if (!(await v.check())) {
@@ -66,9 +62,9 @@ const userController = {
 
       const user = await AdminUser.findOne({
         userName: req.body.username,
-      }).select("+password");
+      }).select('+password');
       if (!user) {
-        return helper.error(res, "User not found");
+        return helper.error(res, 'User not found');
       }
 
       const passwordMatch = await helper.comparePass(
@@ -76,9 +72,8 @@ const userController = {
         user.password
       );
       if (!passwordMatch) {
-        return helper.error(res, "Incorrect password");
+        return helper.error(res, 'Incorrect password');
       }
-
 
       const clientIp = requestIp.getClientIp(req);
       const tokenPayload = {
@@ -116,10 +111,8 @@ const userController = {
 
       //userId
 
-
-
-      return helper.success(res, "Login successful", {
-        authToken:token,
+      return helper.success(res, 'Login successful', {
+        authToken: token,
         user,
       });
     } catch (error) {
@@ -135,16 +128,16 @@ const userController = {
       const data = JSON.stringify({
         query: {
           filter: {
-            language: "en",
+            language: 'en',
             $and: [
               {
                 lastPublishedDate: {
-                  $gte: "2025-01-01T18:30:00.000Z",
+                  $gte: '2025-01-01T18:30:00.000Z',
                 },
               },
               {
                 lastPublishedDate: {
-                  $lte: "2025-05-05T18:29:59.999Z",
+                  $lte: '2025-05-05T18:29:59.999Z',
                 },
               },
             ],
@@ -155,21 +148,21 @@ const userController = {
             offset, // Use the value from the request body
           },
         },
-        fieldsets: ["METRICS", "URL", "TRANSLATIONS"],
+        fieldsets: ['METRICS', 'URL', 'TRANSLATIONS'],
       });
 
       // Axios request configuration
       const config = {
-        method: "post",
+        method: 'post',
         maxBodyLength: Infinity,
-        url: "https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query",
+        url: 'https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query',
         headers: {
           authorization:
-            "R2NP7hpV-bqM8xIbayfmdsVloRlVq39s8VdIItaTwbA.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA3VDEwOjA2OjE3LjI1OVoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDdUMTQ6MDY6MTcuMjU5WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9",
-          "X-XSRF-TOKEN":
-            "R2NP7hpV-bqM8xIbayfmdsVloRlVq39s8VdIItaTwbA.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA3VDEwOjA2OjE3LjI1OVoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDdUMTQ6MDY6MTcuMjU5WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9",
-          "Content-Type": "application/json",
-          Cookie: "XSRF-TOKEN=1746614101|IOkaR7uos9FI",
+            'R2NP7hpV-bqM8xIbayfmdsVloRlVq39s8VdIItaTwbA.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA3VDEwOjA2OjE3LjI1OVoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDdUMTQ6MDY6MTcuMjU5WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9',
+          'X-XSRF-TOKEN':
+            'R2NP7hpV-bqM8xIbayfmdsVloRlVq39s8VdIItaTwbA.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA3VDEwOjA2OjE3LjI1OVoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDdUMTQ6MDY6MTcuMjU5WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9',
+          'Content-Type': 'application/json',
+          Cookie: 'XSRF-TOKEN=1746614101|IOkaR7uos9FI',
         },
         data: data,
       };
@@ -189,22 +182,24 @@ const userController = {
     try {
       const { limit = 40, offset = 0 } = req.body;
 
-      const YOUR_AUTH_HEADER = "4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9";
-      const YOUR_XSRF_TOKEN = "4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9";
-      
+      const YOUR_AUTH_HEADER =
+        '4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+      const YOUR_XSRF_TOKEN =
+        '4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+
       const requestData = {
         query: {
           filter: {
-            language: "en",
+            language: 'en',
             $and: [
               {
                 lastPublishedDate: {
-                  $gte: "2025-01-01T18:30:00.000Z",
+                  $gte: '2025-01-01T18:30:00.000Z',
                 },
               },
               {
                 lastPublishedDate: {
-                  $lte: "2025-05-05T18:29:59.999Z",
+                  $lte: '2025-05-05T18:29:59.999Z',
                 },
               },
             ],
@@ -212,23 +207,23 @@ const userController = {
           sort: [],
           paging: { limit, offset },
         },
-        fieldsets: ["METRICS", "URL", "TRANSLATIONS"],
+        fieldsets: ['METRICS', 'URL', 'TRANSLATIONS'],
       };
 
       const config = {
-        method: "post",
-        url: "https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query",
+        method: 'post',
+        url: 'https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query',
         headers: {
           authorization: YOUR_AUTH_HEADER,
-          "X-XSRF-TOKEN": YOUR_XSRF_TOKEN,
-          "Content-Type": "application/json",
-          Cookie: "XSRF-TOKEN=YOUR_COOKIE",
+          'X-XSRF-TOKEN': YOUR_XSRF_TOKEN,
+          'Content-Type': 'application/json',
+          Cookie: 'XSRF-TOKEN=YOUR_COOKIE',
         },
         data: JSON.stringify(requestData),
       };
 
       const { data } = await axios(config);
-      const ids = data.posts.map(post => post.id);
+      const ids = data.posts.map((post) => post.id);
       console.log('Post IDs:', ids);
 
       const draftContents = {};
@@ -241,23 +236,27 @@ const userController = {
             url: `https://manage.wix.com/_api/communities-blog-node-api/v3/draft-posts/${id}?draftPostId=${id}&fieldsets=RICH_CONTENT&fieldsets=URL&fieldsets=TRANSLATIONS`,
             headers: {
               authorization: YOUR_AUTH_HEADER,
-              "X-XSRF-TOKEN": YOUR_XSRF_TOKEN,
-              Cookie: "XSRF-TOKEN=YOUR_COOKIE"
-            }
+              'X-XSRF-TOKEN': YOUR_XSRF_TOKEN,
+              Cookie: 'XSRF-TOKEN=YOUR_COOKIE',
+            },
           };
 
           const draftResponse = await axios(draftConfig);
-          draftContents[id] = draftResponse.data?.draftPost?.richContent?.html || "";
+          draftContents[id] =
+            draftResponse.data?.draftPost?.richContent?.html || '';
         } catch (err) {
-          console.error(`Failed to fetch draft content for ID ${id}:`, err.message);
-          draftContents[id] = "";
+          console.error(
+            `Failed to fetch draft content for ID ${id}:`,
+            err.message
+          );
+          draftContents[id] = '';
         }
       }
 
       const formattedData = data.posts.map((post) => {
         // Get cover image URL if available
-        const coverImageUrl = post.coverMedia?.image?.url || "";
-        
+        const coverImageUrl = post.coverMedia?.image?.url || '';
+
         // Build content with title, image (if exists), and draft content
         let content = post.title;
         if (coverImageUrl) {
@@ -268,47 +267,74 @@ const userController = {
         }
 
         return {
-          ID: "",
+          ID: '',
           Title: post.title,
           Content: content,
-          Excerpt: post.excerpt || "",
-          Date: dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
-          "Post Type": "post",
+          Excerpt: post.excerpt || '',
+          Date: dayjs(post.lastPublishedDate).format('YYYY-MM-DD HH:mm:ss'),
+          'Post Type': 'post',
           Permalink: post.slug,
-          "Image URL": coverImageUrl || post.media?.wixMedia?.image?.url || "",
-          "Image Title": "",
-          "Image Caption": "",
-          "Image Description": "",
-          "Image Alt Text": "",
-          "Image Featured": "1",
-          "Attachment URL": post.media?.wixMedia?.image?.url || "",
-          Categories: post.category?.join(",") || "",
-          Tags: post.tags?.join(",") || "",
-          Status: post.status || "draft",
-          "Author ID": "1",
-          "Author Username": "admin",
-          "Author Email": "admin@example.com",
-          "Author First Name": "Admin",
-          "Author Last Name": "",
+          'Image URL': coverImageUrl || post.media?.wixMedia?.image?.url || '',
+          'Image Title': '',
+          'Image Caption': '',
+          'Image Description': '',
+          'Image Alt Text': '',
+          'Image Featured': '1',
+          'Attachment URL': post.media?.wixMedia?.image?.url || '',
+          Categories: post.category?.join(',') || '',
+          Tags: post.tags?.join(',') || '',
+          Status: post.status || 'draft',
+          'Author ID': '1',
+          'Author Username': 'admin',
+          'Author Email': 'admin@example.com',
+          'Author First Name': 'Admin',
+          'Author Last Name': '',
           Slug: post.slug,
-          Format: "standard",
-          Template: "",
-          Parent: "",
-          "Parent Slug": "",
-          Order: "0",
-          "Comment Status": post.allowComments ? "open" : "closed",
-          "Ping Status": "open",
-          "Post Modified Date": dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
+          Format: 'standard',
+          Template: '',
+          Parent: '',
+          'Parent Slug': '',
+          Order: '0',
+          'Comment Status': post.allowComments ? 'open' : 'closed',
+          'Ping Status': 'open',
+          'Post Modified Date': dayjs(post.lastPublishedDate).format(
+            'YYYY-MM-DD HH:mm:ss'
+          ),
         };
       });
 
       const fields = [
-        "ID", "Title", "Content", "Excerpt", "Date", "Post Type", "Permalink",
-        "Image URL", "Image Title", "Image Caption", "Image Description", "Image Alt Text",
-        "Image Featured", "Attachment URL", "Categories", "Tags", "Status",
-        "Author ID", "Author Username", "Author Email", "Author First Name", "Author Last Name",
-        "Slug", "Format", "Template", "Parent", "Parent Slug", "Order",
-        "Comment Status", "Ping Status", "Post Modified Date"
+        'ID',
+        'Title',
+        'Content',
+        'Excerpt',
+        'Date',
+        'Post Type',
+        'Permalink',
+        'Image URL',
+        'Image Title',
+        'Image Caption',
+        'Image Description',
+        'Image Alt Text',
+        'Image Featured',
+        'Attachment URL',
+        'Categories',
+        'Tags',
+        'Status',
+        'Author ID',
+        'Author Username',
+        'Author Email',
+        'Author First Name',
+        'Author Last Name',
+        'Slug',
+        'Format',
+        'Template',
+        'Parent',
+        'Parent Slug',
+        'Order',
+        'Comment Status',
+        'Ping Status',
+        'Post Modified Date',
       ];
 
       const parser = new Parser({ fields });
@@ -317,33 +343,36 @@ const userController = {
       const outputPath = `D:/exports/wix_posts_limit-${limit}_offset-${offset}.csv`;
       fs.writeFileSync(outputPath, csv);
 
-      return res.status(200).json({ message: "CSV exported successfully.", path: outputPath });
-
+      return res
+        .status(200)
+        .json({ message: 'CSV exported successfully.', path: outputPath });
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
   },
-  
+
   fetchWixPosts3: async (req, res) => {
     try {
       const { limit = 40, offset = 0 } = req.body;
 
-      const YOUR_AUTH_HEADER = "4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9";
-      const YOUR_XSRF_TOKEN = "4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9";
-      
+      const YOUR_AUTH_HEADER =
+        '4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+      const YOUR_XSRF_TOKEN =
+        '4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+
       const requestData = {
         query: {
           filter: {
-            language: "en",
+            language: 'en',
             $and: [
               {
                 lastPublishedDate: {
-                  $gte: "2025-01-01T18:30:00.000Z",
+                  $gte: '2025-01-01T18:30:00.000Z',
                 },
               },
               {
                 lastPublishedDate: {
-                  $lte: "2025-05-05T18:29:59.999Z",
+                  $lte: '2025-05-05T18:29:59.999Z',
                 },
               },
             ],
@@ -351,70 +380,87 @@ const userController = {
           sort: [],
           paging: { limit, offset },
         },
-        fieldsets: ["METRICS", "URL", "TRANSLATIONS"],
+        fieldsets: ['METRICS', 'URL', 'TRANSLATIONS'],
       };
 
       const config = {
-        method: "post",
-        url: "https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query",
+        method: 'post',
+        url: 'https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query',
         headers: {
           authorization: YOUR_AUTH_HEADER,
-          "X-XSRF-TOKEN": YOUR_XSRF_TOKEN,
-          "Content-Type": "application/json",
-          Cookie: "XSRF-TOKEN=YOUR_COOKIE",
+          'X-XSRF-TOKEN': YOUR_XSRF_TOKEN,
+          'Content-Type': 'application/json',
+          Cookie: 'XSRF-TOKEN=YOUR_COOKIE',
         },
         data: JSON.stringify(requestData),
       };
 
       const { data } = await axios(config);
-      const ids = data.posts.map(post => post.id);
+      const ids = data.posts.map((post) => post.id);
       console.log('Post IDs:', ids);
 
       const draftContents = {};
 
       // Function to process richContent nodes
       const processRichContent = (richContent) => {
-        if (!richContent || !richContent.nodes) return "";
-        
-        let htmlContent = "";
-        
-        richContent.nodes.forEach(node => {
+        if (!richContent || !richContent.nodes) return '';
+
+        let htmlContent = '';
+
+        richContent.nodes.forEach((node) => {
           switch (node.type) {
-            case "PARAGRAPH":
+            case 'PARAGRAPH':
               if (node.nodes && node.nodes.length > 0) {
-                node.nodes.forEach(subNode => {
-                  if (subNode.type === "TEXT" && subNode.textData && subNode.textData.text) {
-                    htmlContent += `<p>${subNode.textData.text}</p>`;
-                  }
-                });
-              } else {
-                htmlContent += "<p></p>"; // Empty paragraph
+                const paragraphText = node.nodes
+                  .map((subNode) => {
+                    if (
+                      subNode.type === 'TEXT' &&
+                      subNode.textData &&
+                      subNode.textData.text
+                    ) {
+                      return subNode.textData.text;
+                    }
+                    return '';
+                  })
+                  .join('');
+
+                if (paragraphText.trim()) {
+                  htmlContent += `<p>${paragraphText}</p>`;
+                }
               }
               break;
-              
-            case "IMAGE":
-              if (node.imageData && node.imageData.image && node.imageData.image.src) {
-                const src = node.imageData.image.src.id || "";
-                const width = node.imageData.image.width || "";
-                const height = node.imageData.image.height || "";
+
+            case 'IMAGE':
+              if (
+                node.imageData &&
+                node.imageData.image &&
+                node.imageData.image.src
+              ) {
+                const src = node.imageData.image.src.id || '';
+                const width = node.imageData.image.width || '';
+                const height = node.imageData.image.height || '';
                 htmlContent += `<img src="${src}" width="${width}" height="${height}" />`;
               }
               break;
-              
-            case "VIDEO":
-              if (node.videoData && node.videoData.video && node.videoData.video.src) {
-                const videoUrl = node.videoData.video.src.url || "";
+
+            case 'VIDEO':
+              if (
+                node.videoData &&
+                node.videoData.video &&
+                node.videoData.video.src
+              ) {
+                const videoUrl = node.videoData.video.src.url || '';
                 htmlContent += `<div class="video-embed"><iframe src="${videoUrl}" frameborder="0" allowfullscreen></iframe></div>`;
               }
               break;
-              
+
             // Add more cases for other content types as needed
             default:
               // Handle other node types or ignore them
               break;
           }
         });
-        
+
         return htmlContent;
       };
 
@@ -426,23 +472,28 @@ const userController = {
             url: `https://manage.wix.com/_api/communities-blog-node-api/v3/draft-posts/${id}?draftPostId=${id}&fieldsets=RICH_CONTENT&fieldsets=URL&fieldsets=TRANSLATIONS`,
             headers: {
               authorization: YOUR_AUTH_HEADER,
-              "X-XSRF-TOKEN": YOUR_XSRF_TOKEN,
-              Cookie: "XSRF-TOKEN=YOUR_COOKIE"
-            }
+              'X-XSRF-TOKEN': YOUR_XSRF_TOKEN,
+              Cookie: 'XSRF-TOKEN=YOUR_COOKIE',
+            },
           };
 
           const draftResponse = await axios(draftConfig);
-          draftContents[id] = processRichContent(draftResponse.data?.draftPost?.richContent) || "";
+          draftContents[id] =
+            processRichContent(draftResponse.data?.draftPost?.richContent) ||
+            '';
         } catch (err) {
-          console.error(`Failed to fetch draft content for ID ${id}:`, err.message);
-          draftContents[id] = "";
+          console.error(
+            `Failed to fetch draft content for ID ${id}:`,
+            err.message
+          );
+          draftContents[id] = '';
         }
       }
 
       const formattedData = data.posts.map((post) => {
         // Get cover image URL if available
-        const coverImageUrl = post.coverMedia?.image?.url || "";
-        
+        const coverImageUrl = post.coverMedia?.image?.url || '';
+
         // Build content with title, image (if exists), and draft content
         let content = `<h1>${post.title}</h1>`;
         if (coverImageUrl) {
@@ -453,47 +504,74 @@ const userController = {
         }
 
         return {
-          ID: "",
+          ID: '',
           Title: post.title,
           Content: content,
-          Excerpt: post.excerpt || "",
-          Date: dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
-          "Post Type": "post",
+          Excerpt: post.excerpt || '',
+          Date: dayjs(post.lastPublishedDate).format('YYYY-MM-DD HH:mm:ss'),
+          'Post Type': 'post',
           Permalink: post.slug,
-          "Image URL": coverImageUrl || post.media?.wixMedia?.image?.url || "",
-          "Image Title": "",
-          "Image Caption": "",
-          "Image Description": "",
-          "Image Alt Text": "",
-          "Image Featured": "1",
-          "Attachment URL": post.media?.wixMedia?.image?.url || "",
-          Categories: post.category?.join(",") || "",
-          Tags: post.tags?.join(",") || "",
-          Status: post.status || "draft",
-          "Author ID": "1",
-          "Author Username": "admin",
-          "Author Email": "admin@example.com",
-          "Author First Name": "Admin",
-          "Author Last Name": "",
+          'Image URL': coverImageUrl || post.media?.wixMedia?.image?.url || '',
+          'Image Title': '',
+          'Image Caption': '',
+          'Image Description': '',
+          'Image Alt Text': '',
+          'Image Featured': '1',
+          'Attachment URL': post.media?.wixMedia?.image?.url || '',
+          Categories: post.category?.join(',') || '',
+          Tags: post.tags?.join(',') || '',
+          Status: post.status || 'draft',
+          'Author ID': '1',
+          'Author Username': 'admin',
+          'Author Email': 'admin@example.com',
+          'Author First Name': 'Admin',
+          'Author Last Name': '',
           Slug: post.slug,
-          Format: "standard",
-          Template: "",
-          Parent: "",
-          "Parent Slug": "",
-          Order: "0",
-          "Comment Status": post.allowComments ? "open" : "closed",
-          "Ping Status": "open",
-          "Post Modified Date": dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
+          Format: 'standard',
+          Template: '',
+          Parent: '',
+          'Parent Slug': '',
+          Order: '0',
+          'Comment Status': post.allowComments ? 'open' : 'closed',
+          'Ping Status': 'open',
+          'Post Modified Date': dayjs(post.lastPublishedDate).format(
+            'YYYY-MM-DD HH:mm:ss'
+          ),
         };
       });
 
       const fields = [
-        "ID", "Title", "Content", "Excerpt", "Date", "Post Type", "Permalink",
-        "Image URL", "Image Title", "Image Caption", "Image Description", "Image Alt Text",
-        "Image Featured", "Attachment URL", "Categories", "Tags", "Status",
-        "Author ID", "Author Username", "Author Email", "Author First Name", "Author Last Name",
-        "Slug", "Format", "Template", "Parent", "Parent Slug", "Order",
-        "Comment Status", "Ping Status", "Post Modified Date"
+        'ID',
+        'Title',
+        'Content',
+        'Excerpt',
+        'Date',
+        'Post Type',
+        'Permalink',
+        'Image URL',
+        'Image Title',
+        'Image Caption',
+        'Image Description',
+        'Image Alt Text',
+        'Image Featured',
+        'Featured Image',
+        'Categories',
+        'Tags',
+        'Status',
+        'Author ID',
+        'Author Username',
+        'Author Email',
+        'Author First Name',
+        'Author Last Name',
+        'Slug',
+        'Format',
+        'Template',
+        'Parent',
+        'Parent Slug',
+        'Order',
+        'Comment Status',
+        'Ping Status',
+        'Post Modified Date',
       ];
 
       const parser = new Parser({ fields });
@@ -502,262 +580,311 @@ const userController = {
       const outputPath = `D:/exports/wix_posts_limit-${limit}_offset-${offset}.csv`;
       fs.writeFileSync(outputPath, csv);
 
-      return res.status(200).json({ message: "CSV exported successfully.", path: outputPath });
-
+      return res
+        .status(200)
+        .json({ message: 'CSV exported successfully.', path: outputPath });
     } catch (error) {
       return res.status(500).json({ error: error.message });
     }
   },
 
+  fetchWixPosts: async (req, res) => {
+    try {
+      const { limit = 40, offset = 0 } = req.body;
 
+      const YOUR_AUTH_HEADER =
+        'QFzy3XLWZCkBmgeLi2QXNbrDJam1FEsvIjYuujAih6Y.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTE0VDA0OjI5OjU4Ljc1NFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMTRUMDg6Mjk6NTguNzU0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+      const YOUR_XSRF_TOKEN =
+        'QFzy3XLWZCkBmgeLi2QXNbrDJam1FEsvIjYuujAih6Y.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTE0VDA0OjI5OjU4Ljc1NFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMTRUMDg6Mjk6NTguNzU0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
 
-
-fetchWixPosts: async (req, res) => {
-  try {
-    const { limit = 40, offset = 0 } = req.body;
-
-    const YOUR_AUTH_HEADER = "4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9";
-    const YOUR_XSRF_TOKEN = "4DVN1_7ohsz9ZaT728GnwoA0rZxMU7Kw2_wQI8s97H0.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTA5VDA0OjM2OjMwLjMwNFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMDlUMDg6MzY6MzAuMzA0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9";
-    
-    const requestData = {
-      query: {
-        filter: {
-          language: "en",
-          $and: [
-            {
-              lastPublishedDate: {
-                $gte: "2025-01-01T18:30:00.000Z",
+      const requestData = {
+        query: {
+          filter: {
+            language: 'en',
+            $and: [
+              {
+                lastPublishedDate: {
+                  $gte: '2025-01-01T18:30:00.000Z',
+                },
               },
-            },
-            {
-              lastPublishedDate: {
-                $lte: "2025-05-05T18:29:59.999Z",
+              {
+                lastPublishedDate: {
+                  $lte: '2025-05-05T18:29:59.999Z',
+                },
               },
-            },
-          ],
+            ],
+          },
+          sort: [],
+          paging: { limit, offset },
         },
-        sort: [],
-        paging: { limit, offset },
-      },
-      fieldsets: ["METRICS", "URL", "TRANSLATIONS"],
-    };
+        fieldsets: ['METRICS', 'URL', 'TRANSLATIONS'],
+      };
 
-    const config = {
-      method: "post",
-      url: "https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query",
-      headers: {
-        authorization: YOUR_AUTH_HEADER,
-        "X-XSRF-TOKEN": YOUR_XSRF_TOKEN,
-        "Content-Type": "application/json",
-        Cookie: "XSRF-TOKEN=YOUR_COOKIE",
-      },
-      data: JSON.stringify(requestData),
-    };
+      const config = {
+        method: 'post',
+        url: 'https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query',
+        headers: {
+          authorization: YOUR_AUTH_HEADER,
+          'X-XSRF-TOKEN': YOUR_XSRF_TOKEN,
+          'Content-Type': 'application/json',
+          Cookie: 'XSRF-TOKEN=YOUR_COOKIE',
+        },
+        data: JSON.stringify(requestData),
+      };
 
-    const { data } = await axios(config);
+      const { data } = await axios(config);
 
-    const ids = data.posts.map(post => post.id);
-    const draftContents = {};
-    
-    // Get all unique category IDs from all posts
-    const allCategoryIds = [...new Set(data.posts.flatMap(post => post.categoryIds || []))];
-    
-    // Create a map to store category ID to name mapping
-    const categoryMap = {};
-    
-    // Fetch category details for each unique category ID
-    for (const categoryId of allCategoryIds) {
-      try {
-        const categoryConfig = {
-          method: 'get',
-          url: `https://manage.wix.com/_api/communities-blog-node-api/v3/categories/${categoryId}?fieldsets=SEO&categoryId=${categoryId}`,
-          headers: {
-            authorization: YOUR_AUTH_HEADER,
-            "X-XSRF-TOKEN": YOUR_XSRF_TOKEN,
-            Cookie: "XSRF-TOKEN=YOUR_COOKIE"
-          }
-        };
-        
-        const categoryResponse = await axios(categoryConfig);
-        categoryMap[categoryId] = categoryResponse.data?.category?.label || `Unknown Category (${categoryId})`;
-      } catch (err) {
-        console.error(`Failed to fetch category ${categoryId}:`, err.message);
-        categoryMap[categoryId] = `Unknown Category (${categoryId})`;
-      }
-    }
+      const ids = data.posts.map((post) => post.id);
+      const draftContents = {};
 
-    const processRichContent = (richContent) => {
-      if (!richContent || !richContent.nodes) return "";
+      // Get all unique category IDs from all posts
+      const allCategoryIds = [
+        ...new Set(data.posts.flatMap((post) => post.categoryIds || [])),
+      ];
 
-      let htmlContent = "";
+      // Create a map to store category ID to name mapping
+      const categoryMap = {};
 
-      richContent.nodes.forEach(node => {
-        switch (node.type) {
-          case "PARAGRAPH":
-            if (node.nodes && node.nodes.length > 0) {
-              node.nodes.forEach(subNode => {
-                if (subNode.type === "TEXT" && subNode.textData && subNode.textData.text) {
-                  htmlContent += `<p>${subNode.textData.text}</p>`;
-                }
-              });
-            } else {
-              htmlContent += "<p></p>";
-            }
-            break;
+      // Fetch category details for each unique category ID
+      for (const categoryId of allCategoryIds) {
+        try {
+          const categoryConfig = {
+            method: 'get',
+            url: `https://manage.wix.com/_api/communities-blog-node-api/v3/categories/${categoryId}?fieldsets=SEO&categoryId=${categoryId}`,
+            headers: {
+              authorization: YOUR_AUTH_HEADER,
+              'X-XSRF-TOKEN': YOUR_XSRF_TOKEN,
+              Cookie: 'XSRF-TOKEN=YOUR_COOKIE',
+            },
+          };
 
-          case "IMAGE":
-            if (node.imageData?.image?.src?.id?.startsWith("https://")) {
-             const src = node.imageData.image.src.id;
-             const width = node.imageData.image.width || "";
-             const height = node.imageData.image.height || "";
-            htmlContent += `<img src="${src}" width="${width}" height="${height}" />`;
-            }
-            break;
-
-          case "VIDEO":
-            if (node.videoData && node.videoData.video && node.videoData.video.src) {
-              const videoUrl = node.videoData.video.src.url || "";
-              htmlContent += `<div class="video-embed">${videoUrl}</div>`;
-            }
-            break;
-
-          case "TABLE":
-            if (node.nodes?.length) {
-              htmlContent += `<table border="1">`;
-              node.nodes.forEach(row => {
-                if (row.type === "TABLE_ROW" && row.nodes?.length) {
-                  htmlContent += `<tr>`;
-                  row.nodes.forEach(cell => {
-                    const cellContent = (cell.nodes || []).map(cellNode => {
-                      if (cellNode.type === "PARAGRAPH") {
-                        return (cellNode.nodes || []).map(textNode =>
-                          textNode.type === "TEXT" && textNode.textData?.text
-                            ? textNode.textData.text
-                            : ""
-                        ).join("");
-                      }
-                      return "";
-                    }).join("");
-                    htmlContent += `<td>${cellContent}</td>`;
-                  });
-                  htmlContent += `</tr>`;
-                }
-              });
-              htmlContent += `</table>`;
-            }
-            break;
-
-          default:
-            break;
+          const categoryResponse = await axios(categoryConfig);
+          categoryMap[categoryId] =
+            categoryResponse.data?.category?.label ||
+            `Unknown Category (${categoryId})`;
+        } catch (err) {
+          console.error(`Failed to fetch category ${categoryId}:`, err.message);
+          categoryMap[categoryId] = `Unknown Category (${categoryId})`;
         }
+      }
+
+      const processRichContent = (richContent) => {
+        if (!richContent || !richContent.nodes) return '';
+
+        let htmlContent = '';
+
+        richContent.nodes.forEach((node) => {
+          switch (node.type) {
+            case 'PARAGRAPH':
+              if (node.nodes && node.nodes.length > 0) {
+                const paragraphText = node.nodes
+                  .map((subNode) => {
+                    if (
+                      subNode.type === 'TEXT' &&
+                      subNode.textData &&
+                      subNode.textData.text
+                    ) {
+                      return subNode.textData.text;
+                    }
+                    return '';
+                  })
+                  .join('');
+
+                if (paragraphText.trim()) {
+                  htmlContent += `<p>${paragraphText}</p>`;
+                }
+              }
+              break;
+
+            case 'IMAGE':
+              if (node.imageData?.image?.src?.id?.startsWith('https://')) {
+                const src = node.imageData.image.src.id;
+                const width = node.imageData.image.width || '';
+                const height = node.imageData.image.height || '';
+                htmlContent += `<img src="${src}" width="${width}" height="${height}" />`;
+              }
+              break;
+
+            case 'VIDEO':
+              if (
+                node.videoData &&
+                node.videoData.video &&
+                node.videoData.video.src
+              ) {
+                const videoUrl = node.videoData.video.src.url || '';
+                htmlContent += `<div class="video-embed">${videoUrl}</div>`;
+              }
+              break;
+
+            case 'TABLE':
+              if (node.nodes?.length) {
+                htmlContent += `<table border="1">`;
+                node.nodes.forEach((row) => {
+                  if (row.type === 'TABLE_ROW' && row.nodes?.length) {
+                    htmlContent += `<tr>`;
+                    row.nodes.forEach((cell) => {
+                      const cellContent = (cell.nodes || [])
+                        .map((cellNode) => {
+                          if (cellNode.type === 'PARAGRAPH') {
+                            return (cellNode.nodes || [])
+                              .map((textNode) =>
+                                textNode.type === 'TEXT' &&
+                                textNode.textData?.text
+                                  ? textNode.textData.text
+                                  : ''
+                              )
+                              .join('');
+                          }
+                          return '';
+                        })
+                        .join('');
+                      htmlContent += `<td>${cellContent}</td>`;
+                    });
+                    htmlContent += `</tr>`;
+                  }
+                });
+                htmlContent += `</table>`;
+              }
+              break;
+
+            default:
+              break;
+          }
+        });
+
+        return htmlContent;
+      };
+
+      for (const id of ids) {
+        try {
+          const draftConfig = {
+            method: 'get',
+            url: `https://manage.wix.com/_api/communities-blog-node-api/v3/draft-posts/${id}?draftPostId=${id}&fieldsets=RICH_CONTENT&fieldsets=URL&fieldsets=TRANSLATIONS`,
+            headers: {
+              authorization: YOUR_AUTH_HEADER,
+              'X-XSRF-TOKEN': YOUR_XSRF_TOKEN,
+              Cookie: 'XSRF-TOKEN=YOUR_COOKIE',
+            },
+          };
+
+          const draftResponse = await axios(draftConfig);
+          draftContents[id] =
+            processRichContent(draftResponse.data?.draftPost?.richContent) ||
+            '';
+        } catch (err) {
+          console.error(
+            `Failed to fetch draft content for ID ${id}:`,
+            err.message
+          );
+          draftContents[id] = '';
+        }
+      }
+
+      const formattedData = data.posts.map((post) => {
+        const coverImageUrl = post.coverMedia?.image?.url || '';
+
+        // Map category IDs to their names
+        const categoryNames = (post.categoryIds || []).map(
+          (id) => categoryMap[id] || `Unknown Category (${id})`
+        );
+
+        let content = '';
+        if (draftContents[post.id]) {
+          content += draftContents[post.id];
+        }
+
+        return {
+          ID: '',
+          Title: post.title,
+          Content: content,
+          Excerpt: post.excerpt || '',
+          Date: dayjs(post.lastPublishedDate).format('YYYY-MM-DD HH:mm:ss'),
+          'Post Type': 'post',
+          Permalink: post.slug,
+          'Image URL': coverImageUrl || post.media?.wixMedia?.image?.url || '',
+          'Image Title': '',
+          'Image Caption': '',
+          'Image Description': '',
+          'Image Alt Text': '',
+          'Image Featured': '1',
+          'Attachment URL': post.media?.wixMedia?.image?.url || '',
+          Tags: post.tags?.join(',') || '',
+          Status: post.status || 'draft',
+          'Author ID': '1',
+          'Author Username': 'admin',
+          'Author Email': 'admin@example.com',
+          'Author First Name': 'Admin',
+          'Author Last Name': '',
+          Slug: post.slug,
+          Format: 'standard',
+          Template: '',
+          Parent: '',
+          'Parent Slug': '',
+          Order: '0',
+          'Comment Status': post.allowComments ? 'open' : 'closed',
+          'Ping Status': 'open',
+          'Post Modified Date': dayjs(post.lastPublishedDate).format(
+            'YYYY-MM-DD HH:mm:ss'
+          ),
+          Categories: categoryNames.join(', '), // Use the mapped category names
+        };
       });
 
-      return htmlContent;
-    };
+      const fields = [
+        'ID',
+        'Title',
+        'Content',
+        'Excerpt',
+        'Date',
+        'Post Type',
+        'Permalink',
+        'Image URL',
+        'Image Title',
+        'Image Caption',
+        'Image Description',
+        'Image Alt Text',
+        'Image Featured',
+        'Attachment URL',
+        'Tags',
+        'Status',
+        'Author ID',
+        'Author Username',
+        'Author Email',
+        'Author First Name',
+        'Author Last Name',
+        'Slug',
+        'Format',
+        'Template',
+        'Parent',
+        'Parent Slug',
+        'Order',
+        'Comment Status',
+        'Ping Status',
+        'Post Modified Date',
+        'Categories',
+      ];
 
-    for (const id of ids) {
-      try {
-        const draftConfig = {
-          method: 'get',
-          url: `https://manage.wix.com/_api/communities-blog-node-api/v3/draft-posts/${id}?draftPostId=${id}&fieldsets=RICH_CONTENT&fieldsets=URL&fieldsets=TRANSLATIONS`,
-          headers: {
-            authorization: YOUR_AUTH_HEADER,
-            "X-XSRF-TOKEN": YOUR_XSRF_TOKEN,
-            Cookie: "XSRF-TOKEN=YOUR_COOKIE"
-          }
-        };
+      const parser = new Parser({ fields });
+      const csv = parser.parse(formattedData);
 
-        const draftResponse = await axios(draftConfig);
-        draftContents[id] = processRichContent(draftResponse.data?.draftPost?.richContent) || "";
-      } catch (err) {
-        console.error(`Failed to fetch draft content for ID ${id}:`, err.message);
-        draftContents[id] = "";
-      }
+      const outputPath = `D:/exports/wix_posts_limit-${limit}_offset-${offset}.csv`;
+      fs.writeFileSync(outputPath, '\uFEFF' + csv, { encoding: 'utf8' });
+
+      return res
+        .status(200)
+        .json({ message: 'CSV exported successfully.', path: outputPath });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
     }
-
-    const formattedData = data.posts.map((post) => {
-      const coverImageUrl = post.coverMedia?.image?.url || "";
-      
-      // Map category IDs to their names
-      const categoryNames = (post.categoryIds || []).map(id => categoryMap[id] || `Unknown Category (${id})`);
-      
-      let content = `<h1>${post.title}</h1>`;
-      if (coverImageUrl) {
-        content += `<img src="${coverImageUrl}" alt="${post.title}" />`;
-      }
-      if (draftContents[post.id]) {
-        content += draftContents[post.id];
-      }
-
-      return {
-        ID: "",
-        Title: post.title,
-        Content: content,
-        Excerpt: post.excerpt || "",
-        Date: dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
-        "Post Type": "post",
-        Permalink: post.slug,
-        "Image URL": coverImageUrl || post.media?.wixMedia?.image?.url || "",
-        "Image Title": "",
-        "Image Caption": "",
-        "Image Description": "",
-        "Image Alt Text": "",
-        "Image Featured": "1",
-        "Attachment URL": post.media?.wixMedia?.image?.url || "",       
-        Tags: post.tags?.join(",") || "",
-        Status: post.status || "draft",
-        "Author ID": "1",
-        "Author Username": "admin",
-        "Author Email": "admin@example.com",
-        "Author First Name": "Admin",
-        "Author Last Name": "",
-        Slug: post.slug,
-        Format: "standard",
-        Template: "",
-        Parent: "",
-        "Parent Slug": "",
-        Order: "0",
-        "Comment Status": post.allowComments ? "open" : "closed",
-        "Ping Status": "open",
-        "Post Modified Date": dayjs(post.lastPublishedDate).format("YYYY-MM-DD HH:mm:ss"),
-         Categories: categoryNames.join(", "), // Use the mapped category names
-      };
-    });
-
-    const fields = [
-      "ID", "Title", "Content", "Excerpt", "Date", "Post Type", "Permalink",
-      "Image URL", "Image Title", "Image Caption", "Image Description", "Image Alt Text",
-      "Image Featured", "Attachment URL", "Tags", "Status",
-      "Author ID", "Author Username", "Author Email", "Author First Name", "Author Last Name",
-      "Slug", "Format", "Template", "Parent", "Parent Slug", "Order",
-      "Comment Status", "Ping Status", "Post Modified Date", "Categories"
-    ];
-
-    const parser = new Parser({ fields });
-    const csv = parser.parse(formattedData);
-
-    const outputPath = `D:/exports/wix_posts_limit-${limit}_offset-${offset}.csv`;
-    fs.writeFileSync(outputPath, '\uFEFF' + csv, { encoding: "utf8" });
-
-    return res.status(200).json({ message: "CSV exported successfully.", path: outputPath });
-
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-},
-
-
- 
-  
+  },
 };
 
 export default userController;
 
-
 const cleanText = (text) => {
   return he
-    .decode(text || "")
-    .replace(/\n/g, " ")
-    .replace(/[^\x20-\x7E]+/g, "") // remove non-ASCII chars
+    .decode(text || '')
+    .replace(/\n/g, ' ')
+    .replace(/[^\x20-\x7E]+/g, '') // remove non-ASCII chars
     .trim();
 };

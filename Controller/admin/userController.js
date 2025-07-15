@@ -1114,12 +1114,10 @@ const userController = {
         return map;
       }, {});
 
-      console.log(req.body);
-
       const YOUR_AUTH_HEADER =
-        'QFzy3XLWZCkBmgeLi2QXNbrDJam1FEsvIjYuujAih6Y.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTE0VDA0OjI5OjU4Ljc1NFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMTRUMDg6Mjk6NTguNzU0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+        'ON_zeD2s40Gk3k4bibqVvHGBfq5OuzUPs04vUWItPRg.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTE1VDA0OjI1OjQ2LjAyOVoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMTVUMDg6MjU6NDYuMDI5WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
       const YOUR_XSRF_TOKEN =
-        'QFzy3XLWZCkBmgeLi2QXNbrDJam1FEsvIjYuujAih6Y.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA1LTE0VDA0OjI5OjU4Ljc1NFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDUtMTRUMDg6Mjk6NTguNzU0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+        'ON_zeD2s40Gk3k4bibqVvHGBfq5OuzUPs04vUWItPRg.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTE1VDA0OjI1OjQ2LjAyOVoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMTVUMDg6MjU6NDYuMDI5WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
 
       const requestData = {
         query: {
@@ -1128,12 +1126,12 @@ const userController = {
             $and: [
               {
                 lastPublishedDate: {
-                  $gte: '2025-01-01T18:30:00.000Z',
+                  $gte: '2025-07-06T18:30:00.000Z',
                 },
               },
               {
                 lastPublishedDate: {
-                  $lte: '2025-05-05T18:29:59.999Z',
+                  $lte: '2025-07-15T18:29:59.999Z',
                 },
               },
             ],
@@ -1159,10 +1157,13 @@ const userController = {
       const { data } = await axios(config);
 
       const ids = data.posts.map((post) => post.id);
+      const metrics = data.posts.map((post) => post.metrics);
+
+      console.log('data123', metrics);
+
       const draftContents = {};
 
       const tagIds = data.posts.map((post) => post.tagIds);
-      console.log(tagIds);
 
       // Get all unique category IDs from all posts
       const allCategoryIds = [
@@ -1342,13 +1343,15 @@ const userController = {
         }
 
         return {
-          ID: '',
+          ID: post.id,
           Title: post.title,
           Content: content,
           Excerpt: post.excerpt || '',
           Date: dayjs(post.lastPublishedDate).format('YYYY-MM-DD HH:mm:ss'),
           'Post Type': 'post',
           Permalink: post.slug,
+          'URL Base': post.url?.base || '', // 👈 Add this
+          'URL Path': post.url?.path || '', // 👈 Add this
           'Image URL': coverImageUrl || post.media?.wixMedia?.image?.url || '',
           'Image Title': '',
           'Image Caption': '',
@@ -1360,7 +1363,9 @@ const userController = {
             .filter((id) => tagMap[id]) // Keep only known tags
             .map((id) => tagMap[id])
             .join(', '),
-
+          Likes: post.metrics?.likes || 0,
+          Views: post.metrics?.views || 0,
+          'Minutes to Read': post.minutesToRead || 0,
           Status: post.status || 'draft',
           'Author ID': '1',
           'Author Username': 'admin',
@@ -1390,6 +1395,8 @@ const userController = {
         'Date',
         'Post Type',
         'Permalink',
+        'URL Base',
+        'URL Path',
         'Image URL',
         'Image Title',
         'Image Caption',
@@ -1398,6 +1405,9 @@ const userController = {
         'Image Featured',
         'Attachment URL',
         'Tags',
+        'Likes',
+        'Views',
+        'Minutes to Read',
         'Status',
         'Author ID',
         'Author Username',

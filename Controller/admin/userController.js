@@ -225,7 +225,6 @@ const userController = {
 
       const { data } = await axios(config);
       const ids = data.posts.map((post) => post.id);
-      console.log('Post IDs:', ids);
 
       const draftContents = {};
 
@@ -243,6 +242,17 @@ const userController = {
           };
 
           const draftResponse = await axios(draftConfig);
+
+          const richContentNodes =
+            draftResponse?.data?.post?.richContent?.nodes || [];
+
+          const firstImageNode = richContentNodes.find(
+            (node) => node.type === 'IMAGE'
+          );
+
+          const imageAltText = firstImageNode?.imageData?.altText || '';
+          const imageCaption = firstImageNode?.imageData?.caption || '';
+
           draftContents[id] =
             draftResponse.data?.draftPost?.richContent?.html || '';
         } catch (err) {
@@ -398,7 +408,6 @@ const userController = {
 
       const { data } = await axios(config);
       const ids = data.posts.map((post) => post.id);
-      console.log('Post IDs:', ids);
 
       const draftContents = {};
 
@@ -1162,8 +1171,10 @@ const userController = {
       const draftContents = {};
 
       const tagIds = data.posts.map((post) => post.tagIds);
-      const memberId = data.posts.map((post) => post.memberId);
 
+      const richContent = data.posts.map((post) => post.richContent);
+
+      const memberId = data.posts.map((post) => post.memberId);
       const memberIds = data.posts.map((post) => post.memberId);
 
       const uniqueMemberIds = [...new Set(memberIds)];
@@ -1355,11 +1366,22 @@ const userController = {
               Cookie: 'XSRF-TOKEN=YOUR_COOKIE',
             },
           };
-
           const draftResponse = await axios(draftConfig);
-          draftContents[id] =
-            processRichContent(draftResponse.data?.draftPost?.richContent) ||
-            '';
+          const imageNode =
+            draftResponse.data?.draftPost?.richContent?.nodes?.find(
+              (node) => node.type === 'IMAGE'
+            );
+
+          const imageAltText = imageNode?.imageData?.altText || '';
+          const imageCaption = imageNode?.imageData?.caption || '';
+
+          draftContents[id] = {
+            content:
+              processRichContent(draftResponse.data?.draftPost?.richContent) ||
+              '',
+            imageAltText,
+            imageCaption,
+          };
         } catch (err) {
           console.error(
             `Failed to fetch draft content for ID ${id}:`,
@@ -1385,11 +1407,13 @@ const userController = {
           (id) => categoryMap[id] || `Unknown Category (${id})`
         );
 
-        let content = '';
-        if (draftContents[post.id]) {
-          content += draftContents[post.id];
-        }
-        // Author from memberMap
+        // Draft content and image metadata
+        const {
+          content = '',
+          imageAltText = '',
+          imageCaption = '',
+        } = draftContents[post.id] || {};
+
         const author = memberMap[post.memberId] || {
           nickname: 'admin',
           photoUrl: '',
@@ -1403,17 +1427,17 @@ const userController = {
           Date: dayjs(post.lastPublishedDate).format('YYYY-MM-DD HH:mm:ss'),
           'Post Type': 'post',
           Permalink: post.slug,
-          'URL Base': post.url?.base || '', // 👈 Add this
-          'URL Path': post.url?.path || '', // 👈 Add this
+          'URL Base': post.url?.base || '',
+          'URL Path': post.url?.path || '',
           'Image URL': coverImageUrl || post.media?.wixMedia?.image?.url || '',
           'Image Title': '',
-          'Image Caption': '',
+          'Image Caption': imageCaption,
           'Image Description': '',
-          'Image Alt Text': '',
+          'Image Alt Text': imageAltText,
           'Image Featured': '1',
           'Attachment URL': post.media?.wixMedia?.image?.url || '',
           Tags: (post.tagIds || [])
-            .filter((id) => tagMap[id]) // Keep only known tags
+            .filter((id) => tagMap[id])
             .map((id) => tagMap[id])
             .join(', '),
           Likes: post.metrics?.likes || 0,
@@ -1433,7 +1457,7 @@ const userController = {
           'Post Modified Date': dayjs(post.lastPublishedDate).format(
             'YYYY-MM-DD HH:mm:ss'
           ),
-          Categories: categoryNames.join(', '), // Use the mapped category names
+          Categories: categoryNames.join(', '),
         };
       });
 
@@ -1454,6 +1478,8 @@ const userController = {
         'Image Alt Text',
         'Image Featured',
         'Attachment URL',
+        'Image Caption',
+        'Image Alt Text',
         'Tags',
         'Likes',
         'Views',

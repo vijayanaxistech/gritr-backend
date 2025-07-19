@@ -1395,14 +1395,6 @@ const userController = {
           photoUrl: '',
         };
 
-        // // Author (member) mapping
-        // const author = memberMap[post.memberId] || {
-        //   nickname: 'admin',
-        //   photoUrl: '', // fallback photo if needed
-        // };
-
-        // console.log('author', author);
-
         return {
           ID: post.id,
           Title: post.title,

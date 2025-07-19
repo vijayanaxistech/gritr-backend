@@ -1135,12 +1135,12 @@ const userController = {
             $and: [
               {
                 lastPublishedDate: {
-                  $gte: '2025-07-16T18:30:00.000Z',
+                  $gte: '2025-01-01T00:00:00.000Z',
                 },
               },
               {
                 lastPublishedDate: {
-                  $lte: '2025-07-20T18:29:59.999Z',
+                  $lte: '2025-07-20T23:59:59.999Z',
                 },
               },
             ],
@@ -1443,7 +1443,6 @@ const userController = {
           'Image URL': coverImageUrl || post.media?.wixMedia?.image?.url || '',
           'Image Title': '',
           'Image Caption': imageCaption,
-          'Image Description': '',
           'Image Alt Text': imageAltText,
           'Image Featured': '1',
           'Attachment URL': post.media?.wixMedia?.image?.url || '',
@@ -1488,12 +1487,9 @@ const userController = {
         'Image URL',
         'Image Title',
         'Image Caption',
-        'Image Description',
         'Image Alt Text',
         'Image Featured',
         'Attachment URL',
-        'Image Caption',
-        'Image Alt Text',
         'Tags',
         'Likes',
         'Views',

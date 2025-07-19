@@ -1115,9 +1115,9 @@ const userController = {
       }, {});
 
       const YOUR_AUTH_HEADER =
-        'ON_zeD2s40Gk3k4bibqVvHGBfq5OuzUPs04vUWItPRg.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTE1VDA0OjI1OjQ2LjAyOVoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMTVUMDg6MjU6NDYuMDI5WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+        'CycaTehQb1A0RELlqYxyvG6arg8mL0f0kuRg9VoHI18.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTE5VDA1OjQxOjM1LjA3N1oiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMTlUMDk6NDE6MzUuMDc3WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
       const YOUR_XSRF_TOKEN =
-        'ON_zeD2s40Gk3k4bibqVvHGBfq5OuzUPs04vUWItPRg.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTE1VDA0OjI1OjQ2LjAyOVoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMTVUMDg6MjU6NDYuMDI5WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+        'CycaTehQb1A0RELlqYxyvG6arg8mL0f0kuRg9VoHI18.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTE5VDA1OjQxOjM1LjA3N1oiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMTlUMDk6NDE6MzUuMDc3WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
 
       const requestData = {
         query: {
@@ -1126,12 +1126,12 @@ const userController = {
             $and: [
               {
                 lastPublishedDate: {
-                  $gte: '2025-07-06T18:30:00.000Z',
+                  $gte: '2025-07-16T18:30:00.000Z',
                 },
               },
               {
                 lastPublishedDate: {
-                  $lte: '2025-07-15T18:29:59.999Z',
+                  $lte: '2025-07-20T18:29:59.999Z',
                 },
               },
             ],
@@ -1159,11 +1159,51 @@ const userController = {
       const ids = data.posts.map((post) => post.id);
       const metrics = data.posts.map((post) => post.metrics);
 
-      console.log('data123', metrics);
-
       const draftContents = {};
 
       const tagIds = data.posts.map((post) => post.tagIds);
+      const memberId = data.posts.map((post) => post.memberId);
+
+      const memberIds = data.posts.map((post) => post.memberId);
+
+      const uniqueMemberIds = [...new Set(memberIds)];
+
+      const membersData = [];
+      for (const memberId of uniqueMemberIds) {
+        try {
+          const requestData = {
+            query: {
+              paging: { limit: 1 },
+              filter: { id: { $in: [memberId] } },
+            },
+          };
+
+          const config = {
+            method: 'post',
+            url: 'https://manage.wix.com/_api/members/v1/members/query',
+            headers: {
+              authorization: YOUR_AUTH_HEADER,
+              'X-XSRF-TOKEN': YOUR_XSRF_TOKEN,
+              'Content-Type': 'application/json',
+              Cookie: 'XSRF-TOKEN=YOUR_COOKIE',
+            },
+            data: JSON.stringify(requestData),
+          };
+
+          const res = await axios(config);
+          const member = res.data?.members?.[0];
+
+          if (member) {
+            membersData.push({
+              id: member.id,
+              nickname: member.profile?.nickname || '',
+              photoUrl: member.profile?.photo?.url || '',
+            });
+          }
+        } catch (err) {
+          console.error(`Error fetching member ${memberId}:`, err.message);
+        }
+      }
 
       // Get all unique category IDs from all posts
       const allCategoryIds = [
@@ -1329,6 +1369,14 @@ const userController = {
         }
       }
 
+      const memberMap = {};
+      for (const member of membersData) {
+        memberMap[member.id] = {
+          nickname: member.nickname,
+          photoUrl: member.photoUrl,
+        };
+      }
+
       const formattedData = data.posts.map((post) => {
         const coverImageUrl = post.coverMedia?.image?.url || '';
 
@@ -1341,6 +1389,19 @@ const userController = {
         if (draftContents[post.id]) {
           content += draftContents[post.id];
         }
+        // Author from memberMap
+        const author = memberMap[post.memberId] || {
+          nickname: 'admin',
+          photoUrl: '',
+        };
+
+        // // Author (member) mapping
+        // const author = memberMap[post.memberId] || {
+        //   nickname: 'admin',
+        //   photoUrl: '', // fallback photo if needed
+        // };
+
+        // console.log('author', author);
 
         return {
           ID: post.id,
@@ -1367,11 +1428,8 @@ const userController = {
           Views: post.metrics?.views || 0,
           'Minutes to Read': post.minutesToRead || 0,
           Status: post.status || 'draft',
-          'Author ID': '1',
-          'Author Username': 'admin',
-          'Author Email': 'admin@example.com',
-          'Author First Name': 'Admin',
-          'Author Last Name': '',
+          'Author Username': author.nickname || 'admin',
+          'Author Photo': author.photoUrl || '',
           Slug: post.slug,
           Format: 'standard',
           Template: '',
@@ -1409,11 +1467,8 @@ const userController = {
         'Views',
         'Minutes to Read',
         'Status',
-        'Author ID',
         'Author Username',
-        'Author Email',
-        'Author First Name',
-        'Author Last Name',
+        'Author Photo',
         'Slug',
         'Format',
         'Template',

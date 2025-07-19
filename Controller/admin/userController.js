@@ -1399,6 +1399,12 @@ const userController = {
         };
       }
 
+      // Build ID-to-Title map for related posts
+      const postIdToTitleMap = {};
+      data.posts.forEach((post) => {
+        postIdToTitleMap[post.id] = post.title || '';
+      });
+
       const formattedData = data.posts.map((post) => {
         const coverImageUrl = post.coverMedia?.image?.url || '';
 
@@ -1418,6 +1424,11 @@ const userController = {
           nickname: 'admin',
           photoUrl: '',
         };
+
+        // Related post titles (fallback to ID if not found)
+        const relatedPostTitles = (post.relatedPostIds || [])
+          .map((id) => postIdToTitleMap[id] || id)
+          .join(', ');
 
         return {
           ID: post.id,
@@ -1443,6 +1454,9 @@ const userController = {
           Likes: post.metrics?.likes || 0,
           Views: post.metrics?.views || 0,
           'Minutes to Read': post.minutesToRead || 0,
+          // ✅ Newly added fields
+          'Related Posts': relatedPostTitles,
+          'Related Post IDs': (post.relatedPostIds || []).join(', '),
           Status: post.status || 'draft',
           'Author Username': author.nickname || 'admin',
           'Author Photo': author.photoUrl || '',
@@ -1484,6 +1498,8 @@ const userController = {
         'Likes',
         'Views',
         'Minutes to Read',
+        'Related Posts', // ✅ New
+        'Related Post IDs', // ✅ New
         'Status',
         'Author Username',
         'Author Photo',

@@ -1615,13 +1615,22 @@ const userController = {
         const relatedPostIdString = relatedIds.join(', ');
 
         return {
+          ID: post.id,
+          Date: dayjs(post.lastPublishedDate).format('YYYY-MM-DD HH:mm:ss'),
           Title: post.title,
           'Related Posts': relatedPostTitles,
           'Related Post IDs': relatedPostIdString,
         };
       });
 
-      const fields = ['Title', 'Related Posts', 'Related Post IDs'];
+      const fields = [
+        'ID',
+        'Date',
+        'Title',
+        'Related Posts',
+        'Related Post IDs',
+      ];
+
       const parser = new Parser({ fields });
       const csv = parser.parse(formattedData);
 

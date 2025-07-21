@@ -1571,16 +1571,19 @@ const userController = {
       const { data } = await axios(config);
       const posts = data.posts;
 
-      // Collect all unique relatedPostIds
+      // Collect all unique relatedPostIds and tagIds
       const relatedPostIds = new Set();
+      const allTagIds = new Set();
+
       posts.forEach((post) => {
         (post.relatedPostIds || []).forEach((id) => relatedPostIds.add(id));
+        (post.tagIds || []).forEach((tagId) => allTagIds.add(tagId));
       });
 
-      // Fetch titles for relatedPostIds
+      // Fetch related post titles
       let relatedIdToTitleMap = {};
       if (relatedPostIds.size > 0) {
-        const relatedPostConfig = {
+        const relatedData = await axios({
           method: 'post',
           url: 'https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query',
           headers: {
@@ -1596,17 +1599,40 @@ const userController = {
             },
             fieldsets: ['TITLE'],
           }),
-        };
+        });
 
-        const relatedData = await axios(relatedPostConfig);
         relatedData.data.posts.forEach((post) => {
           relatedIdToTitleMap[post.id] = post.title || '';
         });
       }
 
-      // Format the data
+      // Fetch tag labels
+      let tagIdToLabelMap = {};
+      if (allTagIds.size > 0) {
+        const tagData = await axios({
+          method: 'post',
+          url: 'https://manage.wix.com/_api/communities-blog-node-api/v3/tags/query',
+          headers: {
+            authorization: YOUR_AUTH_HEADER,
+            'X-XSRF-TOKEN': YOUR_XSRF_TOKEN,
+            'Content-Type': 'application/json',
+            Cookie: 'XSRF-TOKEN=YOUR_COOKIE',
+          },
+          data: JSON.stringify({
+            tagIds: [...allTagIds],
+          }),
+        });
+
+        tagData.data.tags.forEach((tag) => {
+          tagIdToLabelMap[tag.id] = tag.label || '';
+        });
+      }
+
+      // Format final data
       const formattedData = posts.map((post) => {
         const relatedIds = post.relatedPostIds || [];
+        const tagIds = post.tagIds || [];
+
         const relatedPostTitles = relatedIds
           .map((id) => relatedIdToTitleMap[id])
           .filter(Boolean)
@@ -1614,10 +1640,18 @@ const userController = {
 
         const relatedPostIdString = relatedIds.join(', ');
 
+        const tagLabels = tagIds
+          .map((id) => tagIdToLabelMap[id])
+          .filter(Boolean)
+          .join(', ');
+
+        const tagIdString = tagIds.join(', ');
+
         return {
           ID: post.id,
           Date: dayjs(post.lastPublishedDate).format('YYYY-MM-DD HH:mm:ss'),
           Title: post.title,
+          Tags: tagLabels,
           'Related Posts': relatedPostTitles,
           'Related Post IDs': relatedPostIdString,
         };
@@ -1627,6 +1661,7 @@ const userController = {
         'ID',
         'Date',
         'Title',
+        'Tags',
         'Related Posts',
         'Related Post IDs',
       ];
@@ -1634,11 +1669,11 @@ const userController = {
       const parser = new Parser({ fields });
       const csv = parser.parse(formattedData);
 
-      const outputPath = `D:/exports/wix_related_posts_limit-${limit}_offset-${offset}.csv`;
+      const outputPath = `D:/exports/wix_related_posts_tags_limit-${limit}_offset-${offset}.csv`;
       fs.writeFileSync(outputPath, '\uFEFF' + csv, { encoding: 'utf8' });
 
       return res.status(200).json({
-        message: 'CSV with related posts and IDs exported successfully.',
+        message: 'CSV with related posts and tags exported successfully.',
         path: outputPath,
       });
     } catch (error) {

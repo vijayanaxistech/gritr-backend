@@ -1525,7 +1525,7 @@ const userController = {
     }
   },
 
-  fetchWixPostsRPost: async (req, res) => {
+  fetchWixPostsRPost1: async (req, res) => {
     try {
       const { limit, offset } = req.body;
 
@@ -1606,32 +1606,9 @@ const userController = {
         });
       }
 
-      // Fetch tag labels
-      let tagIdToLabelMap = {};
-      if (allTagIds.size > 0) {
-        const tagData = await axios({
-          method: 'post',
-          url: 'https://manage.wix.com/_api/communities-blog-node-api/v3/tags/query',
-          headers: {
-            authorization: YOUR_AUTH_HEADER,
-            'X-XSRF-TOKEN': YOUR_XSRF_TOKEN,
-            'Content-Type': 'application/json',
-            Cookie: 'XSRF-TOKEN=YOUR_COOKIE',
-          },
-          data: JSON.stringify({
-            tagIds: [...allTagIds],
-          }),
-        });
-
-        tagData.data.tags.forEach((tag) => {
-          tagIdToLabelMap[tag.id] = tag.label || '';
-        });
-      }
-
       // Format final data
       const formattedData = posts.map((post) => {
         const relatedIds = post.relatedPostIds || [];
-        const tagIds = post.tagIds || [];
 
         const relatedPostTitles = relatedIds
           .map((id) => relatedIdToTitleMap[id])
@@ -1640,20 +1617,10 @@ const userController = {
 
         const relatedPostIdString = relatedIds.join(', ');
 
-        const tagLabels = tagIds
-          .map((id) => tagIdToLabelMap[id])
-          .filter(Boolean)
-          .join(', ');
-
-        const tagIdString = tagIds.join(', ');
-
         return {
           ID: post.id,
           Date: dayjs(post.lastPublishedDate).format('YYYY-MM-DD HH:mm:ss'),
           Title: post.title,
-          Tags: tagLabels,
-          'Related Posts': relatedPostTitles,
-          'Related Post IDs': relatedPostIdString,
         };
       });
 
@@ -1661,7 +1628,6 @@ const userController = {
         'ID',
         'Date',
         'Title',
-        'Tags',
         'Related Posts',
         'Related Post IDs',
       ];
@@ -1678,6 +1644,310 @@ const userController = {
       });
     } catch (error) {
       return res.status(500).json({ error: error.message });
+    }
+  },
+
+  fetchWixPostsRPost2: async (req, res) => {
+    try {
+      const { limit = 40, offset = 0 } = req.body;
+
+      const url =
+        'https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query';
+
+      const YOUR_AUTH_HEADER =
+        'eTKfBqB62PS7ghGuCzCFKD5CiNo6j5K6SDM9rJaq3Gw.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTIxVDExOjMxOjIyLjk0NFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMjFUMTU6MzE6MjIuOTQ0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+      const YOUR_XSRF_TOKEN =
+        'eTKfBqB62PS7ghGuCzCFKD5CiNo6j5K6SDM9rJaq3Gw.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTIxVDExOjMxOjIyLjk0NFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMjFUMTU6MzE6MjIuOTQ0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+
+      const COOKIE = 'XSRF-TOKEN=YOUR_COOKIE_HERE';
+
+      const requestBody = {
+        query: {
+          filter: {
+            language: 'en',
+            $and: [
+              { firstPublishedDate: { $gte: '2024-12-31T18:30:00.000Z' } },
+              { firstPublishedDate: { $lte: '2025-07-21T18:29:59.999Z' } },
+            ],
+          },
+          sort: [],
+          paging: { limit, offset },
+        },
+        fieldsets: ['METRICS', 'URL', 'TRANSLATIONS'],
+      };
+
+      const headers = {
+        authorization: YOUR_AUTH_HEADER,
+        'X-XSRF-TOKEN': YOUR_XSRF_TOKEN,
+        'Content-Type': 'application/json',
+        Cookie: COOKIE,
+      };
+
+      const response = await axios.post(url, requestBody, { headers });
+
+      const posts = response.data.posts || [];
+
+      // Helper function to get related post title
+      const getTitleById = async (id) => {
+        try {
+          const draftUrl = `https://manage.wix.com/_api/communities-blog-node-api/v3/draft-posts/${id}?draftPostId=${id}&fieldsets=RICH_CONTENT&fieldsets=URL&fieldsets=TRANSLATIONS`;
+          const response = await axios.get(draftUrl, { headers });
+          return response.data.draftPost?.title || '';
+        } catch (err) {
+          console.warn(`Failed to fetch title for ${id}`);
+          return '';
+        }
+      };
+
+      // Loop through posts and build final structure
+      const formattedData = [];
+
+      for (const post of posts) {
+        const tagIds = (post.tagIds || []).join(',');
+        const relatedPostIds = post.relatedPostIds || [];
+
+        // Fetch related post titles
+        const relatedTitles = [];
+        for (const relId of relatedPostIds) {
+          const title = await getTitleById(relId);
+          if (title) relatedTitles.push(title);
+        }
+
+        formattedData.push({
+          tagIds,
+          relatedPostIds: relatedPostIds.join(','),
+          relatedTitles: relatedTitles.join(', '), // semicolon-separated titles
+        });
+      }
+
+      const fields = ['tagIds', 'relatedPostIds', 'relatedTitles'];
+      const parser = new Parser({ fields });
+      const csv = parser.parse(formattedData);
+
+      const outputPath = `D:/exports/wix_related_posts_tags_limit-${limit}_offset-${offset}.csv`;
+      fs.writeFileSync(outputPath, '\uFEFF' + csv, { encoding: 'utf8' });
+
+      res.status(200).json({
+        message: 'CSV exported successfully',
+        filePath: outputPath,
+        count: posts.length,
+      });
+    } catch (error) {
+      console.error('❌ Error:', error.message);
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  fetchWixPostsRPost3: async (req, res) => {
+    try {
+      const { limit = 40, offset = 0 } = req.body;
+
+      const url =
+        'https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query';
+
+      const AUTH_HEADER =
+        'eTKfBqB62PS7ghGuCzCFKD5CiNo6j5K6SDM9rJaq3Gw.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTIxVDExOjMxOjIyLjk0NFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMjFUMTU6MzE6MjIuOTQ0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+      const XSRF_TOKEN =
+        'eTKfBqB62PS7ghGuCzCFKD5CiNo6j5K6SDM9rJaq3Gw.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTIxVDExOjMxOjIyLjk0NFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMjFUMTU6MzE6MjIuOTQ0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+
+      const COOKIE = 'XSRF-TOKEN=YOUR_COOKIE_HERE';
+      const headers = {
+        authorization: AUTH_HEADER,
+        'X-XSRF-TOKEN': XSRF_TOKEN,
+        'Content-Type': 'application/json',
+        Cookie: COOKIE,
+      };
+
+      const requestBody = {
+        query: {
+          filter: {
+            language: 'en',
+            $and: [
+              { firstPublishedDate: { $gte: '2024-12-31T18:30:00.000Z' } },
+              { firstPublishedDate: { $lte: '2025-07-21T18:29:59.999Z' } },
+            ],
+          },
+          sort: [],
+          paging: { limit, offset },
+        },
+        fieldsets: ['METRICS', 'URL', 'TRANSLATIONS'],
+      };
+
+      const response = await axios.post(url, requestBody, { headers });
+      const posts = response.data.posts || [];
+
+      const getTitleById = async (id) => {
+        try {
+          const draftUrl = `https://manage.wix.com/_api/communities-blog-node-api/v3/draft-posts/${id}?draftPostId=${id}&fieldsets=RICH_CONTENT&fieldsets=URL&fieldsets=TRANSLATIONS`;
+          const resp = await axios.get(draftUrl, { headers });
+          return resp.data.draftPost?.title || '';
+        } catch {
+          return '';
+        }
+      };
+
+      const formattedData = await Promise.all(
+        posts.map(async (post) => {
+          const tagIds = (post.tagIds || []).join(',');
+          const relatedPostIds = post.relatedPostIds || [];
+
+          // Fetch all related titles in parallel
+          const relatedTitles = await Promise.all(
+            relatedPostIds.map((id) => getTitleById(id))
+          );
+
+          return {
+            id: post.id,
+            title: post.title,
+            tagIds,
+            relatedPostIds: relatedPostIds.join(','),
+            relatedTitles: relatedTitles.filter(Boolean).join(', '),
+          };
+        })
+      );
+
+      const fields = [
+        'id',
+        'title',
+        'tagIds',
+        'relatedPostIds',
+        'relatedTitles',
+      ];
+      const parser = new Parser({ fields });
+      const csv = parser.parse(formattedData);
+
+      const outputPath = `D:/exports/wix_related_posts_tags_limit-${limit}_offset-${offset}.csv`;
+      fs.writeFileSync(outputPath, '\uFEFF' + csv, { encoding: 'utf8' });
+
+      res.status(200).json({
+        message: 'CSV exported successfully',
+        filePath: outputPath,
+        count: posts.length,
+      });
+    } catch (error) {
+      console.error('❌ Error:', error.message);
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  fetchWixPostsRPost: async (req, res) => {
+    try {
+      const { limit = 40, offset = 0 } = req.body;
+
+      const url =
+        'https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query';
+
+      const AUTH_HEADER =
+        'eTKfBqB62PS7ghGuCzCFKD5CiNo6j5K6SDM9rJaq3Gw.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTIxVDExOjMxOjIyLjk0NFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMjFUMTU6MzE6MjIuOTQ0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+      const XSRF_TOKEN =
+        'eTKfBqB62PS7ghGuCzCFKD5CiNo6j5K6SDM9rJaq3Gw.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTIxVDExOjMxOjIyLjk0NFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMjFUMTU6MzE6MjIuOTQ0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+
+      const COOKIE = 'XSRF-TOKEN=YOUR_COOKIE_HERE';
+
+      const headers = {
+        authorization: AUTH_HEADER,
+        'X-XSRF-TOKEN': XSRF_TOKEN,
+        'Content-Type': 'application/json',
+        Cookie: COOKIE,
+      };
+
+      const requestBody = {
+        query: {
+          filter: {
+            language: 'en',
+            $and: [
+              { firstPublishedDate: { $gte: '2024-12-31T18:30:00.000Z' } },
+              { firstPublishedDate: { $lte: '2025-07-21T18:29:59.999Z' } },
+            ],
+          },
+          sort: [],
+          paging: { limit, offset },
+        },
+        fieldsets: ['METRICS', 'URL', 'TRANSLATIONS'],
+      };
+
+      const response = await axios.post(url, requestBody, { headers });
+      const posts = response.data.posts || [];
+
+      // Collect all tag IDs across posts
+      const allTagIds = Array.from(
+        new Set(posts.flatMap((post) => post.tagIds || []))
+      );
+
+      // Fetch tag labels
+      const tagLabelResponse = await axios.post(
+        'https://manage.wix.com/_api/communities-blog-node-api/v3/tags/query',
+        {
+          query: {
+            paging: { limit: 100 },
+            filter: { id: { $in: allTagIds } },
+          },
+        },
+        { headers }
+      );
+
+      const tagMap = {};
+      (tagLabelResponse.data.tags || []).forEach((tag) => {
+        tagMap[tag.id] = tag.label;
+      });
+
+      const getTitleById = async (id) => {
+        try {
+          const draftUrl = `https://manage.wix.com/_api/communities-blog-node-api/v3/draft-posts/${id}?draftPostId=${id}&fieldsets=RICH_CONTENT&fieldsets=URL&fieldsets=TRANSLATIONS`;
+          const resp = await axios.get(draftUrl, { headers });
+          return resp.data.draftPost?.title || '';
+        } catch {
+          return '';
+        }
+      };
+
+      const formattedData = await Promise.all(
+        posts.map(async (post) => {
+          const tagIds = post.tagIds || [];
+          const relatedPostIds = post.relatedPostIds || [];
+
+          const relatedTitles = await Promise.all(
+            relatedPostIds.map((id) => getTitleById(id))
+          );
+
+          const tagLabels = tagIds
+            .map((id) => tagMap[id] || '')
+            .filter(Boolean)
+            .join(', ');
+
+          return {
+            ID: post.id,
+            Date: post.firstPublishedDate,
+            Title: post.title,
+            Tags: tagLabels,
+            'Related Posts': relatedTitles.filter(Boolean).join(', '),
+            'Related Post IDs': relatedPostIds.join(','),
+          };
+        })
+      );
+
+      const fields = [
+        'ID',
+        'Date',
+        'Title',
+        'Tags',
+        'Related Posts',
+        'Related Post IDs',
+      ];
+      const parser = new Parser({ fields });
+      const csv = parser.parse(formattedData);
+
+      const outputPath = `D:/exports/wix_related_posts_tags_limit-${limit}_offset-${offset}.csv`;
+      fs.writeFileSync(outputPath, '\uFEFF' + csv, { encoding: 'utf8' });
+
+      res.status(200).json({
+        message: 'CSV exported successfully',
+        filePath: outputPath,
+        count: posts.length,
+      });
+    } catch (error) {
+      console.error('❌ Error:', error.message);
+      res.status(500).json({ error: error.message });
     }
   },
 };

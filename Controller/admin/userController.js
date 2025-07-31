@@ -1838,10 +1838,9 @@ const userController = {
         'https://manage.wix.com/_api/communities-blog-node-api/v3/posts/query';
 
       const AUTH_HEADER =
-        'eTKfBqB62PS7ghGuCzCFKD5CiNo6j5K6SDM9rJaq3Gw.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTIxVDExOjMxOjIyLjk0NFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMjFUMTU6MzE6MjIuOTQ0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
+        'Atu-7aowF-6o2uWwkvLYxrP8fAQA1bF6oCl7VO0u1aU.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTMxVDA1OjMzOjI2LjYzNloiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMzFUMDk6MzM6MjYuNjM2WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
       const XSRF_TOKEN =
-        'eTKfBqB62PS7ghGuCzCFKD5CiNo6j5K6SDM9rJaq3Gw.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTIxVDExOjMxOjIyLjk0NFoiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMjFUMTU6MzE6MjIuOTQ0WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
-
+        'Atu-7aowF-6o2uWwkvLYxrP8fAQA1bF6oCl7VO0u1aU.eyJpbnN0YW5jZUlkIjoiNzcwZTkyMjgtNjk1NS00YjBlLTgwY2YtOTBkM2VhNjJlYjhlIiwiYXBwRGVmSWQiOiIxNGJjZGVkNy0wMDY2LTdjMzUtMTRkNy00NjZjYjNmMDkxMDMiLCJtZXRhU2l0ZUlkIjoiYjQ3M2JhMDYtMWY2Ni00NGY0LTk2ODQtODZmY2Y3OWFhY2EzIiwic2lnbkRhdGUiOiIyMDI1LTA3LTMxVDA1OjMzOjI2LjYzNloiLCJ1aWQiOiJmNTQzMWM0MS1kZTEwLTQyMTItYjhjNC0yNTEwZTM2MDM0ZmIiLCJwZXJtaXNzaW9ucyI6Ik9XTkVSIiwiZGVtb01vZGUiOmZhbHNlLCJiaVRva2VuIjoiYzM3ZDI4MmUtNzYzMy0wZmZhLTE2NGItMTYyZjFkZjg0NzJkIiwic2l0ZU93bmVySWQiOiI4MmNhMDRjYS1jYmVkLTRiN2ItODY3OS1iYjExYzFmZTZkNmYiLCJzaXRlTWVtYmVySWQiOiJhMDAwMzU4Mi0yZGMyLTQyNTgtYjU1ZS01NmYxZTg1YjM1YWEiLCJleHBpcmF0aW9uRGF0ZSI6IjIwMjUtMDctMzFUMDk6MzM6MjYuNjM2WiIsImxvZ2luQWNjb3VudElkIjoiZjU0MzFjNDEtZGUxMC00MjEyLWI4YzQtMjUxMGUzNjAzNGZiIiwibHBhaSI6bnVsbCwiYW9yIjp0cnVlLCJzY2QiOiIyMDIxLTAxLTE3VDIzOjI3OjM4LjI0NFoiLCJhY2QiOiIyMDI0LTEwLTMwVDE3OjQ0OjEzWiJ9';
       const COOKIE = 'XSRF-TOKEN=YOUR_COOKIE_HERE';
 
       const headers = {
@@ -1869,12 +1868,10 @@ const userController = {
       const response = await axios.post(url, requestBody, { headers });
       const posts = response.data.posts || [];
 
-      // Collect all tag IDs across posts
       const allTagIds = Array.from(
         new Set(posts.flatMap((post) => post.tagIds || []))
       );
 
-      // Fetch tag labels
       const tagLabelResponse = await axios.post(
         'https://manage.wix.com/_api/communities-blog-node-api/v3/tags/query',
         {
@@ -1891,13 +1888,25 @@ const userController = {
         tagMap[tag.id] = tag.label;
       });
 
-      const getTitleById = async (id) => {
+      const getPostMetaById = async (id) => {
         try {
           const draftUrl = `https://manage.wix.com/_api/communities-blog-node-api/v3/draft-posts/${id}?draftPostId=${id}&fieldsets=RICH_CONTENT&fieldsets=URL&fieldsets=TRANSLATIONS`;
           const resp = await axios.get(draftUrl, { headers });
-          return resp.data.draftPost?.title || '';
+
+          const post = resp.data.draftPost || {};
+          const title = post.title || '';
+
+          const descriptionTag = post.seoData?.tags?.find(
+            (tag) => tag.props?.name === 'description'
+          );
+          const description = descriptionTag?.props?.content || '';
+
+          const keywordsArray = post.seoData?.settings?.keywords || [];
+          const keywords = keywordsArray.map((k) => k.term).join(', ');
+
+          return { title, description, keywords };
         } catch {
-          return '';
+          return { title: '', description: '', keywords: '' };
         }
       };
 
@@ -1906,8 +1915,8 @@ const userController = {
           const tagIds = post.tagIds || [];
           const relatedPostIds = post.relatedPostIds || [];
 
-          const relatedTitles = await Promise.all(
-            relatedPostIds.map((id) => getTitleById(id))
+          const relatedMeta = await Promise.all(
+            relatedPostIds.map((id) => getPostMetaById(id))
           );
 
           const tagLabels = tagIds
@@ -1919,9 +1928,20 @@ const userController = {
             ID: post.id,
             Date: post.firstPublishedDate,
             Title: post.title,
-            Tags: tagLabels,
-            'Related Posts': relatedTitles.filter(Boolean).join(', '),
-            'Related Post IDs': relatedPostIds.join(','),
+            // Tags: tagLabels,
+            // 'Related Posts': relatedMeta
+            //   .map((m) => m.title)
+            //   .filter(Boolean)
+            //   .join(', '),
+            // 'Related Post IDs': relatedPostIds.join(','),
+            Descriptions: relatedMeta
+              .map((m) => m.description)
+              .filter(Boolean)
+              .join(' | '),
+            Keywords: relatedMeta
+              .map((m) => m.keywords)
+              .filter(Boolean)
+              .join(', '),
           };
         })
       );
@@ -1930,9 +1950,11 @@ const userController = {
         'ID',
         'Date',
         'Title',
-        'Tags',
-        'Related Posts',
-        'Related Post IDs',
+        // 'Tags',
+        // 'Related Posts',
+        // 'Related Post IDs',
+        'Descriptions',
+        'Keywords',
       ];
       const parser = new Parser({ fields });
       const csv = parser.parse(formattedData);
